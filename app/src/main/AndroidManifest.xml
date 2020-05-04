@@ -17,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".TestVideo"></activity>
+        <activity android:name=".VideoPlay">
+
+        </activity>
 
         <service
             android:name=".VideoLinkService"
@@ -34,6 +36,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
     </application>
 

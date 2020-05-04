@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:background="@color/white"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".VideoListing">
 
     <androidx.constraintlayout.widget.Guideline
@@ -14,21 +14,31 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.36388507" />
 
+    <ImageView
+        android:id="@+id/download"
+        android:layout_width="104dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/guideline24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline26"
+        app:layout_constraintTop_toTopOf="@+id/guideline23" />
+
     <TextView
         android:id="@+id/textView12"
         android:layout_width="match_parent"
-        android:layout_marginRight="25dp"
-        android:layout_marginLeft="25dp"
         android:layout_height="1dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
         android:background="@color/grey"
         app:layout_constraintTop_toTopOf="@+id/guideline23" />
 
     <TextView
-        android:layout_marginRight="25dp"
-        android:layout_marginLeft="25dp"
-
         android:layout_width="match_parent"
         android:layout_height="1dp"
+
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
         android:background="@color/grey"
         app:layout_constraintTop_toTopOf="@+id/guideline24" />
 
@@ -38,6 +48,15 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.48" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/guideline24"
+        app:layout_constraintEnd_toStartOf="@+id/download"
+        app:layout_constraintTop_toTopOf="@+id/guideline23"
+        app:srcCompat="@drawable/full_screen" />
 
     <VideoView
         android:id="@+id/videoView"
@@ -68,31 +87,31 @@
 
         <TextView
             android:id="@+id/topic"
-            android:fontFamily="@font/helvetica"
-            android:textColor="@color/black"
-            android:textSize="22sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Topic Name" />
+            android:fontFamily="@font/helvetica"
+            android:text="Topic Name"
+            android:textColor="@color/black"
+            android:textSize="22sp" />
 
         <TextView
             android:id="@+id/textView10"
-            android:textSize="15sp"
-            android:fontFamily="@font/helvetica"
-            android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Main Head" />
+            android:fontFamily="@font/helvetica"
+            android:text="Main Head"
+            android:textColor="@color/black"
+            android:textSize="15sp" />
 
         <TextView
-            android:textSize="12sp"
             android:id="@+id/textView11"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fontFamily="@font/helvetica"
             android:gravity="bottom|center"
             android:text="Teacher Name"
             android:textColor="@color/black"
-            android:fontFamily="@font/helvetica"/>
+            android:textSize="12sp" />
     </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
@@ -100,9 +119,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.61" />
+        app:layout_constraintGuide_percent="0.55" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/subject_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline25"
@@ -110,14 +130,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline24" />
 
-    <TextView
-        android:id="@+id/test"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/video_play_list"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline26"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.68613136" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

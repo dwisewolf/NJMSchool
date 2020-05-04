@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
         link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent msgIntent = new Intent(MainActivity.this, VideoListing.class);
+                Intent msgIntent = new Intent(MainActivity.this, SignUpActivity.class);
                 startActivity(msgIntent);
             }
         });

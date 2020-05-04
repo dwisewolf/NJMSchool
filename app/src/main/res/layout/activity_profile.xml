@@ -60,6 +60,7 @@
             android:orientation="horizontal">
 
             <androidx.cardview.widget.CardView
+                android:id="@+id/media_card"
                 android:layout_width="170dp"
                 android:layout_height="match_parent"
                 app:cardBackgroundColor="@color/c1"

@@ -1,11 +1,13 @@
 package com.wisewolf.njmschool;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -14,6 +16,7 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,7 +34,7 @@ import java.util.List;
 public class VideoListing extends AppCompatActivity {
 
 
-    String StudentClass = "2";
+    String StudentClass = "4";
     RecyclerView added_list;
 
 
@@ -55,6 +58,7 @@ public class VideoListing extends AppCompatActivity {
     TextView no_of_videos;
 
     ArrayList addedLessons = new ArrayList();
+    CardView mediaCard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +66,8 @@ public class VideoListing extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         topic = findViewById(R.id.profilepic);
         Glide.with(this).asGif().load(R.raw.profile).into(topic);
-        no_of_videos=findViewById(R.id.no_of_files);
+        no_of_videos = findViewById(R.id.no_of_files);
+        mediaCard=findViewById(R.id.media_card);
         // media("android.resource://" + getPackageName() + "/" + R.raw.v1); tobe used in video play screen
 
         ActionBar actionBar = getSupportActionBar();
@@ -79,19 +84,18 @@ public class VideoListing extends AppCompatActivity {
         allVideoList = (ArrayList) arrayList;
         GlobalData.ReservallVideoList = allVideoList;
         try {
-            allVideoList=   (ArrayList<Video>) ObjectSerialiser.deserialize(sharedPrefs.getString("task", ObjectSerialiser.serialize(new ArrayList<Video>())));
+            allVideoList = (ArrayList<Video>) ObjectSerialiser.deserialize(sharedPrefs.getString("task", ObjectSerialiser.serialize(new ArrayList<Video>())));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        allVideoList=(ArrayList) arrayList;
+        allVideoList = (ArrayList) arrayList;
 
 
         actionBar.hide();
 
         // media(videoList.data.get(1).files.get(0).link);
-
 
 
         for (int i = 0; i < allVideoList.size(); i++) {
@@ -110,7 +114,7 @@ public class VideoListing extends AppCompatActivity {
 
                 GlobalData.class12 = (aList);
 
-               // // allVideoList.remove(videoList);
+                // // allVideoList.remove(videoList);
             }
 
             if (classname.equals("C11")) {
@@ -124,7 +128,7 @@ public class VideoListing extends AppCompatActivity {
 
                 GlobalData.class11 = (aList);
 
-              //  // allVideoList.remove(videoList);
+                //  // allVideoList.remove(videoList);
             }
 
             if (classname.equals("C10")) {
@@ -138,7 +142,7 @@ public class VideoListing extends AppCompatActivity {
 
                 GlobalData.class10 = (aList);
 
-              //  // allVideoList.remove(videoList);
+                //  // allVideoList.remove(videoList);
             }
 
 
@@ -160,7 +164,7 @@ public class VideoListing extends AppCompatActivity {
 
                 GlobalData.class1 = (aList);
 
-              //  // allVideoList.remove(videoList);
+                //  // allVideoList.remove(videoList);
             }
 
             if (classname.equals("C2L")) {
@@ -174,7 +178,7 @@ public class VideoListing extends AppCompatActivity {
 
                 GlobalData.class2 = (aList);
 
-              //  // allVideoList.remove(videoList);
+                //  // allVideoList.remove(videoList);
             }
 
             if (classname.equals("C3L")) {
@@ -296,7 +300,7 @@ public class VideoListing extends AppCompatActivity {
             if (StudentClass.equals("12")) {
 
                 if (allVideoList12 != null) {
-                    no_of_videos.setText("Files - " +String.valueOf(allVideoList12.size()));
+
                     for (int i = 0; i < allVideoList12.size(); i++) {
                         Video videoList = (Video) allVideoList12.get(i);
                         String x = videoList.name;
@@ -314,7 +318,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS1 = (aList);
 
-                          //  allVideoList12.remove(videoList);
+                            //  allVideoList12.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -328,7 +332,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS2 = (aList);
 
-                          //  allVideoList12.remove(videoList);
+                            //  allVideoList12.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -342,7 +346,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS3 = (aList);
 
-                           // allVideoList12.remove(videoList);
+                            // allVideoList12.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -356,7 +360,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS4 = (aList);
 
-                         //   allVideoList12.remove(videoList);
+                            //   allVideoList12.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -384,7 +388,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS6 = (aList);
 
-                          //  allVideoList12.remove(videoList);
+                            //  allVideoList12.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -398,7 +402,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class12LS7 = (aList);
 
-                          //  allVideoList12.remove(videoList);
+                            //  allVideoList12.remove(videoList);
                         }
 
 
@@ -427,7 +431,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS1 = (aList);
 
-                          //  allVideoList11.remove(videoList);
+                            //  allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -441,7 +445,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS2 = (aList);
 
-                          //  allVideoList11.remove(videoList);
+                            //  allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -455,7 +459,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS3 = (aList);
 
-                           // allVideoList11.remove(videoList);
+                            // allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -469,7 +473,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS4 = (aList);
 
-                          //  allVideoList11.remove(videoList);
+                            //  allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -483,7 +487,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS5 = (aList);
 
-                         //   allVideoList11.remove(videoList);
+                            //   allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L6")) {
@@ -497,7 +501,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS6 = (aList);
 
-                          //  allVideoList11.remove(videoList);
+                            //  allVideoList11.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -511,7 +515,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class11LS7 = (aList);
 
-                           // allVideoList11.remove(videoList);
+                            // allVideoList11.remove(videoList);
                         }
 
 
@@ -539,7 +543,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS1 = (aList);
 
-                         //   allVideoList10.remove(videoList);
+                            //   allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -553,7 +557,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS2 = (aList);
 
-                          //  allVideoList10.remove(videoList);
+                            //  allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -567,7 +571,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS3 = (aList);
 
-                         //   allVideoList10.remove(videoList);
+                            //   allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -581,7 +585,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS4 = (aList);
 
-                          //  allVideoList10.remove(videoList);
+                            //  allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -595,7 +599,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS5 = (aList);
 
-                         //   allVideoList10.remove(videoList);
+                            //   allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L6")) {
@@ -609,7 +613,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS6 = (aList);
 
-                          //  allVideoList10.remove(videoList);
+                            //  allVideoList10.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -623,7 +627,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class10LS7 = (aList);
 
-                          //  allVideoList10.remove(videoList);
+                            //  allVideoList10.remove(videoList);
                         }
 
 
@@ -651,7 +655,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS1 = (aList);
 
-                         //   allVideoList1.remove(videoList);
+                            //   allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -665,7 +669,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS2 = (aList);
 
-                          //  allVideoList1.remove(videoList);
+                            //  allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -679,7 +683,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS3 = (aList);
 
-                         //   allVideoList1.remove(videoList);
+                            //   allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -693,7 +697,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS4 = (aList);
 
-                        //    allVideoList1.remove(videoList);
+                            //    allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -707,7 +711,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS5 = (aList);
 
-                         //   allVideoList1.remove(videoList);
+                            //   allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L6")) {
@@ -721,7 +725,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS6 = (aList);
 
-                         //   allVideoList1.remove(videoList);
+                            //   allVideoList1.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -735,7 +739,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class1LS7 = (aList);
 
-                          //  allVideoList1.remove(videoList);
+                            //  allVideoList1.remove(videoList);
                         }
 
 
@@ -763,7 +767,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS1 = (aList);
 
-                         //   allVideoList2.remove(videoList);
+                            //   allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -777,7 +781,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS2 = (aList);
 
-                         //   allVideoList2.remove(videoList);
+                            //   allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -791,7 +795,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS3 = (aList);
 
-                          //  allVideoList2.remove(videoList);
+                            //  allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -805,7 +809,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS4 = (aList);
 
-                          //  allVideoList2.remove(videoList);
+                            //  allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -819,7 +823,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS5 = (aList);
 
-                           // allVideoList2.remove(videoList);
+                            // allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L6")) {
@@ -833,7 +837,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS6 = (aList);
 
-                          //  allVideoList2.remove(videoList);
+                            //  allVideoList2.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -847,7 +851,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class2LS7 = (aList);
 
-                         //   allVideoList2.remove(videoList);
+                            //   allVideoList2.remove(videoList);
                         }
 
 
@@ -875,7 +879,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS1 = (aList);
 
-                         //   allVideoList3.remove(videoList);
+                            //   allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -889,7 +893,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS2 = (aList);
 
-                          //  allVideoList3.remove(videoList);
+                            //  allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L3")) {
@@ -903,7 +907,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS3 = (aList);
 
-                         //   allVideoList3.remove(videoList);
+                            //   allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L4")) {
@@ -917,7 +921,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS4 = (aList);
 
-                          //  allVideoList3.remove(videoList);
+                            //  allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L5")) {
@@ -931,7 +935,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS5 = (aList);
 
-                         //   allVideoList3.remove(videoList);
+                            //   allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L6")) {
@@ -945,7 +949,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS6 = (aList);
 
-                         //   allVideoList3.remove(videoList);
+                            //   allVideoList3.remove(videoList);
                         }
 
                         if (lesson.equals("L7")) {
@@ -959,7 +963,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class3LS7 = (aList);
 
-                       //     allVideoList3.remove(videoList);
+                            //     allVideoList3.remove(videoList);
                         }
 
 
@@ -987,7 +991,7 @@ public class VideoListing extends AppCompatActivity {
 
                             GlobalData.class4LS1 = (aList);
 
-                          //  //allVideoList4.remove(videoList);
+                            //  //allVideoList4.remove(videoList);
                         }
 
                         if (lesson.equals("L2")) {
@@ -1642,296 +1646,300 @@ public class VideoListing extends AppCompatActivity {
             Toast.makeText(this, String.valueOf(e), Toast.LENGTH_SHORT).show();
         }
 
-        if (StudentClass.equals("12")){
-            if (GlobalData.class12LS1!=null){
+        if (StudentClass.equals("12")) {
+            if (GlobalData.class12LS1 != null) {
                 addedLessons.addAll(GlobalData.class12LS1);
             }
-            if (GlobalData.class12LS2!=null){
+            if (GlobalData.class12LS2 != null) {
                 addedLessons.addAll(GlobalData.class12LS2);
             }
-            if (GlobalData.class12LS3!=null){
+            if (GlobalData.class12LS3 != null) {
                 addedLessons.addAll(GlobalData.class12LS3);
             }
-            if (GlobalData.class12LS4!=null){
+            if (GlobalData.class12LS4 != null) {
                 addedLessons.addAll(GlobalData.class12LS4);
             }
-            if (GlobalData.class12LS5!=null){
+            if (GlobalData.class12LS5 != null) {
                 addedLessons.addAll(GlobalData.class12LS5);
             }
-            if (GlobalData.class12LS6!=null){
+            if (GlobalData.class12LS6 != null) {
                 addedLessons.addAll(GlobalData.class12LS6);
             }
-            if (GlobalData.class12LS7!=null){
+            if (GlobalData.class12LS7 != null) {
                 addedLessons.addAll(GlobalData.class12LS7);
             }
         }
 
-        if (StudentClass.equals("11")){
-            if (GlobalData.class11LS1!=null){
+        if (StudentClass.equals("11")) {
+            if (GlobalData.class11LS1 != null) {
                 addedLessons.addAll(GlobalData.class11LS1);
             }
-            if (GlobalData.class11LS2!=null){
+            if (GlobalData.class11LS2 != null) {
                 addedLessons.addAll(GlobalData.class11LS2);
             }
-            if (GlobalData.class11LS3!=null){
+            if (GlobalData.class11LS3 != null) {
                 addedLessons.addAll(GlobalData.class11LS3);
             }
-            if (GlobalData.class11LS4!=null){
+            if (GlobalData.class11LS4 != null) {
                 addedLessons.addAll(GlobalData.class11LS4);
             }
-            if (GlobalData.class11LS5!=null){
+            if (GlobalData.class11LS5 != null) {
                 addedLessons.addAll(GlobalData.class11LS5);
             }
-            if (GlobalData.class11LS6!=null){
+            if (GlobalData.class11LS6 != null) {
                 addedLessons.addAll(GlobalData.class11LS6);
             }
-            if (GlobalData.class11LS7!=null){
+            if (GlobalData.class11LS7 != null) {
                 addedLessons.addAll(GlobalData.class11LS7);
             }
         }
 
-        if (StudentClass.equals("10")){
-            if (GlobalData.class10LS1!=null){
+        if (StudentClass.equals("10")) {
+            if (GlobalData.class10LS1 != null) {
                 addedLessons.addAll(GlobalData.class10LS1);
             }
-            if (GlobalData.class10LS2!=null){
+            if (GlobalData.class10LS2 != null) {
                 addedLessons.addAll(GlobalData.class10LS2);
             }
-            if (GlobalData.class10LS3!=null){
+            if (GlobalData.class10LS3 != null) {
                 addedLessons.addAll(GlobalData.class10LS3);
             }
-            if (GlobalData.class10LS4!=null){
+            if (GlobalData.class10LS4 != null) {
                 addedLessons.addAll(GlobalData.class10LS4);
             }
-            if (GlobalData.class10LS5!=null){
+            if (GlobalData.class10LS5 != null) {
                 addedLessons.addAll(GlobalData.class10LS5);
             }
-            if (GlobalData.class10LS6!=null){
+            if (GlobalData.class10LS6 != null) {
                 addedLessons.addAll(GlobalData.class10LS6);
             }
-            if (GlobalData.class10LS7!=null){
+            if (GlobalData.class10LS7 != null) {
                 addedLessons.addAll(GlobalData.class10LS7);
             }
         }
 
-        if (StudentClass.equals("9")){
-            if (GlobalData.class9LS1!=null){
+        if (StudentClass.equals("9")) {
+            if (GlobalData.class9LS1 != null) {
                 addedLessons.addAll(GlobalData.class9LS1);
             }
-            if (GlobalData.class9LS2!=null){
+            if (GlobalData.class9LS2 != null) {
                 addedLessons.addAll(GlobalData.class9LS2);
             }
-            if (GlobalData.class9LS3!=null){
+            if (GlobalData.class9LS3 != null) {
                 addedLessons.addAll(GlobalData.class9LS3);
             }
-            if (GlobalData.class9LS4!=null){
+            if (GlobalData.class9LS4 != null) {
                 addedLessons.addAll(GlobalData.class9LS4);
             }
-            if (GlobalData.class9LS5!=null){
+            if (GlobalData.class9LS5 != null) {
                 addedLessons.addAll(GlobalData.class9LS5);
             }
-            if (GlobalData.class9LS6!=null){
+            if (GlobalData.class9LS6 != null) {
                 addedLessons.addAll(GlobalData.class9LS6);
             }
-            if (GlobalData.class9LS7!=null){
+            if (GlobalData.class9LS7 != null) {
                 addedLessons.addAll(GlobalData.class9LS7);
             }
         }
 
-        if (StudentClass.equals("8")){
-            if (GlobalData.class8LS1!=null){
+        if (StudentClass.equals("8")) {
+            if (GlobalData.class8LS1 != null) {
                 addedLessons.addAll(GlobalData.class8LS1);
             }
-            if (GlobalData.class8LS2!=null){
+            if (GlobalData.class8LS2 != null) {
                 addedLessons.addAll(GlobalData.class8LS2);
             }
-            if (GlobalData.class8LS3!=null){
+            if (GlobalData.class8LS3 != null) {
                 addedLessons.addAll(GlobalData.class8LS3);
             }
-            if (GlobalData.class8LS4!=null){
+            if (GlobalData.class8LS4 != null) {
                 addedLessons.addAll(GlobalData.class8LS4);
             }
-            if (GlobalData.class8LS5!=null){
+            if (GlobalData.class8LS5 != null) {
                 addedLessons.addAll(GlobalData.class8LS5);
             }
-            if (GlobalData.class8LS6!=null){
+            if (GlobalData.class8LS6 != null) {
                 addedLessons.addAll(GlobalData.class8LS6);
             }
-            if (GlobalData.class8LS7!=null){
+            if (GlobalData.class8LS7 != null) {
                 addedLessons.addAll(GlobalData.class8LS7);
             }
         }
 
-        if (StudentClass.equals("7")){
-            if (GlobalData.class7LS1!=null){
+        if (StudentClass.equals("7")) {
+            if (GlobalData.class7LS1 != null) {
                 addedLessons.addAll(GlobalData.class7LS1);
             }
-            if (GlobalData.class7LS2!=null){
+            if (GlobalData.class7LS2 != null) {
                 addedLessons.addAll(GlobalData.class7LS2);
             }
-            if (GlobalData.class7LS3!=null){
+            if (GlobalData.class7LS3 != null) {
                 addedLessons.addAll(GlobalData.class7LS3);
             }
-            if (GlobalData.class7LS4!=null){
+            if (GlobalData.class7LS4 != null) {
                 addedLessons.addAll(GlobalData.class7LS4);
             }
-            if (GlobalData.class7LS5!=null){
+            if (GlobalData.class7LS5 != null) {
                 addedLessons.addAll(GlobalData.class7LS5);
             }
-            if (GlobalData.class7LS6!=null){
+            if (GlobalData.class7LS6 != null) {
                 addedLessons.addAll(GlobalData.class7LS6);
             }
-            if (GlobalData.class7LS7!=null){
+            if (GlobalData.class7LS7 != null) {
                 addedLessons.addAll(GlobalData.class7LS7);
             }
         }
 
-        if (StudentClass.equals("6")){
-            if (GlobalData.class6LS1!=null){
+        if (StudentClass.equals("6")) {
+            if (GlobalData.class6LS1 != null) {
                 addedLessons.addAll(GlobalData.class6LS1);
             }
-            if (GlobalData.class6LS2!=null){
+            if (GlobalData.class6LS2 != null) {
                 addedLessons.addAll(GlobalData.class6LS2);
             }
-            if (GlobalData.class6LS3!=null){
+            if (GlobalData.class6LS3 != null) {
                 addedLessons.addAll(GlobalData.class6LS3);
             }
-            if (GlobalData.class6LS4!=null){
+            if (GlobalData.class6LS4 != null) {
                 addedLessons.addAll(GlobalData.class6LS4);
             }
-            if (GlobalData.class6LS5!=null){
+            if (GlobalData.class6LS5 != null) {
                 addedLessons.addAll(GlobalData.class6LS5);
             }
-            if (GlobalData.class6LS6!=null){
+            if (GlobalData.class6LS6 != null) {
                 addedLessons.addAll(GlobalData.class6LS6);
             }
-            if (GlobalData.class6LS7!=null){
+            if (GlobalData.class6LS7 != null) {
                 addedLessons.addAll(GlobalData.class6LS7);
             }
         }
 
-        if (StudentClass.equals("5")){
-            if (GlobalData.class5LS1!=null){
+        if (StudentClass.equals("5")) {
+            if (GlobalData.class5LS1 != null) {
                 addedLessons.addAll(GlobalData.class5LS1);
             }
-            if (GlobalData.class5LS2!=null){
+            if (GlobalData.class5LS2 != null) {
                 addedLessons.addAll(GlobalData.class5LS2);
             }
-            if (GlobalData.class5LS3!=null){
+            if (GlobalData.class5LS3 != null) {
                 addedLessons.addAll(GlobalData.class5LS3);
             }
-            if (GlobalData.class5LS4!=null){
+            if (GlobalData.class5LS4 != null) {
                 addedLessons.addAll(GlobalData.class5LS4);
             }
-            if (GlobalData.class5LS5!=null){
+            if (GlobalData.class5LS5 != null) {
                 addedLessons.addAll(GlobalData.class5LS5);
             }
-            if (GlobalData.class5LS6!=null){
+            if (GlobalData.class5LS6 != null) {
                 addedLessons.addAll(GlobalData.class5LS6);
             }
-            if (GlobalData.class5LS7!=null){
+            if (GlobalData.class5LS7 != null) {
                 addedLessons.addAll(GlobalData.class5LS7);
             }
         }
 
-        if (StudentClass.equals("4")){
-            if (GlobalData.class4LS1!=null){
+        if (StudentClass.equals("4")) {
+            if (GlobalData.class4LS1 != null) {
                 addedLessons.addAll(GlobalData.class4LS1);
             }
-            if (GlobalData.class4LS2!=null){
+            if (GlobalData.class4LS2 != null) {
                 addedLessons.addAll(GlobalData.class4LS2);
             }
-            if (GlobalData.class4LS3!=null){
+            if (GlobalData.class4LS3 != null) {
                 addedLessons.addAll(GlobalData.class4LS3);
             }
-            if (GlobalData.class4LS4!=null){
+            if (GlobalData.class4LS4 != null) {
                 addedLessons.addAll(GlobalData.class4LS4);
             }
-            if (GlobalData.class4LS5!=null){
+            if (GlobalData.class4LS5 != null) {
                 addedLessons.addAll(GlobalData.class4LS5);
             }
-            if (GlobalData.class4LS6!=null){
+            if (GlobalData.class4LS6 != null) {
                 addedLessons.addAll(GlobalData.class4LS6);
             }
-            if (GlobalData.class4LS7!=null){
+            if (GlobalData.class4LS7 != null) {
                 addedLessons.addAll(GlobalData.class4LS7);
             }
         }
 
-        if (StudentClass.equals("3")){
-            if (GlobalData.class3LS1!=null){
+        if (StudentClass.equals("3")) {
+            if (GlobalData.class3LS1 != null) {
                 addedLessons.addAll(GlobalData.class3LS1);
             }
-            if (GlobalData.class3LS2!=null){
+            if (GlobalData.class3LS2 != null) {
                 addedLessons.addAll(GlobalData.class3LS2);
             }
-            if (GlobalData.class3LS3!=null){
+            if (GlobalData.class3LS3 != null) {
                 addedLessons.addAll(GlobalData.class3LS3);
             }
-            if (GlobalData.class3LS4!=null){
+            if (GlobalData.class3LS4 != null) {
                 addedLessons.addAll(GlobalData.class3LS4);
             }
-            if (GlobalData.class3LS5!=null){
+            if (GlobalData.class3LS5 != null) {
                 addedLessons.addAll(GlobalData.class3LS5);
             }
-            if (GlobalData.class3LS6!=null){
+            if (GlobalData.class3LS6 != null) {
                 addedLessons.addAll(GlobalData.class3LS6);
             }
-            if (GlobalData.class3LS7!=null){
+            if (GlobalData.class3LS7 != null) {
                 addedLessons.addAll(GlobalData.class3LS7);
             }
         }
 
-        if (StudentClass.equals("2")){
-            if (GlobalData.class2LS1!=null){
+        if (StudentClass.equals("2")) {
+            if (GlobalData.class2LS1 != null) {
                 addedLessons.addAll(GlobalData.class2LS1);
             }
-            if (GlobalData.class2LS2!=null){
+            if (GlobalData.class2LS2 != null) {
                 addedLessons.addAll(GlobalData.class2LS2);
             }
-            if (GlobalData.class2LS3!=null){
+            if (GlobalData.class2LS3 != null) {
                 addedLessons.addAll(GlobalData.class2LS3);
             }
-            if (GlobalData.class2LS4!=null){
+            if (GlobalData.class2LS4 != null) {
                 addedLessons.addAll(GlobalData.class2LS4);
             }
-            if (GlobalData.class2LS5!=null){
+            if (GlobalData.class2LS5 != null) {
                 addedLessons.addAll(GlobalData.class2LS5);
             }
-            if (GlobalData.class2LS6!=null){
+            if (GlobalData.class2LS6 != null) {
                 addedLessons.addAll(GlobalData.class2LS6);
             }
-            if (GlobalData.class2LS7!=null){
+            if (GlobalData.class2LS7 != null) {
                 addedLessons.addAll(GlobalData.class2LS7);
             }
         }
 
-        if (StudentClass.equals("1")){
-            if (GlobalData.class1LS1!=null){
+        if (StudentClass.equals("1")) {
+            if (GlobalData.class1LS1 != null) {
                 addedLessons.addAll(GlobalData.class1LS1);
             }
-            if (GlobalData.class1LS2!=null){
+            if (GlobalData.class1LS2 != null) {
                 addedLessons.addAll(GlobalData.class1LS2);
             }
-            if (GlobalData.class1LS3!=null){
+            if (GlobalData.class1LS3 != null) {
                 addedLessons.addAll(GlobalData.class1LS3);
             }
-            if (GlobalData.class1LS4!=null){
+            if (GlobalData.class1LS4 != null) {
                 addedLessons.addAll(GlobalData.class1LS4);
             }
-            if (GlobalData.class1LS5!=null){
+            if (GlobalData.class1LS5 != null) {
                 addedLessons.addAll(GlobalData.class1LS5);
             }
-            if (GlobalData.class1LS6!=null){
+            if (GlobalData.class1LS6 != null) {
                 addedLessons.addAll(GlobalData.class1LS6);
             }
-            if (GlobalData.class1LS7!=null){
+            if (GlobalData.class1LS7 != null) {
                 addedLessons.addAll(GlobalData.class1LS7);
             }
         }
-        GlobalData.addedVideos=addedLessons;
 
-        added_list=findViewById(R.id.added_list);
+
+        GlobalData.addedVideos = addedLessons;
+
+        no_of_videos.setText("Files - " + String.valueOf(addedLessons.size()));
+
+        added_list = findViewById(R.id.added_list);
         VideoAddedAdapter videoAddedAdapter = new
             VideoAddedAdapter(addedLessons, added_list);
         added_list.setAdapter(videoAddedAdapter);
@@ -1939,7 +1947,14 @@ public class VideoListing extends AppCompatActivity {
             = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         added_list.setLayoutManager(added_liste_adapterlayoutManager);
 
-        
+        mediaCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(VideoListing.this,VideoPlay.class);
+                intent.putExtra("class",StudentClass);
+                startActivity(intent);
+            }
+        });
 
 
     }
