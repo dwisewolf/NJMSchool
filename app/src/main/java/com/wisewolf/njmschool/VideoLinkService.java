@@ -4,9 +4,12 @@ import android.app.IntentService;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.vimeo.networking.Configuration;
 import com.vimeo.networking.VimeoClient;
 import com.vimeo.networking.callbacks.AuthCallback;
@@ -14,6 +17,7 @@ import com.vimeo.networking.callbacks.ModelCallback;
 import com.vimeo.networking.model.VideoList;
 import com.vimeo.networking.model.error.VimeoError;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -122,27 +126,31 @@ public class VideoLinkService extends IntentService {
                 public void success(VideoList videoList) {
 
                     if (videoList != null && videoList.data != null && !videoList.data.isEmpty()) {
-                        ArrayList allVideoList=new ArrayList();
-                        if(GlobalData.allVideoList != null){
-                            allVideoList=GlobalData.allVideoList;
+                        ArrayList allVideoList = new ArrayList();
+                        if (GlobalData.allVideoList != null) {
+                            allVideoList = GlobalData.allVideoList;
                         }
 
                         allVideoList.addAll(videoList.data);
 
-                         GlobalData.allVideoList=(allVideoList);
-
+                        GlobalData.allVideoList = (allVideoList);
 
 
                         allVideoList.addAll(videoList.data);
-                        String last_num=videoList.paging.last;
+                        String last_num = videoList.paging.last;
                         String[] parts = last_num.split("=");
-                        int x=Integer.parseInt(parts[1]);
-                        Log.d("eff",allVideoList.toString());
+                        int x = Integer.parseInt(parts[1]);
+                        Log.d("eff", allVideoList.toString());
+                        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoLinkService.this);
 
-                        for (int i=2;i<=x;i++){
-                            String uri=String.valueOf(i);
-                            uri="/me/videos?page="+uri;
-                            callApi(uri);
+                        String size = sharedPrefs.getString("size", "");
+
+                        if (!size.equals(String.valueOf(videoList.total))) {
+                            for (int i = 2; i <= x; i++) {
+                                String uri = String.valueOf(i);
+                                uri = "/me/videos?page=" + uri;
+                                callApi(uri);
+                            }
                         }
 
 
@@ -188,6 +196,20 @@ public class VideoLinkService extends IntentService {
                     allVideoList.addAll(videoList.data);
 
                     GlobalData.allVideoList=(allVideoList);
+                    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoLinkService.this);
+                    SharedPreferences.Editor editor = sharedPrefs.edit();
+                    Gson gson = new Gson();
+
+                    String json = gson.toJson(allVideoList);
+
+                    editor.putString("Allvideolist", json);
+                    editor.putString("size",String.valueOf(videoList.total));
+                    try {
+                        editor.putString("task",ObjectSerialiser.serialize(allVideoList));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    editor.commit();
 
                     Toast.makeText(VideoLinkService.this, "calling"+url, Toast.LENGTH_SHORT).show();
 

@@ -42,11 +42,12 @@ public class MainActivity extends AppCompatActivity {
 
         Intent msgIntent = new Intent(MainActivity.this, VideoLinkService.class);
         startService(msgIntent);
+        Toast.makeText(this, "bnm", Toast.LENGTH_SHORT).show();
 
         link.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent msgIntent = new Intent(MainActivity.this, TestVideo.class);
+                Intent msgIntent = new Intent(MainActivity.this, VideoListing.class);
                 startActivity(msgIntent);
             }
         });
