@@ -83,12 +83,11 @@ public class VideoAddedAdapter extends RecyclerView.Adapter<VideoAddedAdapter.Vi
                     if (video != null) {
 
 
-
-                            String cname = video.name;
+                        String cname = video.name;
                         cname = cname.substring(3);
 
-                            String lessonname = cname.substring(0, Math.min(cname.length(), 2));
-                            lesson.setText(lessonname);
+                        String lessonname = cname.substring(0, Math.min(cname.length(), 2));
+                        lesson.setText(lessonname);
                         cname = (video.name.substring(5)).substring(0, Math.min(cname.length(), 3));
                         part.setText(cname);
 

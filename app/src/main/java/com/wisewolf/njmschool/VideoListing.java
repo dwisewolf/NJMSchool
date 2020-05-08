@@ -1,13 +1,17 @@
 package com.wisewolf.njmschool;
 
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -30,11 +34,12 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class VideoListing extends AppCompatActivity {
 
 
-    String StudentClass = "4";
+    String StudentClass = "12";
     RecyclerView added_list;
 
 
@@ -55,10 +60,13 @@ public class VideoListing extends AppCompatActivity {
     ArrayList allVideoList10 = new ArrayList();
     ArrayList allVideoList11 = new ArrayList();
     ArrayList allVideoList12 = new ArrayList();
+    ArrayList allVideoListnrl = new ArrayList();
+    ArrayList allVideoListlkg = new ArrayList();
+    ArrayList allVideoListukg = new ArrayList();
     TextView no_of_videos;
 
     ArrayList addedLessons = new ArrayList();
-    CardView mediaCard;
+    CardView mediaCard,photocard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +76,13 @@ public class VideoListing extends AppCompatActivity {
         Glide.with(this).asGif().load(R.raw.profile).into(topic);
         no_of_videos = findViewById(R.id.no_of_files);
         mediaCard=findViewById(R.id.media_card);
+        photocard=findViewById(R.id.photo_card);
         // media("android.resource://" + getPackageName() + "/" + R.raw.v1); tobe used in video play screen
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
+        actionBar.hide();
 
 
         allVideoList = GlobalData.allVideoList;
@@ -94,6 +105,15 @@ public class VideoListing extends AppCompatActivity {
 
 
         actionBar.hide();
+
+        photocard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Video videoList = (Video) allVideoList.get(1);
+                String x = videoList.name;
+                downloadFile(videoList.files.get(0).link);
+            }
+        });
 
         // media(videoList.data.get(1).files.get(0).link);
 
@@ -141,6 +161,20 @@ public class VideoListing extends AppCompatActivity {
                 aList.add(videoList);
 
                 GlobalData.class10 = (aList);
+
+                //  // allVideoList.remove(videoList);
+            }
+
+            if (classname.equals("NRL")) {
+
+                ArrayList aList = new ArrayList();
+                if (GlobalData.classNRL != null) {
+                    aList = GlobalData.classNRL;
+                }
+
+                aList.add(videoList);
+
+                GlobalData.classNRL = (aList);
 
                 //  // allVideoList.remove(videoList);
             }
@@ -279,6 +313,34 @@ public class VideoListing extends AppCompatActivity {
                 // allVideoList.remove(videoList);
             }
 
+            if (classname.equals("LKL")) {
+
+                ArrayList aList = new ArrayList();
+                if (GlobalData.classlkg != null) {
+                    aList = GlobalData.classlkg;
+                }
+
+                aList.add(videoList);
+
+                GlobalData.classlkg = (aList);
+
+                // allVideoList.remove(videoList);
+            }
+
+            if (classname.equals("UKL")) {
+
+                ArrayList aList = new ArrayList();
+                if (GlobalData.classukg != null) {
+                    aList = GlobalData.classukg;
+                }
+
+                aList.add(videoList);
+
+                GlobalData.classukg = (aList);
+
+                // allVideoList.remove(videoList);
+            }
+
 
         }
 
@@ -294,9 +356,126 @@ public class VideoListing extends AppCompatActivity {
         allVideoList10 = GlobalData.class10;
         allVideoList11 = GlobalData.class11;
         allVideoList12 = GlobalData.class12;
+        allVideoListnrl = GlobalData.classNRL;
+        allVideoListlkg = GlobalData.classlkg;
+        allVideoListukg = GlobalData.classukg;
 
 
         try {
+            if (StudentClass.equals("nrl")) {
+
+                if (allVideoListnrl != null) {
+
+                    for (int i = 0; i < allVideoListnrl.size(); i++) {
+                        Video videoList = (Video) allVideoListnrl.get(i);
+                        String x = videoList.name;
+                        x = x.substring(3);
+
+                        String lesson = x.substring(0, Math.min(x.length(), 2));
+                        if (lesson.equals("L1")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS1 != null) {
+                                aList = GlobalData.classnrlLS1;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS1 = (aList);
+
+                            //  allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L2")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS2 != null) {
+                                aList = GlobalData.classnrlLS2;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS2 = (aList);
+
+                            //  allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L3")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS3 != null) {
+                                aList = GlobalData.classnrlLS3;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS3 = (aList);
+
+                            // allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L4")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS4 != null) {
+                                aList = GlobalData.classnrlLS4;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS4 = (aList);
+
+                            //   allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L5")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS5 != null) {
+                                aList = GlobalData.classnrlLS5;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS5 = (aList);
+
+                            //allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L6")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS6 != null) {
+                                aList = GlobalData.classnrlLS6;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS6 = (aList);
+
+                            //  allVideoList12.remove(videoList);
+                        }
+
+                        if (lesson.equals("L7")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classnrlLS7 != null) {
+                                aList = GlobalData.classnrlLS7;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classnrlLS7 = (aList);
+
+                            //  allVideoList12.remove(videoList);
+                        }
+
+
+                    }
+                }
+
+            }
+
             if (StudentClass.equals("12")) {
 
                 if (allVideoList12 != null) {
@@ -1642,6 +1821,232 @@ public class VideoListing extends AppCompatActivity {
                     }
                 }
             }
+
+            if (StudentClass.equals("LKG")) {
+                if (allVideoListlkg != null) {
+                    for (int i = 0; i < allVideoListlkg.size(); i++) {
+                        Video videoList = (Video) allVideoListlkg.get(i);
+                        String x = videoList.name;
+                        x = x.substring(2);
+
+                        String lesson = x.substring(0, Math.min(x.length(), 2));
+                        if (lesson.equals("L1")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS1 != null) {
+                                aList = GlobalData.classlkgLS1;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS1 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L2")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS2 != null) {
+                                aList = GlobalData.classlkgLS2;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS1 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L3")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS3 != null) {
+                                aList = GlobalData.classlkgLS3;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS3 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L4")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS4 != null) {
+                                aList = GlobalData.classlkgLS4;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS4 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L5")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS5 != null) {
+                                aList = GlobalData.classlkgLS5;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS5 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L6")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS6 != null) {
+                                aList = GlobalData.classlkgLS6;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS6 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L7")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classlkgLS7 != null) {
+                                aList = GlobalData.classlkgLS7;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classlkgLS7 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+
+                    }
+                }
+            }
+
+            if (StudentClass.equals("UKG")) {
+                if (allVideoListukg != null) {
+                    for (int i = 0; i < allVideoListukg.size(); i++) {
+                        Video videoList = (Video) allVideoListukg.get(i);
+                        String x = videoList.name;
+                        x = x.substring(2);
+
+                        String lesson = x.substring(0, Math.min(x.length(), 2));
+                        if (lesson.equals("L1")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS1 != null) {
+                                aList = GlobalData.classukgLS1;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS1 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L2")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS2 != null) {
+                                aList = GlobalData.classukgLS2;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS1 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L3")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS3 != null) {
+                                aList = GlobalData.classukgLS3;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS3 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L4")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS4 != null) {
+                                aList = GlobalData.classukgLS4;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS4 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L5")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS5 != null) {
+                                aList = GlobalData.classukgLS5;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS5 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L6")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS6 != null) {
+                                aList = GlobalData.classukgLS6;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS6 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+                        if (lesson.equals("L7")) {
+
+                            ArrayList aList = new ArrayList();
+                            if (GlobalData.classukgLS7 != null) {
+                                aList = GlobalData.classukgLS7;
+                            }
+
+                            aList.add(videoList);
+
+                            GlobalData.classukgLS7 = (aList);
+
+                            //allVideoList9.remove(videoList);
+                        }
+
+
+                    }
+                }
+            }
+
+           
+ 
+            
         } catch (Exception e) {
             Toast.makeText(this, String.valueOf(e), Toast.LENGTH_SHORT).show();
         }
@@ -1934,6 +2339,78 @@ public class VideoListing extends AppCompatActivity {
             }
         }
 
+        if (StudentClass.equals("NRL")) {
+            if (GlobalData.classnrlLS1 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS1);
+            }
+            if (GlobalData.classnrlLS2 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS2);
+            }
+            if (GlobalData.classnrlLS3 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS3);
+            }
+            if (GlobalData.classnrlLS4 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS4);
+            }
+            if (GlobalData.classnrlLS5 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS5);
+            }
+            if (GlobalData.classnrlLS6 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS6);
+            }
+            if (GlobalData.classnrlLS7 != null) {
+                addedLessons.addAll(GlobalData.classnrlLS7);
+            }
+        }
+
+        if (StudentClass.equals("LKG")) {
+            if (GlobalData.classlkgLS1 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS1);
+            }
+            if (GlobalData.classlkgLS2 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS2);
+            }
+            if (GlobalData.classlkgLS3 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS3);
+            }
+            if (GlobalData.classlkgLS4 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS4);
+            }
+            if (GlobalData.classlkgLS5 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS5);
+            }
+            if (GlobalData.classlkgLS6 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS6);
+            }
+            if (GlobalData.classlkgLS7 != null) {
+                addedLessons.addAll(GlobalData.classlkgLS7);
+            }
+        }
+
+        if (StudentClass.equals("UKG")) {
+            if (GlobalData.classukgLS1 != null) {
+                addedLessons.addAll(GlobalData.classukgLS1);
+            }
+            if (GlobalData.classukgLS2 != null) {
+                addedLessons.addAll(GlobalData.classukgLS2);
+            }
+            if (GlobalData.classukgLS3 != null) {
+                addedLessons.addAll(GlobalData.classukgLS3);
+            }
+            if (GlobalData.classukgLS4 != null) {
+                addedLessons.addAll(GlobalData.classukgLS4);
+            }
+            if (GlobalData.classukgLS5 != null) {
+                addedLessons.addAll(GlobalData.classukgLS5);
+            }
+            if (GlobalData.classukgLS6 != null) {
+                addedLessons.addAll(GlobalData.classukgLS6);
+            }
+            if (GlobalData.classukgLS7 != null) {
+                addedLessons.addAll(GlobalData.classukgLS7);
+            }
+        }
+
 
         GlobalData.addedVideos = addedLessons;
 
@@ -1981,6 +2458,26 @@ public class VideoListing extends AppCompatActivity {
             }
         });
     }*/
+
+    public void downloadFile(String s) {
+        String DownloadUrl = s;
+        DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(DownloadUrl));
+        request1.setDescription("Sample Music File");   //appears the same in Notification bar while downloading
+        request1.setTitle("Alphabet.mp4");
+        request1.setVisibleInDownloadsUi(false);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            request1.allowScanningByMediaScanner();
+            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+        }
+        request1.setDestinationInExternalFilesDir(getApplicationContext(), "/File", "Alphabet.mp4");
+
+        DownloadManager manager1 = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        Objects.requireNonNull(manager1).enqueue(request1);
+        if (DownloadManager.STATUS_SUCCESSFUL == 8) {
+            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 }
 

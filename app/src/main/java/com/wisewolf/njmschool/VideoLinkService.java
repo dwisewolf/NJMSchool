@@ -78,7 +78,7 @@ public class VideoLinkService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Toast.makeText(this, "hai", Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
@@ -117,7 +117,7 @@ public class VideoLinkService extends IntentService {
             }
 
             if (mApiClient.getVimeoAccount().getAccessToken() == null) {
-                Toast.makeText(this, "ds", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
             }
 
 

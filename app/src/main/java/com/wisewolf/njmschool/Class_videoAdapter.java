@@ -1,8 +1,10 @@
 package com.wisewolf.njmschool;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,12 +16,16 @@ import java.util.ArrayList;
 
 public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.ClassVideoViewHolder> {
     String student="4";
+    private static int lastClickedPosition = -1;
+    private int selectedItem=-1;
 
     public Class_videoAdapter( ArrayList recent_adds, RecyclerView recent_add_recyclerView, OnItemClickListener listener) {
 
         this.recent_adds = recent_adds;
         this.recent_add_recyclerView = recent_add_recyclerView;
         this.listener = listener;
+
+
     }
 
     private ArrayList recent_adds;
@@ -42,9 +48,14 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ClassVideoViewHolder holder, int position) {
+        holder.bgrndClr.setBackgroundColor(Color.parseColor("#FFFFFF"));
+
+        if (selectedItem == position) {
+            holder.bgrndClr.setBackgroundColor(Color.parseColor("#FFFFCCCC"));
+        }
 
         holder.set((Video) recent_adds.get(position));
-        holder.bind(recent_adds.get(position), listener);
+        holder.bind(recent_adds.get(position), listener,position);
 
     }
 
@@ -60,6 +71,7 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
     class ClassVideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         TextView lesson,subject,topic,part;
+        LinearLayout bgrndClr;
 
         public ClassVideoViewHolder(@NonNull View itemView ) {
             super(itemView);
@@ -67,6 +79,7 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
             subject=itemView.findViewById(R.id.sub_videoAdded);
             topic=itemView.findViewById(R.id.topic_videoAdded);
             part=itemView.findViewById(R.id.part_id);
+            bgrndClr=itemView.findViewById(R.id.bgrndClr);
         }
 
         public void set(Video video) {
@@ -113,11 +126,15 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
 
         }
 
-        public void bind(final Object o, final OnItemClickListener listener) {
+        public void bind(final Object o, final OnItemClickListener listener, final int position) {
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
                     listener.onItemClick((Video) o);
+                    int previousItem = selectedItem;
+                    selectedItem = position;
+                    notifyItemChanged(previousItem);
+                    notifyItemChanged(position);
                 }
             });
         }

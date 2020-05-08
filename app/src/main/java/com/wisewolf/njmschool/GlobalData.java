@@ -3,6 +3,7 @@ package com.wisewolf.njmschool;
 import android.app.Application;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GlobalData   {
 
@@ -26,6 +27,7 @@ public class GlobalData   {
     public static ArrayList class12 ;
     public static ArrayList classlkg ;
     public static ArrayList classukg ;
+    public static ArrayList classNRL ;
 
     public static ArrayList class1LS1 ;
     public static ArrayList class2LS1 ;
@@ -41,6 +43,7 @@ public class GlobalData   {
     public static ArrayList class12LS1 ;
     public static ArrayList classlkgLS1 ;
     public static ArrayList classukgLS1 ;
+    public static ArrayList classnrlLS1 ;
 
     public static ArrayList class1LS2;
     public static ArrayList class2LS2 ;
@@ -56,6 +59,7 @@ public class GlobalData   {
     public static ArrayList class12LS2 ;
     public static ArrayList classlkgLS2 ;
     public static ArrayList classukgLS2 ;
+    public static ArrayList classnrlLS2 ;
 
     public static ArrayList class1LS3 ;
     public static ArrayList class2LS3 ;
@@ -71,6 +75,7 @@ public class GlobalData   {
     public static ArrayList class12LS3 ;
     public static ArrayList classlkgLS3 ;
     public static ArrayList classukgLS3 ;
+    public static ArrayList classnrlLS3 ;
 
     public static ArrayList class1LS4 ;
     public static ArrayList class2LS4 ;
@@ -86,6 +91,7 @@ public class GlobalData   {
     public static ArrayList class12LS4 ;
     public static ArrayList classlkgLS4 ;
     public static ArrayList classukgLS4 ;
+    public static ArrayList classnrlLS4 ;
 
     public static ArrayList class1LS5 ;
     public static ArrayList class2LS5;
@@ -101,6 +107,7 @@ public class GlobalData   {
     public static ArrayList class12LS5 ;
     public static ArrayList classlkgLS5 ;
     public static ArrayList classukgLS5 ;
+    public static ArrayList classnrlLS5 ;
 
     public static ArrayList class1LS6 ;
     public static ArrayList class2LS6;
@@ -116,6 +123,7 @@ public class GlobalData   {
     public static ArrayList class12LS6 ;
     public static ArrayList classlkgLS6 ;
     public static ArrayList classukgLS6 ;
+    public static ArrayList classnrlLS6 ;
 
     public static ArrayList class1LS7 ;
     public static ArrayList class2LS7;
@@ -131,6 +139,10 @@ public class GlobalData   {
     public static ArrayList class12LS7 ;
     public static ArrayList classlkgLS7 ;
     public static ArrayList classukgLS7 ;
+    public static ArrayList classnrlLS7 ;
+
+
+    public static List profiles ;
 
 
 }

@@ -116,14 +116,16 @@
             android:background="@color/white"
             android:ems="10"
             android:inputType="phone"
-            android:text="Phone Number"
+            android:hint="Phone Number"
             android:paddingLeft="30dp"
             android:fontFamily="@font/helvetica"/>
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/password"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="30dp"
         app:cardElevation="5dp"
@@ -134,16 +136,15 @@
         app:layout_constraintTop_toTopOf="@+id/guideline11">
 
         <EditText
-            android:id="@+id/password"
+            android:id="@+id/pass_field"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/white"
             android:ems="10"
+            android:fontFamily="@font/helvetica"
             android:inputType="textPassword"
-            android:visibility="gone"
-            android:text="Password"
             android:paddingLeft="30dp"
-            android:fontFamily="@font/helvetica" />
+            android:hint="Password" />
     </androidx.cardview.widget.CardView>
 
     <androidx.cardview.widget.CardView

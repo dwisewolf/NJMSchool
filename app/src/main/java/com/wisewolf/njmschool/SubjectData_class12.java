@@ -3,6 +3,22 @@ package com.wisewolf.njmschool;
 import java.util.ArrayList;
 
 public class SubjectData_class12 {
+
+    public static ArrayList CLASS12EL1 ;
+    public static ArrayList CLASS12CMP ;
+    public static ArrayList CLASS12HNL ;
+    public static ArrayList CLASS12HIS ;
+    public static ArrayList CLASS12GEO ;
+    public static ArrayList CLASS12POL ;
+    public static ArrayList CLASS12ECO ;
+    public static ArrayList CLASS12MAT ;
+    public static ArrayList CLASS12PHY ;
+    public static ArrayList CLASS12CHE ;
+    public static ArrayList CLASS12BIO ;
+    public static ArrayList CLASS12PSY ;
+    public static ArrayList CLASS12BST ;
+    public static ArrayList CLASS12PED ;
+    
     public static ArrayList CLASS12LS1EL1 ;
     public static ArrayList CLASS12LS1CMP ;
     public static ArrayList CLASS12LS1HNL ;
