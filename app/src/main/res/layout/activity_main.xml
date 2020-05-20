@@ -25,15 +25,55 @@
         app:layout_constraintGuide_percent="0.5827633" />
 
     <TextView
-        android:id="@+id/videoLink"
+        android:translationZ="10dp"
+        android:elevation="10dp"
+        android:id="@+id/wait"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="NAVJEEVAN MISSION SHOOL"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/helvetica"
+        android:text="TextView"
         android:textColor="@color/black"
-        android:textSize="20dp"
-        android:fontFamily="@font/roboto_bold"
+        android:textSize="12sp"
         app:layout_constraintBottom_toTopOf="@+id/guideline"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@+id/guideline30" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline29"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.14637482" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline30"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.45690835" />
+
+    <ImageView
+        android:translationZ="10dp"
+        android:elevation="10dp"
+        android:id="@+id/logo_id"
+        android:layout_width="187dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/guideline30"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline29"
+        app:srcCompat="@drawable/logo_njms" />
+
+    <ImageView
+        android:id="@+id/loading"
+
+        android:layout_width="400dp"
+        android:layout_height="100dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline30"
+         />
 </androidx.constraintlayout.widget.ConstraintLayout>

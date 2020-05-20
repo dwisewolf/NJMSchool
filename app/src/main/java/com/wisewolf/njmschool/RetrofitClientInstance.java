@@ -1,5 +1,8 @@
 package com.wisewolf.njmschool;
 
+import com.wisewolf.njmschool.Models.Response;
+import com.wisewolf.njmschool.Models.VideoUp;
+
 import java.util.List;
 
 import retrofit2.Call;
@@ -31,12 +34,26 @@ public class RetrofitClientInstance {
 
         @POST("/checkNum/")
         @FormUrlEncoded
-        Call <Validation>  savePost(@Field("mobileNum") String phone);
+        Call<Validation> savePost(@Field("mobileNum") String phone);
 
-        @POST("/stu/")
+        @POST("/data/")
         @FormUrlEncoded
         Call<List<Response>> savePass(@Field("mobileNum") String phone,
-                                  @Field("password") String pass);
+                                      @Field("password") String pass);
+
+        @POST("/videoFile/")
+        @FormUrlEncoded
+        Call<VideoUp> saveVideo(@Field("userid") String userid,
+                                @Field("name") String name,
+                                @Field("video_link") String video_link,
+                                @Field("description") String description,
+                                @Field("thumbnail_link") String thumbnail_link,
+                                @Field("played_time") String played_time);
+
+        @POST("/getuserData/")
+        @FormUrlEncoded
+        Call<List<VideoUp>> getVideo(@Field("userid") String userid);
+
 
     }
 }

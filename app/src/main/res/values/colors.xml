@@ -9,9 +9,9 @@
     <color name="cream">#CCCACA</color>
     <color name="light_green">#4AC393</color>
     <color name="grey">#A49EBCB0</color>
-
-    <color name="c1">#99ff99</color>
-    <color name="c2">#80FFC107</color>
+    <color name="creamFluro">#79CCCACA</color>
+    <color name="c1">#b8e4d7</color>
+    <color name="c2">#ece0b4</color>
     <color name="c3">#802196F3</color>
 
     <color name="lesson">#ff4d4d</color>

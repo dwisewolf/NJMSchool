@@ -23,28 +23,47 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".StudentProfileSelection"></activity>
-        <activity android:name=".SignUp">
+        <activity android:name=".Activity.OfflinePlayFullScreen"
+            android:screenOrientation="landscape"></activity>
+        <activity
+            android:name=".Activity.Fullscreen"
+            android:screenOrientation="landscape" />
+        <activity android:name=".Activity.StudentProfileSelection" />
+        <activity android:name=".Activity.SignUp" />
+        <activity android:name=".Activity.VideoPlay" />
+
+        <service
+            android:name=".service.VideoLinkService"
+            android:exported="false" />
+
+        <activity
+            android:name=".Activity.VideoListing"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".kotlin.ProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".kotlin.Student_Select"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".kotlin.SignUpActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".kotlin.LoginActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".VideoPlay"
-            android:configChanges="keyboardHidden|orientation|screenSize" />
 
-        <service
-            android:name=".VideoLinkService"
-            android:exported="false" />
-
-        <activity android:name=".VideoListing"></activity>
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".Student_Select" />
-        <activity android:name=".SignUpActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
     </application>
 
 </manifest>
