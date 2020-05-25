@@ -104,7 +104,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         isStoragePermissionGranted();
         mProgressDialogInit();
-        userid=String.valueOf(GlobalData.regno);
+        userid=GlobalData.regno;
         dbb = new OfflineDatabase(getApplicationContext());
 
         ActionBar actionBar = getSupportActionBar();
@@ -142,58 +142,65 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    dbb.OfflineVideoss();
 
+                    Date c = Calendar.getInstance().getTime();
+                    int found = 0;
 
-                Date c = Calendar.getInstance().getTime();
-                int found = 0;
-
-                SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
-                String date = sd.format(new Date());
-                if (GlobalData.OfflineVideos==null){
-                    found=0;
-                }
-                else {for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
-                    OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
-                    if (selectedVideo.name.equals(offlineVideos.getName()))
-                        found = 1;
-
-
-                }}
-
-                if (found == 1) {
-                    Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
-                } else {
-                    if (c.before(selectedVideo.download.get(0).expires)) {
-                        String url = selectedVideo.download.get(0).link;
-                        download_name = selectedVideo.name;
-                        download_url = url;
-                        nametostore = selectedVideo.name;
-                        extra1 = selectedVideo.pictures.sizes.get(selectedVideo.pictures.sizes.size()-1).link;
-                        download();
-                    } else {
-                        new AlertDialog.Builder(VideoPlay.this)
-                            .setTitle("SECURITY ALERT")
-                            .setMessage("Please Restart the app to follow security policy.\n" +
-                                "Download Link Expires every day.")
-
-                            // Specifying a listener allows you to take an action before dismissing the dialog.
-                            // The dialog is automatically dismissed when a dialog button is clicked.
-                            .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoPlay.this);
-                                    SharedPreferences.Editor editor = sharedPrefs.edit();
-                                    editor.putString("size", "0");
-                                    editor.apply();
-                                  finishAffinity();
-                                }
-                            })
-
-                            // A null listener allows the button to dismiss the dialog and take no further action.
-                            .setNegativeButton("Later", null)
-                            .setIcon(android.R.drawable.ic_dialog_alert)
-                            .show();
+                    SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
+                    String date = sd.format(new Date());
+                    if (GlobalData.OfflineVideos==null){
+                        found=0;
                     }
+                    else {for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
+                        OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
+                        if (selectedVideo.name.equals(offlineVideos.getName()))
+                            found = 1;
+
+
+                    }}
+
+                    if (found == 1) {
+                        Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
+                    } else {
+                        if (c.before(selectedVideo.download.get(0).expires)) {
+                            String url = selectedVideo.download.get(0).link;
+                            download_name = selectedVideo.name;
+                            download_url = url;
+                            nametostore = selectedVideo.name;
+                            extra1 = selectedVideo.pictures.sizes.get(selectedVideo.pictures.sizes.size()-1).link;
+                            extra2=selectedVideo.description;
+                            download();
+                        } else {
+                            new AlertDialog.Builder(VideoPlay.this)
+                                .setTitle("SECURITY ALERT")
+                                .setMessage("Please Restart the app to follow security policy.\n" +
+                                    "Download Link Expires every day.")
+
+                                // Specifying a listener allows you to take an action before dismissing the dialog.
+                                // The dialog is automatically dismissed when a dialog button is clicked.
+                                .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoPlay.this);
+                                        SharedPreferences.Editor editor = sharedPrefs.edit();
+                                        editor.putString("size", "0");
+                                        editor.putString("Allvideolist", "");
+                                        editor.apply();
+                                        finishAffinity();
+                                        System.exit(0);
+                                    }
+                                })
+
+                                // A null listener allows the button to dismiss the dialog and take no further action.
+                                .setNegativeButton("Later", null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                        }
+                    }
+
                 }
+                catch (Exception ignored){}
 
 
             }
@@ -201,12 +208,12 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         videoListAdapter();
         media("android.resource://" + getPackageName() + "/" + R.raw.v1);
-        vURL = "\"android.resource://\" + getPackageName() + \"/\" + R.raw.v1";
+        vURL = "android.resource://" + getPackageName() + "/" + R.raw.v1;
 
         lesson_selectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Toast.makeText(VideoPlay.this, lessn[position] + " is showing", Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(VideoPlay.this, lessn[position] + " is showing", Toast.LENGTH_SHORT).show();
                 lesson_flag = lessn_code[position];
                 subj_wise_videoListAdapter(nowShowing);
             }
@@ -230,7 +237,9 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     private void download() {
         try{
-
+            videoView.pause();
+            if (videoView.isPlaying())
+                videoView.stopPlayback();
             Downback DB = new Downback();
             DB.execute("");
         }
@@ -286,7 +295,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                // dir_name = rootDir;
-                location = dir_name;
+                location = rootFile.toString();
 
                 boolean a=rootFile.mkdirs();
 
@@ -317,7 +326,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
                 f.close();
                 encry(buffer, new File(rootFile,
-                    name));
+                    name),rootFile);
 
                 s = "sucess";
 
@@ -334,84 +343,90 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     }
 
-    void encry(byte[] args, File file)   throws Exception {
+    void encry(byte[] args, File file, File rootFile)   throws Exception {
+        try {
+            // file to be encrypted
+            FileInputStream inFile = new FileInputStream(file);
 
-        // file to be encrypted
-        FileInputStream inFile = new FileInputStream(file);
-
-        SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
-        String date = sd.format(new Date());
-        String name = download_name + ".des";
-        String rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
+            String date = sd.format(new Date());
+            String name = download_name + ".des";
+     /*   String rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             + File.separator + "Fil";
         File rootFile = new File(rootDir);
-        rootFile.mkdir();
-        // encrypted file
-        FileOutputStream outFile = new FileOutputStream(new File(rootFile,
-            name));
+        rootFile.mkdir();*/
+            // encrypted file
+            FileOutputStream outFile = new FileOutputStream(new File(rootFile,
+                name));
 
-        // password to encrypt the file
-        String password = pass;
+            // password to encrypt the file
+            String password = pass;
 
-        // password, iv and salt should be transferred to the other end
-        // in a secure manner
+            // password, iv and salt should be transferred to the other end
+            // in a secure manner
 
-        // salt is used for encoding
-        // writing it to a file
-        // salt should be transferred to the recipient securely
-        // for decryption
-        byte[] salt = new byte[8];
-        SecureRandom secureRandom = new SecureRandom();
-        secureRandom.nextBytes(salt);
-        name =download_name+ "salt" + ".enc";
-        salt_name=name;  // to store in local db
-        FileOutputStream saltOutFile = new FileOutputStream(new File(rootFile,
-            name));
-        saltOutFile.write(salt);
-        saltOutFile.close();
+            // salt is used for encoding
+            // writing it to a file
+            // salt should be transferred to the recipient securely
+            // for decryption
+            byte[] salt = new byte[8];
+            SecureRandom secureRandom = new SecureRandom();
+            secureRandom.nextBytes(salt);
+            name =download_name+ "salt" + ".enc";
+            salt_name=name;  // to store in local db
+            FileOutputStream saltOutFile = new FileOutputStream(new File(rootFile,
+                name));
+            saltOutFile.write(salt);
+            saltOutFile.close();
 
-        SecretKeyFactory factory = SecretKeyFactory
-            .getInstance("PBKDF2WithHmacSHA1");
-        KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, 65536,
-            256);
-        SecretKey secretKey = factory.generateSecret(keySpec);
-        SecretKey secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
+            SecretKeyFactory factory = SecretKeyFactory
+                .getInstance("PBKDF2WithHmacSHA1");
+            KeySpec keySpec = new PBEKeySpec(password.toCharArray(), salt, 65536,
+                256);
+            SecretKey secretKey = factory.generateSecret(keySpec);
+            SecretKey secret = new SecretKeySpec(secretKey.getEncoded(), "AES");
 
-        //
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
-        AlgorithmParameters params = cipher.getParameters();
+            //
+            Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
+            AlgorithmParameters params = cipher.getParameters();
 
-        // iv adds randomness to the text and just makes the mechanism more
-        // secure
-        // used while initializing the cipher
-        // file to store the iv
-        name =download_name+ "iv" + ".enc";
-        inv_name=name;
-        FileOutputStream ivOutFile = new FileOutputStream(new File(rootFile,
-            name));
-        byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
-        ivOutFile.write(iv);
-        ivOutFile.close();
+            // iv adds randomness to the text and just makes the mechanism more
+            // secure
+            // used while initializing the cipher
+            // file to store the iv
+            name =download_name+ "iv" + ".enc";
+            inv_name=name;
+            FileOutputStream ivOutFile = new FileOutputStream(new File(rootFile,
+                name));
+            byte[] iv = params.getParameterSpec(IvParameterSpec.class).getIV();
+            ivOutFile.write(iv);
+            ivOutFile.close();
 
-        //file encryption
-        byte[] input = new byte[64];
-        int bytesRead;
+            //file encryption
+            byte[] input = new byte[64];
+            int bytesRead;
 
-        while ((bytesRead = inFile.read(input)) != -1) {
-            byte[] output = cipher.update(input, 0, bytesRead);
+            while ((bytesRead = inFile.read(input)) != -1) {
+                byte[] output = cipher.update(input, 0, bytesRead);
+                if (output != null)
+                    outFile.write(output);
+            }
+
+            byte[] output = cipher.doFinal();
             if (output != null)
                 outFile.write(output);
+
+            inFile.close();
+            outFile.flush();
+            outFile.close();
+            file.delete();
+
+        }catch (Exception e)
+        {
+            String a="";
         }
 
-        byte[] output = cipher.doFinal();
-        if (output != null)
-            outFile.write(output);
-
-        inFile.close();
-        outFile.flush();
-        outFile.close();
-        file.delete();
 
 
 
@@ -593,7 +608,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 vURL = item.files.get(0).link;
                 download.setVisibility(View.VISIBLE);
                 fullscreen.setVisibility(View.VISIBLE);
-                String regno=String.valueOf(GlobalData.regno);
+                String regno=GlobalData.regno;
                 Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
                 String[] time=String.valueOf(item.createdTime).split("\\s+");
                 final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
@@ -637,7 +652,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 download.setVisibility(View.VISIBLE);
                 fullscreen.setVisibility(View.VISIBLE);
                 Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
-                String regno=String.valueOf(GlobalData.regno);
+                String regno=GlobalData.regno;
                 String[] time=String.valueOf(item.createdTime).split("\\s+");
                 final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
 
@@ -678,7 +693,48 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
             }
 
-        } else {
+        }
+        else if (StudentClass.equals("6")){
+
+            String school=GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+            if (school.equals("AND")){
+                for (int i = 0; i < selectedVideoList.size(); i++) {
+                    Video video = (Video) selectedVideoList.get(i);
+                    if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
+                        lesn = (video.name.substring(3));
+                        lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                        if (lesn.equals(lesson_flag)) {
+                            returnVideo.add(selectedVideoList.get(i));
+                        }
+                    }
+                    else {
+                        lesn = (video.name.substring(2));
+                        lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                        if (lesn.equals(lesson_flag)) {
+                            returnVideo.add(selectedVideoList.get(i));
+                        }
+                    }
+
+
+                }
+
+            }
+            else {
+                for (int i = 0; i < selectedVideoList.size(); i++) {
+                    Video video = (Video) selectedVideoList.get(i);
+                    lesn = (video.name.substring(2));
+                    lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                    if (lesn.equals(lesson_flag)) {
+                        returnVideo.add(selectedVideoList.get(i));
+                    }
+
+                }
+            }
+
+        }
+
+        else {
+
             for (int i = 0; i < selectedVideoList.size(); i++) {
                 Video video = (Video) selectedVideoList.get(i);
                 lesn = (video.name.substring(2));
@@ -915,15 +971,49 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         ArrayList videoList = new ArrayList();
         videoList = GlobalData.addedVideos;
         String subj = "";
-        for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
-            subj = subj.substring(0, Math.min(subj.length(), 3));
-            if (subj.equals(subCode)) {
-                subject_videoList.add(videoList.get(i));
-            }
+        String school=GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+        if (school.equals("AND")){
 
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
+                    subj = (video.name.substring(5));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals(subCode)) {
+                        subject_videoList.add(videoList.get(i));
+                    }
+                }
+                else {
+                    subj = (video.name.substring(4));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
+                        if (subj.equals(subCode)) {
+                            subject_videoList.add(videoList.get(i));
+                        }
+                    }
+
+
+                }
+                subj = (video.name.substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
         }
+        else {
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                subj = (video.name.substring(4));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+        }
+
         subj_wise_videoListAdapter(subject_videoList);
     }
 
@@ -940,15 +1030,51 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         ArrayList videoList = new ArrayList();
         videoList = GlobalData.addedVideos;
         String subj = "";
-        for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
-            subj = subj.substring(0, Math.min(subj.length(), 3));
-            if (subj.equals(subCode)) {
-                subject_videoList.add(videoList.get(i));
-            }
 
+        String school=GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+        if (school.equals("AND")){
+
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
+                    subj = (video.name.substring(5));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals(subCode)) {
+                        subject_videoList.add(videoList.get(i));
+                    }
+                }
+                else {
+                    subj = (video.name.substring(4));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
+                        if (subj.equals(subCode)) {
+                            subject_videoList.add(videoList.get(i));
+                        }
+                    }
+
+
+                }
+                subj = (video.name.substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
         }
+        else {
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                subj = (video.name.substring(4));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+        }
+
+
         subj_wise_videoListAdapter(subject_videoList);
     }
 
@@ -964,16 +1090,53 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         ArrayList subject_videoList = new ArrayList();
         ArrayList videoList = new ArrayList();
         videoList = GlobalData.addedVideos;
+        String school=GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
         String subj = "";
-        for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
-            subj = subj.substring(0, Math.min(subj.length(), 3));
-            if (subj.equals(subCode)) {
-                subject_videoList.add(videoList.get(i));
-            }
+        if (school.equals("AND")){
 
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
+                    subj = (video.name.substring(5));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals(subCode)) {
+                        subject_videoList.add(videoList.get(i));
+                    }
+                }
+                else {
+                    subj = (video.name.substring(4));
+                    subj = subj.substring(0, Math.min(subj.length(), 3));
+                    if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
+                        if (subj.equals(subCode)) {
+                            subject_videoList.add(videoList.get(i));
+                        }
+                    }
+
+
+                }
+                subj = (video.name.substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
         }
+        else {
+            for (int i = 0; i < videoList.size(); i++) {
+                Video video = (Video) videoList.get(i);
+                subj = (video.name.substring(4));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+        }
+
+
+
+
         subj_wise_videoListAdapter(subject_videoList);
     }
 
@@ -1159,6 +1322,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         head.setText(detail[1]);
         teacher.setText(detail[2]);
 
+            mProgressDialog.setMessage("Please wait . . .");
+            mProgressDialog.setIndeterminate(true);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+
 
         //Use a media controller so that you can scroll the video contents
         //and also to pause, start the video.
@@ -1170,9 +1338,18 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoView.setVideoURI(Uri.parse(videoUrl));
         videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
+            public void onPrepared(final MediaPlayer mediaPlayer) {
                 mediaController.setAnchorView(videoView);
-                videoView.start();
+               // videoView.start();
+                mediaPlayer.start();
+                mProgressDialog.cancel();
+                mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                        mp.start();
+                        mProgressDialog.cancel();
+                    }
+                });
             }
         });
 

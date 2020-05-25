@@ -69,7 +69,7 @@ public class RecentPlayedAdapter extends RecyclerView.Adapter<RecentPlayedAdapte
 
     class RecentPlayedAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        TextView id1,id2,id3;
+        TextView id1,id2;
         ImageView thumb;
 
 
@@ -77,7 +77,6 @@ public class RecentPlayedAdapter extends RecyclerView.Adapter<RecentPlayedAdapte
             super(itemView);
             id1=itemView.findViewById(R.id.id1);
             id2=itemView.findViewById(R.id.id2);
-            id3=itemView.findViewById(R.id.id3);
             thumb=itemView.findViewById(R.id.thumb_id);
         }
 
@@ -89,9 +88,16 @@ public class RecentPlayedAdapter extends RecyclerView.Adapter<RecentPlayedAdapte
 
                 .centerCrop()
                 .into( thumb);
-            id1.setText(o.getName());
-            id2.setText(o.getName());
-            id3.setText(o.getName());
+            try {
+                String[] split=o.getDescription().split("-");
+                id1.setText(split[1]);
+                id2.setText(split[2]);
+
+            }catch (Exception e)
+            {
+
+            }
+
 
 
         }

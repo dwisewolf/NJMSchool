@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Response;
+import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.Validation;
@@ -54,6 +55,7 @@ public class SignUp extends AppCompatActivity {
         signUp = findViewById(R.id.button);
         passCard=findViewById(R.id.password);
         passCard.setVisibility(View.GONE);
+
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -82,6 +84,7 @@ public class SignUp extends AppCompatActivity {
                     public void onResponse(Call<Validation> call, retrofit2.Response<Validation> response) {
                         try {
                             if (response.body().getResults().equals("Mobile Number is Valid...")){
+
                                 Toast.makeText(SignUp.this, "Enter password to register", Toast.LENGTH_SHORT).show();
                                 check.setText("Enter password to register....");
                                 signUp.setVisibility(View.VISIBLE);
@@ -89,7 +92,7 @@ public class SignUp extends AppCompatActivity {
 
                             }
                             else {
-                                Toast.makeText(SignUp.this, "Number not present !! contact office", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(SignUp.this, "Number not present !! Please contact School office", Toast.LENGTH_LONG).show();
                             }
 
                         }
@@ -113,10 +116,11 @@ public class SignUp extends AppCompatActivity {
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Call<List<Response>> call = service.savePass(phone.getText().toString(),password.getText().toString());
-                call.enqueue(new Callback<List<Response>>() {
+
+                Call<List<SchoolDiff>> get_categ = service.get_Categ(phone.getText().toString(),password.getText().toString());
+                get_categ.enqueue(new Callback<List<SchoolDiff>>() {
                     @Override
-                    public void onResponse(Call<List<Response>> call, retrofit2.Response<List<Response>> response) {
+                    public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
                         if (response!=null) {
                             GlobalData.profiles=response.body();
                             Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
@@ -125,10 +129,11 @@ public class SignUp extends AppCompatActivity {
                     }
 
                     @Override
-                    public void onFailure(Call<List<Response>> call, Throwable t) {
+                    public void onFailure(Call<List<SchoolDiff>> call, Throwable t) {
                         Toast.makeText(SignUp.this, "Something is wrong", Toast.LENGTH_SHORT).show();
                     }
                 });
+
             }
         });
 

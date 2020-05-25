@@ -23,14 +23,14 @@ import com.wisewolf.njmschool.R;
 import java.io.File;
 import java.util.ArrayList;
 
-public class OfflineVideoAdapter extends RecyclerView.Adapter<OfflineVideoAdapter.OfflineViewHolder> {
+public class OfflineMainAdapter extends RecyclerView.Adapter<OfflineMainAdapter.OfflineMainAdapterHolder> {
     private ArrayList offlineList;
     private Context context;
     private RecyclerView recent_add_recyclerView;
     private final  OnItemClickListener listener;
     private final  OnLongClickListener longlistener;
 
-    public OfflineVideoAdapter(ArrayList offlineList, Context context, RecyclerView recent_add_recyclerView, OnItemClickListener listener , OnLongClickListener longlistner) {
+    public OfflineMainAdapter(ArrayList offlineList, Context context, RecyclerView recent_add_recyclerView, OnItemClickListener listener , OnLongClickListener longlistner) {
         this.offlineList = offlineList;
         this.context = context;
         this.recent_add_recyclerView = recent_add_recyclerView;
@@ -40,19 +40,19 @@ public class OfflineVideoAdapter extends RecyclerView.Adapter<OfflineVideoAdapte
 
     @NonNull
     @Override
-    public OfflineViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public OfflineMainAdapterHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v= LayoutInflater.from(parent.getContext()).inflate(
-            R.layout.offlinevideo_card,
+            R.layout.offline_card_main,
             parent,
             false
         );
 
-       OfflineViewHolder viewHolder = new OfflineViewHolder(v);
+        OfflineMainAdapterHolder viewHolder = new OfflineMainAdapterHolder(v);
         return viewHolder;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull OfflineViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull OfflineMainAdapterHolder holder, int position) {
         holder.set(((OfflineVideos)offlineList.get(position)));
         holder.bind(offlineList.get(position), listener,position,longlistener);
     }
@@ -69,15 +69,15 @@ public class OfflineVideoAdapter extends RecyclerView.Adapter<OfflineVideoAdapte
         void onItemLongClick(OfflineVideos item);
     }
 
-    class OfflineViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener{
+    class OfflineMainAdapterHolder extends RecyclerView.ViewHolder implements View.OnClickListener,View.OnLongClickListener{
         TextView id1,id2;
         ImageView thumb;
 
-        public OfflineViewHolder(@NonNull View itemView) {
+        public OfflineMainAdapterHolder(@NonNull View itemView) {
             super(itemView);
-            id1=itemView.findViewById(R.id.id1);
-            id2=itemView.findViewById(R.id.id2);
-            thumb=itemView.findViewById(R.id.thumb_id);
+            id1=itemView.findViewById(R.id.topic_tv_id);
+            id2=itemView.findViewById(R.id.teacher_id_tv);
+            thumb=itemView.findViewById(R.id.thumb_nail_id);
         }
 
         @Override

@@ -10,7 +10,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.view.View;
 import android.view.WindowManager;
@@ -42,6 +44,12 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
         file=intent.getStringExtra("root");
         name=intent.getStringExtra("name");
         File rootFile = new File(file);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+        else
+            rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                + File.separator + "Fil");
+
         File play=new File(rootFile,name+".mp4");
         delete=play;
 

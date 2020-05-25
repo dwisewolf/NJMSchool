@@ -1,11 +1,16 @@
 package com.wisewolf.njmschool.Activity;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -26,12 +31,22 @@ import com.vimeo.networking.callbacks.ModelCallback;
 import com.vimeo.networking.model.Video;
 import com.vimeo.networking.model.VideoList;
 import com.vimeo.networking.model.error.VimeoError;
+import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
+import com.wisewolf.njmschool.Models.OfflineVideos;
+import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.ObjectSerialiser;
 import com.wisewolf.njmschool.R;
+import com.wisewolf.njmschool.RetrofitClientInstance;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
     ImageView education,logo,load;
@@ -40,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
     String  lastpage="";
 
 
-    ArrayList allVideoList = new ArrayList();
+    ArrayList allVideoList_1stcall = new ArrayList();
 
 
 
@@ -60,6 +75,7 @@ public class MainActivity extends AppCompatActivity {
 
                 Glide.with(MainActivity.this).asGif().load(R.raw.educat).into(education);
                 Glide.with(MainActivity.this).asGif().load(R.raw.loading).into(load);
+
 
             }
         });
@@ -104,7 +120,32 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
         }
 
-        download();
+        if (isNetworkAvailable()){
+            download();
+        }
+        else {
+            new AlertDialog.Builder(MainActivity.this)
+                .setTitle("OOPS....")
+                .setMessage("You are not connected to INTERNET..")
+
+                // Specifying a listener allows you to take an action before dismissing the dialog.
+                // The dialog is automatically dismissed when a dialog button is clicked.
+                .setPositiveButton("OFFLINE", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent msgIntent = new Intent(MainActivity.this, OfflineScreen.class);
+                        startActivity(msgIntent);
+
+                    }
+                })
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setNegativeButton("CLOSE", null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+        }
+
+
+
 
 
 
@@ -118,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
     private void download() {
         Downback DB = new Downback();
@@ -139,16 +182,18 @@ public class MainActivity extends AppCompatActivity {
 
                     if (videoList != null && videoList.data != null && !videoList.data.isEmpty()) {
                         ArrayList allVideoList = new ArrayList();
-                        if (GlobalData.allVideoList != null) {
+                    /* did now   if (GlobalData.allVideoList != null) {
                             allVideoList = GlobalData.allVideoList;
                         }
 
                         allVideoList.addAll(videoList.data);
 
-                        GlobalData.allVideoList = (allVideoList);
+                        GlobalData.allVideoList = (allVideoList);*/
+
+                        allVideoList_1stcall=videoList.data;
 
 
-                        allVideoList.addAll(videoList.data);
+                     //   allVideoList.addAll(videoList.data);
                         String last_num = videoList.paging.last;
                         String[] parts = last_num.split("=");
                         int x = Integer.parseInt(parts[1]);
@@ -195,20 +240,23 @@ public class MainActivity extends AppCompatActivity {
 
                 if (videoList != null && videoList.data != null && !videoList.data.isEmpty()) {
 
-                    ArrayList allVideoList=GlobalData.allVideoList;
-                    allVideoList.addAll(videoList.data);
+                    /*did now  ArrayList allVideoList= allVideoList_1stcall;
+                    allVideoList.addAll(videoList.data);*/
 
-                    GlobalData.allVideoList=(allVideoList);
+
+                    allVideoList_1stcall.addAll(videoList.data);
+                    GlobalData.allVideoList=(allVideoList_1stcall);
+                  // did now GlobalData.allVideoList=(allVideoList);
                     SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                     SharedPreferences.Editor editor = sharedPrefs.edit();
                     Gson gson = new Gson();
 
-                    String json = gson.toJson(allVideoList);
-
+//            did now        String json = gson.toJson(allVideoList);
+                    String json = gson.toJson(allVideoList_1stcall);
                     editor.putString("Allvideolist", json);
                     editor.putString("size",String.valueOf(videoList.total));
                     try {
-                        editor.putString("task", ObjectSerialiser.serialize(allVideoList));
+                        editor.putString("task", ObjectSerialiser.serialize(allVideoList_1stcall));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -234,6 +282,13 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+            = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
 }

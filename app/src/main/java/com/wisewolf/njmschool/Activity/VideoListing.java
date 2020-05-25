@@ -76,7 +76,8 @@ public class VideoListing extends AppCompatActivity {
 
     private ProgressDialog mProgressDialog;
     Video videoTest;
-    ImageView topic;
+    ImageView topic,logout;
+    int exitflag=0;
 
     ArrayList allVideoList = new ArrayList();
     ArrayList allVideoList1 = new ArrayList();
@@ -85,6 +86,7 @@ public class VideoListing extends AppCompatActivity {
     ArrayList allVideoList4 = new ArrayList();
     ArrayList allVideoList5 = new ArrayList();
     ArrayList allVideoList6 = new ArrayList();
+    ArrayList allVideoListN6 = new ArrayList();
     ArrayList allVideoList7 = new ArrayList();
     ArrayList allVideoList8 = new ArrayList();
     ArrayList allVideoList9 = new ArrayList();
@@ -105,6 +107,8 @@ public class VideoListing extends AppCompatActivity {
         super.onResume();
 
         try{
+
+
             recentVideos();
             runOnUiThread(new Runnable() {
                 @Override
@@ -129,7 +133,7 @@ public class VideoListing extends AppCompatActivity {
             public void run() {
 
                 final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-                String regno=String.valueOf(GlobalData.regno);
+                String regno=GlobalData.regno;
                 Call<List<VideoUp>> getVideo = service.getVideo(regno);
                 getVideo.enqueue(new Callback<List<VideoUp>>() {
                     @Override
@@ -194,6 +198,7 @@ public class VideoListing extends AppCompatActivity {
         added_list = findViewById(R.id.added_list);
         recentVideo = findViewById(R.id.recent_video);
         playFlag = findViewById(R.id.playListFlag);
+        logout = findViewById(R.id.logout);
 
         // media("android.resource://" + getPackageName() + "/" + R.raw.v1); tobe used in video play screen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -256,6 +261,12 @@ public class VideoListing extends AppCompatActivity {
                 Toast.makeText(VideoListing.this, "update coming soon....", Toast.LENGTH_SHORT).show();
             }
         });
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout_funct();
+            }
+        });
 
         // media(videoList.data.get(1).files.get(0).link);
 
@@ -267,6 +278,8 @@ public class VideoListing extends AppCompatActivity {
                     String x = videoList.name;
 
                     String classname = x.substring(0, Math.min(x.length(), 3));
+
+
                     if (classname.equals("C12")) {
 
                         ArrayList aList = new ArrayList();
@@ -308,8 +321,6 @@ public class VideoListing extends AppCompatActivity {
 
                         //  // allVideoList.remove(videoList);
                     }
-
-
 
 
                 }
@@ -390,6 +401,20 @@ public class VideoListing extends AppCompatActivity {
                     }
 
                     if (classname.equals("C6L")) {
+
+                        ArrayList aList = new ArrayList();
+                        if (GlobalData.class6 != null) {
+                            aList = GlobalData.class6;
+                        }
+
+                        aList.add(videoList);
+
+                        GlobalData.class6 = (aList);
+
+                        // allVideoList.remove(videoList);
+                    }
+
+                    if (classname.equals("NC6")) {
 
                         ArrayList aList = new ArrayList();
                         if (GlobalData.class6 != null) {
@@ -511,10 +536,149 @@ public class VideoListing extends AppCompatActivity {
 
     }
 
+    private void logout_funct() {
+        GlobalData.addedVideos=new ArrayList();
+        GlobalData.ReservallVideoList =new ArrayList();
+
+        GlobalData.addedVideos =new ArrayList();
+
+        GlobalData.class1 =new ArrayList();
+        GlobalData.class2 =new ArrayList();
+        GlobalData.class3 =new ArrayList();
+        GlobalData.class4 =new ArrayList();
+        GlobalData.class5 =new ArrayList();
+        GlobalData.class6 =new ArrayList();
+        GlobalData.classN6 =new ArrayList();
+        GlobalData.class7 =new ArrayList();
+        GlobalData.class8 =new ArrayList();
+        GlobalData.class9 =new ArrayList();
+        GlobalData.class10 =new ArrayList();
+        GlobalData.class11 =new ArrayList();
+        GlobalData.class12 =new ArrayList();
+        GlobalData.classlkg =new ArrayList();
+        GlobalData.classukg =new ArrayList();
+        GlobalData.classNRL =new ArrayList();
+
+        GlobalData.class1LS1 =new ArrayList();
+        GlobalData.class2LS1 =new ArrayList();
+        GlobalData.class3LS1 =new ArrayList();
+        GlobalData.class4LS1 =new ArrayList();
+        GlobalData.class5LS1 =new ArrayList();
+        GlobalData.class6LS1 =new ArrayList();
+        GlobalData.class7LS1 =new ArrayList();
+        GlobalData.class8LS1 =new ArrayList();
+        GlobalData.class9LS1 =new ArrayList();
+        GlobalData.class10LS1 =new ArrayList();
+        GlobalData.class11LS1 =new ArrayList();
+        GlobalData.class12LS1 =new ArrayList();
+        GlobalData.classlkgLS1 =new ArrayList();
+        GlobalData.classukgLS1 =new ArrayList();
+        GlobalData.classnrlLS1 =new ArrayList();
+
+        GlobalData.class1LS2=new ArrayList();
+        GlobalData.class2LS2 =new ArrayList();
+        GlobalData.class3LS2 =new ArrayList();
+        GlobalData.class4LS2 =new ArrayList();
+        GlobalData.class5LS2 =new ArrayList();
+        GlobalData.class6LS2 =new ArrayList();
+        GlobalData.class7LS2 =new ArrayList();
+        GlobalData.class8LS2 =new ArrayList();
+        GlobalData.class9LS2 =new ArrayList();
+        GlobalData.class10LS2 =new ArrayList();
+        GlobalData.class11LS2 =new ArrayList();
+        GlobalData.class12LS2 =new ArrayList();
+        GlobalData.classlkgLS2 =new ArrayList();
+        GlobalData.classukgLS2 =new ArrayList();
+        GlobalData.classnrlLS2 =new ArrayList();
+
+        GlobalData.class1LS3 =new ArrayList();
+        GlobalData.class2LS3 =new ArrayList();
+        GlobalData.class3LS3 =new ArrayList();
+        GlobalData.class4LS3 =new ArrayList();
+        GlobalData.class5LS3 =new ArrayList();
+        GlobalData.class6LS3 =new ArrayList();
+        GlobalData.class7LS3 =new ArrayList();
+        GlobalData.class8LS3 =new ArrayList();
+        GlobalData.class9LS3 =new ArrayList();
+        GlobalData.class10LS3 =new ArrayList();
+        GlobalData.class11LS3 =new ArrayList();
+        GlobalData.class12LS3 =new ArrayList();
+        GlobalData.classlkgLS3 =new ArrayList();
+        GlobalData.classukgLS3 =new ArrayList();
+        GlobalData.classnrlLS3 =new ArrayList();
+
+        GlobalData.class1LS4 =new ArrayList();
+        GlobalData.class2LS4 =new ArrayList();
+        GlobalData.class3LS4 =new ArrayList();
+        GlobalData.class4LS4 =new ArrayList();
+        GlobalData.class5LS4 =new ArrayList();
+        GlobalData.class6LS4 =new ArrayList();
+        GlobalData.class7LS4 =new ArrayList();
+        GlobalData.class8LS4 =new ArrayList();
+        GlobalData.class9LS4 =new ArrayList();
+        GlobalData.class10LS4 =new ArrayList();
+        GlobalData.class11LS4 =new ArrayList();
+        GlobalData.class12LS4 =new ArrayList();
+        GlobalData.classlkgLS4 =new ArrayList();
+        GlobalData.classukgLS4 =new ArrayList();
+        GlobalData.classnrlLS4 =new ArrayList();
+
+        GlobalData.class1LS5 =new ArrayList();
+        GlobalData.class2LS5=new ArrayList();
+        GlobalData.class3LS5 =new ArrayList();
+        GlobalData.class4LS5 =new ArrayList();
+        GlobalData.class5LS5 =new ArrayList();
+        GlobalData.class6LS5 =new ArrayList();
+        GlobalData.class7LS5 =new ArrayList();
+        GlobalData.class8LS5 =new ArrayList();
+        GlobalData.class9LS5 =new ArrayList();
+        GlobalData.class10LS5 =new ArrayList();
+        GlobalData.class11LS5 =new ArrayList();
+        GlobalData.class12LS5 =new ArrayList();
+        GlobalData.classlkgLS5 =new ArrayList();
+        GlobalData.classukgLS5 =new ArrayList();
+        GlobalData.classnrlLS5 =new ArrayList();
+
+        GlobalData.class1LS6 =new ArrayList();
+        GlobalData.class2LS6=new ArrayList();
+        GlobalData.class3LS6 =new ArrayList();
+        GlobalData.class4LS6 =new ArrayList();
+        GlobalData.class5LS6 =new ArrayList();
+        GlobalData.class6LS6 =new ArrayList();
+        GlobalData.class7LS6 =new ArrayList();
+        GlobalData.class8LS6 =new ArrayList();
+        GlobalData.class9LS6 =new ArrayList();
+        GlobalData.class10LS6 =new ArrayList();
+        GlobalData.class11LS6 =new ArrayList();
+        GlobalData.class12LS6 =new ArrayList();
+        GlobalData.classlkgLS6 =new ArrayList();
+        GlobalData.classukgLS6 =new ArrayList();
+        GlobalData.classnrlLS6 =new ArrayList();
+
+        GlobalData.class1LS7 =new ArrayList();
+        GlobalData.class2LS7=new ArrayList();
+        GlobalData.class3LS7 =new ArrayList();
+        GlobalData.class4LS7 =new ArrayList();
+        GlobalData.class5LS7 =new ArrayList();
+        GlobalData.class6LS7 =new ArrayList();
+        GlobalData.class7LS7 =new ArrayList();
+        GlobalData.class8LS7 =new ArrayList();
+        GlobalData.class9LS7 =new ArrayList();
+        GlobalData.class10LS7 =new ArrayList();
+        GlobalData.class11LS7 =new ArrayList();
+        GlobalData.class12LS7 =new ArrayList();
+        GlobalData.classlkgLS7 =new ArrayList();
+        GlobalData.classukgLS7 =new ArrayList();
+        GlobalData.classnrlLS7 =new ArrayList();
+
+        finish();
+    }
+
     private void configure() {
         Configure DB = new Configure();
         DB.execute("");
     }
+
     private class Configure extends AsyncTask<String, String, String> {
         @Override
         protected void onPostExecute(String s) {
@@ -2051,7 +2215,7 @@ public class VideoListing extends AppCompatActivity {
 
                                 aList.add(videoList);
 
-                                GlobalData.classlkgLS1 = (aList);
+                                GlobalData.classlkgLS2 = (aList);
 
                                 //allVideoList9.remove(videoList);
                             }
@@ -2162,7 +2326,7 @@ public class VideoListing extends AppCompatActivity {
 
                                 aList.add(videoList);
 
-                                GlobalData.classukgLS1 = (aList);
+                                GlobalData.classukgLS2 = (aList);
 
                                 //allVideoList9.remove(videoList);
                             }
@@ -2396,7 +2560,8 @@ public class VideoListing extends AppCompatActivity {
             }
 
             if (StudentClass.equals("6")) {
-                if (GlobalData.class6LS1 != null) {
+                addedLessons.addAll(allVideoList6);
+             /*   if (GlobalData.class6LS1 != null) {
                     addedLessons.addAll(GlobalData.class6LS1);
                 }
                 if (GlobalData.class6LS2 != null) {
@@ -2416,7 +2581,7 @@ public class VideoListing extends AppCompatActivity {
                 }
                 if (GlobalData.class6LS7 != null) {
                     addedLessons.addAll(GlobalData.class6LS7);
-                }
+                }*/
             }
 
             if (StudentClass.equals("5")) {
@@ -2721,14 +2886,17 @@ public class VideoListing extends AppCompatActivity {
 
 
     }
+
     void d_encry(String M_name, String M_salt, String M_inv) throws Exception {
 
         String password = pass;
-        String rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            + File.separator + "Fil";
-        File rootFile = new File(rootDir);
-        rootFile.mkdir();
-
+        File rootFile ;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+        else
+            rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                + File.separator + "Fil");
+        boolean a=rootFile.mkdirs();
         // reading the salt
         // user should have secure mechanism to transfer the
         // salt, iv and password to the recipient
@@ -2789,7 +2957,7 @@ public class VideoListing extends AppCompatActivity {
         clas=findViewById(R.id.class_id);
         phn=findViewById(R.id.phone_id);
         sec=findViewById(R.id.setion_id);
-
+String a=intent.getStringExtra("phone");
         name.setText(intent.getStringExtra("name"));
         clas.setText("Class :"+intent.getStringExtra("class"));
         phn.setText("Numb :"+intent.getStringExtra("phone"));
@@ -2806,10 +2974,8 @@ public class VideoListing extends AppCompatActivity {
                 StudentClass = "UKG";
                 break;
             case "XII":
-                StudentClass = "12";
-                break;
             case "XI":
-                StudentClass = "11";
+                StudentClass = "12";
                 break;
             case "X":
                 StudentClass = "10";
@@ -2890,5 +3056,27 @@ public class VideoListing extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+       if (exitflag==0){
+           new AlertDialog.Builder(VideoListing.this)
+               .setTitle("CLOSE APP")
+               .setMessage("Do you really want to close the`b app")
+
+               // Specifying a listener allows you to take an action before dismissing the dialog.
+               // The dialog is automatically dismissed when a dialog button is clicked.
+               .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int which) {
+                        finishAffinity();
+
+                   }
+               })
+
+               // A null listener allows the button to dismiss the dialog and take no further action.
+               .setNegativeButton("CLOSE", null)
+               .setIcon(android.R.drawable.ic_dialog_alert)
+               .show();
+       }
+    }
 }
 

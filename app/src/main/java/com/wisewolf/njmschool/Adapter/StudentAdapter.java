@@ -8,11 +8,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.vimeo.networking.model.Video;
-import com.wisewolf.njmschool.Models.Response;
+import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.StudentViewHolder>{
@@ -21,7 +19,7 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.Student
     private final  OnItemClickListener listener;
 
     public interface OnItemClickListener {
-        void onItemClick(Response s);
+        void onItemClick(SchoolDiff s);
     }
 
     public StudentAdapter(List recent_adds, RecyclerView recent_add_recyclerView, OnItemClickListener itemClickListener) {
@@ -45,8 +43,8 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.Student
 
     @Override
     public void onBindViewHolder(@NonNull StudentViewHolder holder, int position) {
-        holder.set((Response) students.get(position));
-        holder.bind((Response) students.get(position), listener,position);
+        holder.set((SchoolDiff) students.get(position));
+        holder.bind((SchoolDiff) students.get(position), listener,position);
     }
 
     @Override
@@ -66,18 +64,18 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.Student
             regno=itemView.findViewById(R.id.regno_id);
         }
 
-        public void set(Response o) {
+        public void set(SchoolDiff o) {
             name.setText(o.getName());
             clss.setText("Class " +o.getClas());
-            sect.setText("Div :"+o.getSection());
-            regno.setText("srno : "+String.valueOf(o.getRegNum()));
+            sect.setText("Div :"+o.getCategory());
+            regno.setText("srno : "+o.getUserid());
 
         }
         public void bind(final Object o, final OnItemClickListener listener, final int position) {
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
-                    listener.onItemClick((Response) o);
+                    listener.onItemClick((SchoolDiff) o);
 
                 }
             });

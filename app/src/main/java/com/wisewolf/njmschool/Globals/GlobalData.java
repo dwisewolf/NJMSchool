@@ -21,6 +21,7 @@ public class GlobalData   {
     public static ArrayList class4 ;
     public static ArrayList class5 ;
     public static ArrayList class6 ;
+    public static ArrayList classN6 ;
     public static ArrayList class7 ;
     public static ArrayList class8 ;
     public static ArrayList class9 ;
@@ -148,7 +149,8 @@ public class GlobalData   {
 
     public static String clas ;
     public static String sect ;
-    public static int regno ;
+    public static String regno ;
+    public static String categ ;
 
     public static VimeoClient vimeoclient ;
 

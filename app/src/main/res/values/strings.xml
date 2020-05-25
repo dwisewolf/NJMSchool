@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NJMSchool</string>
+    <string name="app_name">NJMS</string>
     <string name="deeplink_redirect_scheme">testlib</string>
     <string name="deeplink_redirect_host">vimeonetworktestlib.com</string>
     <string name="request_staff_picks_first_page_with_gson">Request Staff Picks First Page with Gson</string>
