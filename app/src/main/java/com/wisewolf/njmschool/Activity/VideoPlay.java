@@ -61,6 +61,8 @@ import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.VimeoCallback;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -124,7 +126,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         head = findViewById(R.id.mainHead);
         topic = findViewById(R.id.topic);
         teacher = findViewById(R.id.teacher);
+
+
         lessonSpinnerLoad();
+        intent();
+        subjectAdapter();
 
 
         fullscreen.setOnClickListener(new View.OnClickListener() {
@@ -136,8 +142,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             }
         });
 
-        intent();
-        subjectAdapter();
+
 
         download.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -187,8 +192,13 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                                         editor.putString("size", "0");
                                         editor.putString("Allvideolist", "");
                                         editor.apply();
-                                        finishAffinity();
-                                        System.exit(0);
+                                        logout_funct();
+                                        if(Build.VERSION.SDK_INT>=16 && Build.VERSION.SDK_INT<21){
+                                            finishAffinity();
+                                        } else if(Build.VERSION.SDK_INT>=21){
+                                            finishAffinity();
+                                        }
+
                                     }
                                 })
 
@@ -224,6 +234,149 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             }
 
         });
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    private void logout_funct() {
+        GlobalData.addedVideos=new ArrayList();
+        GlobalData.ReservallVideoList =new ArrayList();
+
+        GlobalData.addedVideos =new ArrayList();
+
+        GlobalData.class1 =new ArrayList();
+        GlobalData.class2 =new ArrayList();
+        GlobalData.class3 =new ArrayList();
+        GlobalData.class4 =new ArrayList();
+        GlobalData.class5 =new ArrayList();
+        GlobalData.class6 =new ArrayList();
+        GlobalData.classN6 =new ArrayList();
+        GlobalData.class7 =new ArrayList();
+        GlobalData.class8 =new ArrayList();
+        GlobalData.class9 =new ArrayList();
+        GlobalData.class10 =new ArrayList();
+        GlobalData.class11 =new ArrayList();
+        GlobalData.class12 =new ArrayList();
+        GlobalData.classlkg =new ArrayList();
+        GlobalData.classukg =new ArrayList();
+        GlobalData.classNRL =new ArrayList();
+
+        GlobalData.class1LS1 =new ArrayList();
+        GlobalData.class2LS1 =new ArrayList();
+        GlobalData.class3LS1 =new ArrayList();
+        GlobalData.class4LS1 =new ArrayList();
+        GlobalData.class5LS1 =new ArrayList();
+        GlobalData.class6LS1 =new ArrayList();
+        GlobalData.class7LS1 =new ArrayList();
+        GlobalData.class8LS1 =new ArrayList();
+        GlobalData.class9LS1 =new ArrayList();
+        GlobalData.class10LS1 =new ArrayList();
+        GlobalData.class11LS1 =new ArrayList();
+        GlobalData.class12LS1 =new ArrayList();
+        GlobalData.classlkgLS1 =new ArrayList();
+        GlobalData.classukgLS1 =new ArrayList();
+        GlobalData.classnrlLS1 =new ArrayList();
+
+        GlobalData.class1LS2=new ArrayList();
+        GlobalData.class2LS2 =new ArrayList();
+        GlobalData.class3LS2 =new ArrayList();
+        GlobalData.class4LS2 =new ArrayList();
+        GlobalData.class5LS2 =new ArrayList();
+        GlobalData.class6LS2 =new ArrayList();
+        GlobalData.class7LS2 =new ArrayList();
+        GlobalData.class8LS2 =new ArrayList();
+        GlobalData.class9LS2 =new ArrayList();
+        GlobalData.class10LS2 =new ArrayList();
+        GlobalData.class11LS2 =new ArrayList();
+        GlobalData.class12LS2 =new ArrayList();
+        GlobalData.classlkgLS2 =new ArrayList();
+        GlobalData.classukgLS2 =new ArrayList();
+        GlobalData.classnrlLS2 =new ArrayList();
+
+        GlobalData.class1LS3 =new ArrayList();
+        GlobalData.class2LS3 =new ArrayList();
+        GlobalData.class3LS3 =new ArrayList();
+        GlobalData.class4LS3 =new ArrayList();
+        GlobalData.class5LS3 =new ArrayList();
+        GlobalData.class6LS3 =new ArrayList();
+        GlobalData.class7LS3 =new ArrayList();
+        GlobalData.class8LS3 =new ArrayList();
+        GlobalData.class9LS3 =new ArrayList();
+        GlobalData.class10LS3 =new ArrayList();
+        GlobalData.class11LS3 =new ArrayList();
+        GlobalData.class12LS3 =new ArrayList();
+        GlobalData.classlkgLS3 =new ArrayList();
+        GlobalData.classukgLS3 =new ArrayList();
+        GlobalData.classnrlLS3 =new ArrayList();
+
+        GlobalData.class1LS4 =new ArrayList();
+        GlobalData.class2LS4 =new ArrayList();
+        GlobalData.class3LS4 =new ArrayList();
+        GlobalData.class4LS4 =new ArrayList();
+        GlobalData.class5LS4 =new ArrayList();
+        GlobalData.class6LS4 =new ArrayList();
+        GlobalData.class7LS4 =new ArrayList();
+        GlobalData.class8LS4 =new ArrayList();
+        GlobalData.class9LS4 =new ArrayList();
+        GlobalData.class10LS4 =new ArrayList();
+        GlobalData.class11LS4 =new ArrayList();
+        GlobalData.class12LS4 =new ArrayList();
+        GlobalData.classlkgLS4 =new ArrayList();
+        GlobalData.classukgLS4 =new ArrayList();
+        GlobalData.classnrlLS4 =new ArrayList();
+
+        GlobalData.class1LS5 =new ArrayList();
+        GlobalData.class2LS5=new ArrayList();
+        GlobalData.class3LS5 =new ArrayList();
+        GlobalData.class4LS5 =new ArrayList();
+        GlobalData.class5LS5 =new ArrayList();
+        GlobalData.class6LS5 =new ArrayList();
+        GlobalData.class7LS5 =new ArrayList();
+        GlobalData.class8LS5 =new ArrayList();
+        GlobalData.class9LS5 =new ArrayList();
+        GlobalData.class10LS5 =new ArrayList();
+        GlobalData.class11LS5 =new ArrayList();
+        GlobalData.class12LS5 =new ArrayList();
+        GlobalData.classlkgLS5 =new ArrayList();
+        GlobalData.classukgLS5 =new ArrayList();
+        GlobalData.classnrlLS5 =new ArrayList();
+
+        GlobalData.class1LS6 =new ArrayList();
+        GlobalData.class2LS6=new ArrayList();
+        GlobalData.class3LS6 =new ArrayList();
+        GlobalData.class4LS6 =new ArrayList();
+        GlobalData.class5LS6 =new ArrayList();
+        GlobalData.class6LS6 =new ArrayList();
+        GlobalData.class7LS6 =new ArrayList();
+        GlobalData.class8LS6 =new ArrayList();
+        GlobalData.class9LS6 =new ArrayList();
+        GlobalData.class10LS6 =new ArrayList();
+        GlobalData.class11LS6 =new ArrayList();
+        GlobalData.class12LS6 =new ArrayList();
+        GlobalData.classlkgLS6 =new ArrayList();
+        GlobalData.classukgLS6 =new ArrayList();
+        GlobalData.classnrlLS6 =new ArrayList();
+
+        GlobalData.class1LS7 =new ArrayList();
+        GlobalData.class2LS7=new ArrayList();
+        GlobalData.class3LS7 =new ArrayList();
+        GlobalData.class4LS7 =new ArrayList();
+        GlobalData.class5LS7 =new ArrayList();
+        GlobalData.class6LS7 =new ArrayList();
+        GlobalData.class7LS7 =new ArrayList();
+        GlobalData.class8LS7 =new ArrayList();
+        GlobalData.class9LS7 =new ArrayList();
+        GlobalData.class10LS7 =new ArrayList();
+        GlobalData.class11LS7 =new ArrayList();
+        GlobalData.class12LS7 =new ArrayList();
+        GlobalData.classlkgLS7 =new ArrayList();
+        GlobalData.classukgLS7 =new ArrayList();
+        GlobalData.classnrlLS7 =new ArrayList();
+
 
     }
 
@@ -264,8 +417,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
             mProgressDialog.dismiss();
+            if (!s.equals("f")){
+                dbb.insertinto(nametostore,salt_name,dir_name,inv_name,location,userid,extra1,extra2);
+            }
 
-            dbb.insertinto(nametostore,salt_name,dir_name,inv_name,location,userid,extra1,extra2);
+
         }
 
         @Override
@@ -274,6 +430,9 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setMax(100);
             mProgressDialog.setProgress(values[0]);
+            if (values[0]==100){
+                mProgressDialog.setMessage("Encrypting your video");
+            }
         }
 
         @Override
@@ -333,6 +492,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
             } catch (Exception e) {
                 s = e.toString();
+                s="f";//for fail
 
             }
 
@@ -422,9 +582,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             outFile.close();
             file.delete();
 
-        }catch (Exception e)
+        }catch (Exception ignored)
         {
-            String a="";
         }
 
 
@@ -433,9 +592,14 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     }
 
     private void lessonSpinnerLoad() {
-        ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lessn);
-        spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
-        lesson_selectSpinner.setAdapter(spinnerArrayAdapter);
+        try {
+
+            ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, lessn);
+            spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item); // The drop down view
+            lesson_selectSpinner.setAdapter(spinnerArrayAdapter);
+        }
+        catch (Exception ignored)
+        {}
     }
 
     private void intent() {
@@ -455,7 +619,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 public void onItemClick(String s) {
 
                     getVideosList(s);
-                    Toast.makeText(VideoPlay.this, s, Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(VideoPlay.this, s, Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -475,6 +639,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
             });
         }
+
         if (StudentClass.equals("4")) {
             subjectAdapter = new SubjectAdapter(SubjectList.class4, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
@@ -499,6 +664,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
             });
         }
+
         if (StudentClass.equals("7")) {
             subjectAdapter = new SubjectAdapter(SubjectList.class7, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
@@ -523,6 +689,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
             });
         }
+
         if (StudentClass.equals("10")) {
             subjectAdapter = new SubjectAdapter(SubjectList.class10, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
@@ -568,7 +735,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
             });
         }
-
         if (StudentClass.equals("LKG")) {
             subjectAdapter = new SubjectAdapter(SubjectList.lkg, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
@@ -577,7 +743,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 }
             });
         }
-
         if (StudentClass.equals("UKG")) {
             subjectAdapter = new SubjectAdapter(SubjectList.ukg, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
@@ -602,7 +767,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         video_play_list.setAdapter(new Class_videoAdapter(VideoPlay.this, GlobalData.addedVideos, video_play_list, new Class_videoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(Video item) {
-                Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
+              //  Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
                 details = item.description;
                 media(item.files.get(0).link);
                 vURL = item.files.get(0).link;
@@ -617,7 +782,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 saveVideo.enqueue(new Callback<VideoUp>() {
                     @Override
                     public void onResponse(Call<VideoUp> call, retrofit2.Response<VideoUp> response) {
-                        Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -645,7 +810,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             @Override
             public void onItemClick(Video item) {
                 selectedVideo=item;
-                Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
                 details = item.description;
                 media(item.files.get(0).link);
                 vURL = item.files.get(0).link;
@@ -660,7 +825,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 saveVideo.enqueue(new Callback<VideoUp>() {
                     @Override
                     public void onResponse(Call<VideoUp> call, retrofit2.Response<VideoUp> response) {
-                        Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -931,7 +1096,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         subj_wise_videoListAdapter(subject_videoList);
     }
 
-
     private void class9(String subject) {
         String subCode = "";
 
@@ -956,7 +1120,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         }
         subj_wise_videoListAdapter(subject_videoList);
     }
-
 
     private void class8(String subject) {
         String subCode = "";
@@ -1139,7 +1302,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         subj_wise_videoListAdapter(subject_videoList);
     }
-
 
     private void class5(String subject) {
         String subCode = "";
@@ -1375,7 +1537,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     }
 
-
     @Override
     public void vimeoURLCallback(String callback) {
 
@@ -1387,7 +1548,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
             Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);

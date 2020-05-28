@@ -1,5 +1,6 @@
 package com.wisewolf.njmschool;
 
+import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.Models.Response;
 import com.wisewolf.njmschool.Models.SchoolDiff;
@@ -73,6 +74,22 @@ public class RetrofitClientInstance {
 
         @GET("/qod/")
         Call<List<Quotes>> getQuote();
+
+        @POST("/newsData/")
+        @FormUrlEncoded
+        Call<List<News>> get_News(@Field("user_code") String user_code);
+
+        @POST("/stuListSchool/")
+        @FormUrlEncoded
+        Call<List<SchoolDiff>> get_students(@Field("school_code") String school_code);
+
+        @POST("/newsUpload/")
+        @FormUrlEncoded
+        Call<News> set_News(      @Field("school_code") String school_code,
+                                        @Field("user_code") String user_code,
+                                        @Field("news") String news,
+                                        @Field("expiryDate") String expiryDate,
+                                        @Field("link") String link);
 
 
 

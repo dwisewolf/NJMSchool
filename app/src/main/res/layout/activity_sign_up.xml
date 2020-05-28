@@ -168,7 +168,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/helvetica"
-            android:text="Sign Up" />
+            android:text="Sign In" />
     </androidx.cardview.widget.CardView>
 
     <androidx.constraintlayout.widget.Guideline

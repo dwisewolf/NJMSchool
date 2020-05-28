@@ -121,10 +121,13 @@ public class SignUp extends AppCompatActivity {
                 get_categ.enqueue(new Callback<List<SchoolDiff>>() {
                     @Override
                     public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
-                        if (response!=null) {
+                        if (response!=null||response.body().get(0)!=null) {
                             GlobalData.profiles=response.body();
                             Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
                             startActivity(msgIntent);
+                        }
+                        else {
+                            Toast.makeText(SignUp.this, "Bad Network", Toast.LENGTH_SHORT).show();
                         }
                     }
 

@@ -16,7 +16,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -96,11 +98,12 @@ public class VideoListing extends AppCompatActivity {
     ArrayList allVideoListnrl = new ArrayList();
     ArrayList allVideoListlkg = new ArrayList();
     ArrayList allVideoListukg = new ArrayList();
-    TextView no_of_videos,offlineFlagTextview,playFlag;
+    TextView no_of_videos,offlineFlagTextview,playFlag,shared_id;
 
     ArrayList addedLessons = new ArrayList();
     CardView mediaCard,photocard,docucard;
     OfflineDatabase dbb;
+    String aSize="";
 
     @Override
     protected void onResume() {
@@ -189,6 +192,7 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+        shared_id = findViewById(R.id.shared_id);
         no_of_videos = findViewById(R.id.no_of_files);
         mediaCard=findViewById(R.id.media_card);
         photocard=findViewById(R.id.photo_card);
@@ -225,27 +229,27 @@ public class VideoListing extends AppCompatActivity {
                 }.getType();
                 List<Video> arrayList = gson.fromJson(json, type);
                 allVideoList = (ArrayList) arrayList;
+                aSize=String.valueOf(allVideoList.size());
                 GlobalData.ReservallVideoList = allVideoList;
                 try {
                     allVideoList = (ArrayList<Video>) ObjectSerialiser.deserialize(sharedPrefs.getString("task", ObjectSerialiser.serialize(new ArrayList<Video>())));
+                    aSize=aSize+"   "+String.valueOf(allVideoList.size());
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 allVideoList = (ArrayList) arrayList;
+                aSize=aSize+"   "+String.valueOf(allVideoList.size());
 
             }
         });
 
 
-
-
-
         //TODO VIDEO SCHOOL WISE CUTTING
 
         allVideoList= schoolwise(allVideoList);
-
+        aSize=aSize+"   "+String.valueOf(allVideoList.size());
 
         actionBar.hide();
 
@@ -267,6 +271,15 @@ public class VideoListing extends AppCompatActivity {
                 logout_funct();
             }
         });
+        logout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showNEwsAddAlert();
+                return true;
+            }
+        });
+
+
 
         // media(videoList.data.get(1).files.get(0).link);
 
@@ -536,6 +549,51 @@ public class VideoListing extends AppCompatActivity {
 
     }
 
+    private void showNEwsAddAlert() {
+
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(VideoListing.this);
+        alertDialog.setTitle("PASSWORD");
+        alertDialog.setMessage("Enter Password");
+
+        final EditText input = new EditText(VideoListing.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+        alertDialog.setIcon(R.drawable.logo_njms);
+
+        alertDialog.setPositiveButton("YES",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    String password = input.getText().toString();
+
+                    if (password.equals("njms_news")) {
+
+                        Intent myIntent1 = new Intent(VideoListing.this,
+                            NewsSet.class);
+                        startActivity(myIntent1);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                            "Wrong Password!", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+            });
+
+        alertDialog.setNegativeButton("NO",
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+        alertDialog.show();
+    }
+
+
+
+
     private void logout_funct() {
         GlobalData.addedVideos=new ArrayList();
         GlobalData.ReservallVideoList =new ArrayList();
@@ -671,7 +729,7 @@ public class VideoListing extends AppCompatActivity {
         GlobalData.classukgLS7 =new ArrayList();
         GlobalData.classnrlLS7 =new ArrayList();
 
-        finish();
+        finishAffinity();
     }
 
     private void configure() {
@@ -685,7 +743,9 @@ public class VideoListing extends AppCompatActivity {
             super.onPostExecute(s);
 
             no_of_videos.setText("Files - " + String.valueOf(addedLessons.size()));
-
+            aSize=aSize+"   t"+String.valueOf(GlobalData.addedVideos.size());
+            aSize=aSize+"   t"+String.valueOf(addedLessons.size());
+            shared_id.setText(aSize);
 
             VideoAddedAdapter videoAddedAdapter = new
                 VideoAddedAdapter(addedLessons, added_list);
@@ -699,6 +759,9 @@ public class VideoListing extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            addedLessons=new ArrayList();
+        //    aSize=aSize+"   x"+String.valueOf(GlobalData.addedVideos.size());
+            aSize=aSize+"  x "+String.valueOf(addedLessons.size());
             mProgressDialog.show();
         }
 
@@ -724,6 +787,7 @@ public class VideoListing extends AppCompatActivity {
 
 
             try {
+                Toast.makeText(VideoListing.this, String.valueOf(allVideoList4.size()), Toast.LENGTH_SHORT).show();
                 if (StudentClass.equals("NRL")) {
 
                     if (allVideoListnrl != null) {
@@ -2950,14 +3014,13 @@ public class VideoListing extends AppCompatActivity {
     }
 
 
-
     private void getData(Intent intent) {
         TextView name,clas,phn,sec;
         name=findViewById(R.id.name_id);
         clas=findViewById(R.id.class_id);
         phn=findViewById(R.id.phone_id);
         sec=findViewById(R.id.setion_id);
-String a=intent.getStringExtra("phone");
+        String a=intent.getStringExtra("phone");
         name.setText(intent.getStringExtra("name"));
         clas.setText("Class :"+intent.getStringExtra("class"));
         phn.setText("Numb :"+intent.getStringExtra("phone"));
@@ -3036,32 +3099,14 @@ String a=intent.getStringExtra("phone");
         });
     }*/
 
-    public void downloadFile(String s) {
-        String DownloadUrl = s;
-        DownloadManager.Request request1 = new DownloadManager.Request(Uri.parse(DownloadUrl));
-        request1.setDescription("Sample Music File");   //appears the same in Notification bar while downloading
-        request1.setTitle("Alphabet.mp4");
-        request1.setVisibleInDownloadsUi(false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            request1.allowScanningByMediaScanner();
-            request1.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
-        }
-        request1.setDestinationInExternalFilesDir(getApplicationContext(), "/File", "Alphabet.mp4");
-
-        DownloadManager manager1 = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-        Objects.requireNonNull(manager1).enqueue(request1);
-        if (DownloadManager.STATUS_SUCCESSFUL == 8) {
-            Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     @Override
     public void onBackPressed() {
        if (exitflag==0){
            new AlertDialog.Builder(VideoListing.this)
                .setTitle("CLOSE APP")
-               .setMessage("Do you really want to close the`b app")
+               .setMessage("Do you really want to close the app")
 
                // Specifying a listener allows you to take an action before dismissing the dialog.
                // The dialog is automatically dismissed when a dialog button is clicked.
@@ -3073,7 +3118,7 @@ String a=intent.getStringExtra("phone");
                })
 
                // A null listener allows the button to dismiss the dialog and take no further action.
-               .setNegativeButton("CLOSE", null)
+               .setNegativeButton("Cancel", null)
                .setIcon(android.R.drawable.ic_dialog_alert)
                .show();
        }

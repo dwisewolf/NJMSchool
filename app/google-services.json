@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "521246116252",
+    "firebase_url": "https://njms-2e633.firebaseio.com",
+    "project_id": "njms-2e633",
+    "storage_bucket": "njms-2e633.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:521246116252:android:7afef88c9b11620696a059",
+        "android_client_info": {
+          "package_name": "com.wisewolf.njmschool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "521246116252-h2gmo39mqrou4u9qcskb942991cid41s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.wisewolf.njmschool",
+            "certificate_hash": "b06ce3fefce9db12ef6084014d0a6d8df78bb479"
+          }
+        },
+        {
+          "client_id": "521246116252-j95fvm36rgli8r71s6d796oalfn5ud9c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9xKw5AcbLtBt1tYzzeVbq8X2fQRlnzMs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "521246116252-j95fvm36rgli8r71s6d796oalfn5ud9c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

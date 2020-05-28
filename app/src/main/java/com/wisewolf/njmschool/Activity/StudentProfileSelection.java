@@ -11,6 +11,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.wisewolf.njmschool.Globals.GlobalData;
+import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.R;
@@ -32,8 +33,16 @@ public class StudentProfileSelection extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student__select);
         parents = findViewById(R.id.parentsDetails);
-        SchoolDiff a = (SchoolDiff) GlobalData.profiles.get(0);
-        parents.setText(a.getFatherName() + "\nPhone - " + a.getMobileNum());
+
+        try {
+            SchoolDiff a = (SchoolDiff) GlobalData.profiles.get(0);
+            parents.setText(a.getFatherName() + "\nPhone - " + a.getMobileNum());
+        }catch (Exception e)
+        {
+
+        }
+
+
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -57,6 +66,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                 }
                 if (s.getCategory().equals("STUDENT")) {
                     GlobalData.regno = s.getUserid();
+                    getnews(s.getUserid());
                     Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
                     intent.putExtra("name", s.getName());
                     intent.putExtra("class", s.getClas());
@@ -73,24 +83,26 @@ public class StudentProfileSelection extends AppCompatActivity {
         studentList.setLayoutManager(added_liste_adapterlayoutManager);
     }
 
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
        finishAffinity();
     }
 
-    private void callQuote() {
+    private void getnews(String userid) {
         try {
-            final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance1("https://quotes.rest/").create(RetrofitClientInstance.GetDataService.class);
-            Call<List<Quotes>> call = service.getQuote();
-            call.enqueue(new Callback<List<Quotes>>() {
+            final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+            Call<List<News>> call = service.get_News(userid);
+            call.enqueue(new Callback<List<News>>() {
                 @Override
-                public void onResponse(Call<List<Quotes>> call, Response<List<Quotes>> response) {
+                public void onResponse(Call<List<News>> call, Response<List<News>> response) {
                     String a="";
                 }
 
                 @Override
-                public void onFailure(Call<List<Quotes>> call, Throwable t) {
+                public void onFailure(Call<List<News>> call, Throwable t) {
 String a="";
                 }
             });

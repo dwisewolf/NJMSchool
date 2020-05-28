@@ -23,7 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.OfflineScreen"></activity>
+        <activity android:name=".Activity.NewsSet">  </activity>
+        <activity android:name=".Activity.OfflineScreen" />
         <activity android:name=".Activity.ClassSelect" />
         <activity
             android:name=".Activity.OfflinePlayFullScreen"

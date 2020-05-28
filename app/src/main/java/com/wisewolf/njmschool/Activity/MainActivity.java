@@ -54,10 +54,7 @@ public class MainActivity extends AppCompatActivity {
     TextView wait;
     String  lastpage="";
 
-
     ArrayList allVideoList_1stcall = new ArrayList();
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,21 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-        logo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent msgIntent = new Intent(MainActivity.this, SignUp.class);
-                startActivity(msgIntent);
-            }
-        });
-
     }
-
-
 
     private void download() {
         Downback DB = new Downback();
