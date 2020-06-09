@@ -1,12 +1,15 @@
 package com.wisewolf.njmschool.Activity;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -27,6 +30,8 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+
+import static android.preference.PreferenceManager.getDefaultSharedPreferences;
 
 public class SignUp extends AppCompatActivity {
     ProgressDialog progressDoalog;
@@ -55,6 +60,8 @@ public class SignUp extends AppCompatActivity {
         signUp = findViewById(R.id.button);
         passCard=findViewById(R.id.password);
         passCard.setVisibility(View.GONE);
+
+        checkLogin();
 
         runOnUiThread(new Runnable() {
             @Override
@@ -123,8 +130,8 @@ public class SignUp extends AppCompatActivity {
                     public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
                         if (response!=null||response.body().get(0)!=null) {
                             GlobalData.profiles=response.body();
-                            Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
-                            startActivity(msgIntent);
+                            savePass(phone.getText().toString(),password.getText().toString());
+
                         }
                         else {
                             Toast.makeText(SignUp.this, "Bad Network", Toast.LENGTH_SHORT).show();
@@ -154,6 +161,100 @@ public class SignUp extends AppCompatActivity {
                 Toast.makeText(SignUp.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void checkLogin() {
+        final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
+        String logged = sp1.getString("login", "");
+
+        if (logged.equals("logged"))
+        {
+            showsnack(sp1.getString("username", ""),sp1.getString("pass", ""));
+        }
+    }
+
+    private void showsnack(final String username, final String pass) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
+
+
+
+        alertDialogBuilder.setTitle("App Credentials")
+            .setMessage("Proceed with saved Credentials of "+ username)
+            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+
+                    Call<List<SchoolDiff>> get_categ = service.get_Categ(username,pass);
+                    get_categ.enqueue(new Callback<List<SchoolDiff>>() {
+                        @Override
+                        public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
+                            if (response!=null||response.body().get(0)!=null) {
+                                GlobalData.profiles=response.body();
+                                Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
+                                startActivity(msgIntent);
+
+                            }
+                            else {
+                                Toast.makeText(SignUp.this, "Bad Network", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<SchoolDiff>> call, Throwable t) {
+                            Toast.makeText(SignUp.this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            })
+            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
+    private void savePass(final String phone, final String pass) {
+
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
+
+
+
+        alertDialogBuilder.setTitle("App Credentials")
+            .setMessage("Do you want to save the username and password ?")
+            .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+                    final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
+                    SharedPreferences.Editor editor = sp1.edit();
+                    editor . putString("username", phone);
+                    editor . putString("pass", pass);
+                    editor . putString("login", "logged");
+                    editor.apply();
+
+                    Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
+                    startActivity(msgIntent);
+                }
+            })
+            .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
+                    SharedPreferences.Editor editor = sp1.edit();
+
+                    editor . putString("username", phone);
+                    editor . putString("pass", pass);
+                    editor . putString("login", "Not-logged");
+                    editor.commit();
+
+                    Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
+                    startActivity(msgIntent);
+
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 
     private void generateDataList(List<Response> photoList) {

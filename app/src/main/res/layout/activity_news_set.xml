@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="School/Student"
+        android:text="@string/school_student"
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/guideline40"
         app:layout_constraintStart_toStartOf="parent" />
@@ -47,31 +47,31 @@
                 android:id="@+id/kasia_rd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="KASIA" />
+                android:text="@string/kasia" />
 
             <RadioButton
                 android:id="@+id/anand_rd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="ANANDNAGAR" />
+                android:text="@string/anandnagar" />
 
             <RadioButton
                 android:id="@+id/njint_rd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="NJ INTERNATIONAL" />
+                android:text="@string/nj_international" />
 
             <RadioButton
                 android:id="@+id/deo_rd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="DEORIA" />
+                android:text="@string/deoria" />
 
             <RadioButton
                 android:id="@+id/all_school_rd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="All" />
+                android:text="@string/all" />
         </RadioGroup>
     </androidx.cardview.widget.CardView>
 
@@ -94,7 +94,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.5" />
+        app:layout_constraintGuide_percent="0.55" />
 
     <RadioGroup
         android:id="@+id/student_rg"
@@ -112,10 +112,16 @@
             android:text="ALL" />
 
         <RadioButton
+            android:id="@+id/class_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Class" />
+
+        <RadioButton
             android:id="@+id/student_rd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Student" />
+            android:text="@string/student" />
     </RadioGroup>
 
     <TextView
@@ -124,7 +130,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Select a school"
+        android:text="@string/select_a_school"
 
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/guideline39"
@@ -151,7 +157,7 @@
         android:layout_marginEnd="8dp"
         android:background="@drawable/primary_shape"
         android:ems="10"
-        android:hint="Name"
+        android:hint="@string/name"
         android:inputType="textPersonName"
         android:padding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline42"
@@ -166,7 +172,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.6" />
+        app:layout_constraintGuide_percent="0.63" />
 
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView"
@@ -176,8 +182,8 @@
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@drawable/primary_shape"
-        android:hint="studentname"
-        android:paddingLeft="10dp"
+        android:hint="@string/studentname"
+        android:paddingStart="10dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline44"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@+id/guideline43"
@@ -187,7 +193,7 @@
         android:id="@+id/post_id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="post"
+        android:text="@string/post"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline46" />
@@ -211,7 +217,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="Expiry Date"
+        android:text="@string/expiry_date"
         android:textColor="@color/black"
         app:layout_constraintStart_toStartOf="@+id/guideline43"
         app:layout_constraintTop_toTopOf="@+id/guideline42" />

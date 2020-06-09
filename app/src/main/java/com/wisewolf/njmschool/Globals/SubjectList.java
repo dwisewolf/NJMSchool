@@ -13,14 +13,6 @@ public class SubjectList {
     public static String[] ukg_code= new String[]{"ENG","HIN","MAT","RHY"};
 
 
-
-
-
-
-
-
-
-
     public static String[] class1= new String[]{"English Literature Book1", "English Literature Book2"," English Grammar",
     "Hindi Literature","Hindi Grammar","Science","Mathematics","Computer"};
     public static String[] class1_code= new String[]{"EL1", "EL2","EGG", "HNL","HNG","SCI","MAT","CMP"};
@@ -63,19 +55,17 @@ public class SubjectList {
         ,"GEO","POL","ECO","MAT","PHY","CHE","BIO"};
 
 
-
-
     public static String[] class11_COMM= new String[]{"English", "Hindi","Physical Education","Computer Science"};
     public static String[] class12_COMM= new String[]{"English", "Hindi","Physical Education","Computer Science"};
 
-    public static String[] class12_SCI= new String[]{"English", "Hindi","Physical Education","Computer Science","Mathematics","Physics","Chemistry","Biology"};
-    public static String[] class12_SCI_code= new String[]{"EL1", "HNL","PED","CMP","MAT","PHY","CHE","BIO"};
+    public static String[] class12_SCI= new String[]{"English", "Hindi","Physical Education","Computer Science","Psychology","Mathematics","Physics","Chemistry","Biology"};
+    public static String[] class12_SCI_code= new String[]{"EL1", "HNL","PED","CMP","PSY","MAT","PHY","CHE","BIO"};
 
-    public static String[] class12_COMR= new String[]{"English", "Hindi","Physical Education","Computer Science","Accountancy","Economincs","Buisiness Studies"};
-    public static String[] class12_COMR_code= new String[]{"EL1", "HNL","PED","CMP","ACT","ECO","BST"};
+    public static String[] class12_COMR= new String[]{"English", "Hindi","Physical Education","Computer Science","Psychology","Accountancy","Economics","Business Studies"};
+    public static String[] class12_COMR_code= new String[]{"EL1", "HNL","PED","CMP","PSY","ACT","ECO","BST"};
 
-    public static String[] class12_HUM= new String[]{"English", "Hindi","Physical Education","Computer Science","History","Political science","Psycology"};
-    public static String[] class12_HUM_code= new String[]{"EL1", "HNL","PED","CMP","HIS","POL","PSY"};
+    public static String[] class12_HUM= new String[]{"English", "Hindi","Physical Education","Computer Science","History","Political science","Psychology","Economics"};
+    public static String[] class12_HUM_code= new String[]{"EL1", "HNL","PED","CMP","HIS","POL","PSY","ECO"};
 
 
 }

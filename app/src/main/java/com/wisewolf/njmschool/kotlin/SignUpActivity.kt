@@ -25,7 +25,7 @@ class SignUpActivity : AppCompatActivity() {
         setContentView(R.layout.activity_sign_up)
         this.window.setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN)
         val actionBar = supportActionBar!!
-        actionBar!!.hide()
+        actionBar.hide()
         imageView  =findViewById<ImageView>(R.id.child_gif2)
         check  =findViewById<TextView>(R.id.check)
         phone  =findViewById<EditText>(R.id.phone)

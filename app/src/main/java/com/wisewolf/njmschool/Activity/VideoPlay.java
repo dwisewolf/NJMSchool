@@ -20,10 +20,7 @@ import java.text.SimpleDateFormat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -48,6 +45,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.vimeo.networking.model.Video;
 import com.wisewolf.njmschool.Adapter.Class_videoAdapter;
 import com.wisewolf.njmschool.Adapter.SubjectAdapter;
@@ -87,6 +85,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     Spinner lesson_selectSpinner;
     ArrayList nowShowing = new ArrayList();
 
+
     String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"};
     String lessn_code[] = {"L1", "L2", "L3", "L4", "L5", "L6", "L7"};
     String lesson_flag = "ALL";
@@ -122,7 +121,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         download.setVisibility(View.INVISIBLE);
         fullscreen.setVisibility(View.INVISIBLE);
         videoView = (VideoView) findViewById(R.id.videoView);
-        lesson_selectSpinner = findViewById(R.id.lesson_select);
+        lesson_selectSpinner = (Spinner) findViewById(R.id.lesson_select);
         head = findViewById(R.id.mainHead);
         topic = findViewById(R.id.topic);
         teacher = findViewById(R.id.teacher);
@@ -130,7 +129,13 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         lessonSpinnerLoad();
         intent();
-        subjectAdapter();
+        try {
+            subjectAdapter();
+        }
+        catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(String.valueOf(e));
+        }
+
 
 
         fullscreen.setOnClickListener(new View.OnClickListener() {
@@ -219,21 +224,25 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoListAdapter();
         media("android.resource://" + getPackageName() + "/" + R.raw.v1);
         vURL = "android.resource://" + getPackageName() + "/" + R.raw.v1;
+        try {
+            lesson_selectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    //  Toast.makeText(VideoPlay.this, lessn[position] + " is showing", Toast.LENGTH_SHORT).show();
+                    lesson_flag = lessn_code[position];
+                    subj_wise_videoListAdapter(nowShowing);
+                }
 
-        lesson_selectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-              //  Toast.makeText(VideoPlay.this, lessn[position] + " is showing", Toast.LENGTH_SHORT).show();
-                lesson_flag = lessn_code[position];
-                subj_wise_videoListAdapter(nowShowing);
-            }
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
+                }
 
-            }
-
-        });
+            });
+        }
+        catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(String.valueOf(e));
+        }
 
     }
 
@@ -247,7 +256,6 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         GlobalData.ReservallVideoList =new ArrayList();
 
         GlobalData.addedVideos =new ArrayList();
-
         GlobalData.class1 =new ArrayList();
         GlobalData.class2 =new ArrayList();
         GlobalData.class3 =new ArrayList();
@@ -846,45 +854,129 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     private ArrayList getLesson(ArrayList selectedVideoList) {
         ArrayList returnVideo = new ArrayList();
-        String lesn = "";
-        if (StudentClass.equals("12") || StudentClass.equals("11") || StudentClass.equals("10")) {
-            for (int i = 0; i < selectedVideoList.size(); i++) {
-                Video video = (Video) selectedVideoList.get(i);
-                lesn = (video.name.substring(3));
-                lesn = lesn.substring(0, Math.min(lesn.length(), 2));
-                if (lesn.equals(lesson_flag)) {
-                    returnVideo.add(selectedVideoList.get(i));
-                }
+        try {
 
-            }
 
-        }
-        else if (StudentClass.equals("6")){
 
-            String school=GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
-            if (school.equals("AND")){
+            String lesn = "";
+            if (StudentClass.equals("12") || StudentClass.equals("11") || StudentClass.equals("10")) {
                 for (int i = 0; i < selectedVideoList.size(); i++) {
                     Video video = (Video) selectedVideoList.get(i);
-                    if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
-                        lesn = (video.name.substring(3));
-                        lesn = lesn.substring(0, Math.min(lesn.length(), 2));
-                        if (lesn.equals(lesson_flag)) {
-                            returnVideo.add(selectedVideoList.get(i));
-                        }
+                    lesn = (video.name.substring(3));
+                    lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                    if (lesn.equals(lesson_flag)) {
+                        returnVideo.add(selectedVideoList.get(i));
                     }
-                    else {
+
+                }
+
+            } else if (StudentClass.equals("6")) {
+
+                String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+                if (school.equals("AND")) {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
+                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
+                            lesn = (video.name.substring(3));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        } else {
+                            lesn = (video.name.substring(2));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        }
+
+
+                    }
+
+                } else {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
                         lesn = (video.name.substring(2));
                         lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                         if (lesn.equals(lesson_flag)) {
                             returnVideo.add(selectedVideoList.get(i));
                         }
+
                     }
-
-
                 }
 
-            }
-            else {
+            } else if (StudentClass.equals("7")) {
+
+                String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+                if (school.equals("AND")) {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
+                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
+                            lesn = (video.name.substring(3));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        } else {
+                            lesn = (video.name.substring(2));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        }
+
+
+                    }
+
+                } else {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
+                        lesn = (video.name.substring(2));
+                        lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                        if (lesn.equals(lesson_flag)) {
+                            returnVideo.add(selectedVideoList.get(i));
+                        }
+
+                    }
+                }
+
+            } else if (StudentClass.equals("8")) {
+
+                String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
+                if (school.equals("AND")) {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
+                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
+                            lesn = (video.name.substring(3));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        } else {
+                            lesn = (video.name.substring(2));
+                            lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                            if (lesn.equals(lesson_flag)) {
+                                returnVideo.add(selectedVideoList.get(i));
+                            }
+                        }
+
+
+                    }
+
+                } else {
+                    for (int i = 0; i < selectedVideoList.size(); i++) {
+                        Video video = (Video) selectedVideoList.get(i);
+                        lesn = (video.name.substring(2));
+                        lesn = lesn.substring(0, Math.min(lesn.length(), 2));
+                        if (lesn.equals(lesson_flag)) {
+                            returnVideo.add(selectedVideoList.get(i));
+                        }
+
+                    }
+                }
+
+            } else {
+
                 for (int i = 0; i < selectedVideoList.size(); i++) {
                     Video video = (Video) selectedVideoList.get(i);
                     lesn = (video.name.substring(2));
@@ -894,22 +986,14 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                     }
 
                 }
+
             }
+
 
         }
-
-        else {
-
-            for (int i = 0; i < selectedVideoList.size(); i++) {
-                Video video = (Video) selectedVideoList.get(i);
-                lesn = (video.name.substring(2));
-                lesn = lesn.substring(0, Math.min(lesn.length(), 2));
-                if (lesn.equals(lesson_flag)) {
-                    returnVideo.add(selectedVideoList.get(i));
-                }
-
-            }
-
+        catch (Exception e){
+            FirebaseCrashlytics.getInstance().log(String.valueOf(e));
+            Toast.makeText(this, "Network Error..", Toast.LENGTH_SHORT).show();
         }
         return returnVideo;
     }
@@ -1157,11 +1241,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-                subj = (video.name.substring(5));
+              /*  subj = (video.name.substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
-                }
+                }*/
 
             }
         }
@@ -1217,11 +1301,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-                subj = (video.name.substring(5));
+             /*   subj = (video.name.substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
-                }
+                }*/
 
             }
         }
@@ -1277,11 +1361,11 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-                subj = (video.name.substring(5));
+              /*  subj = (video.name.substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
-                }
+                }*/
 
             }
         }
@@ -1517,23 +1601,22 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     }
 
-    public  boolean isStoragePermissionGranted() {
+    public void isStoragePermissionGranted() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED) {
                 Log.v(TAG,"Permission is granted");
-                return true;
+                return;
             } else {
 
                 Log.v(TAG,"Permission is revoked");
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
-                return false;
+                return;
             }
         }
         //permission is automatically granted on sdk<23 upon installation
         Log.v(TAG,"Permission is granted");
-        return true;
 
     }
 

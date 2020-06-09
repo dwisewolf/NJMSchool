@@ -10,4 +10,16 @@
     <string name="this_is_where_request_output_will_go">This is where request output will go.</string>
     <string name="request_time" formatted="false">Time - %s : %2d</string>
     <string name="gson_or_moshi_request_time_will_show_here_once_complete">Gson or Moshi request time will show here once complete.</string>
+    <string name="school_student">School/Student</string>
+    <string name="kasia">KASIA</string>
+    <string name="anandnagar">ANANDNAGAR</string>
+    <string name="nj_international">NJ INTERNATIONAL</string>
+    <string name="deoria">DEORIA</string>
+    <string name="all">All</string>
+    <string name="student">Student</string>
+    <string name="select_a_school">Select a school</string>
+    <string name="name">Name</string>
+    <string name="studentname">studentname</string>
+    <string name="post">post</string>
+    <string name="expiry_date">Expiry Date</string>
 </resources>

@@ -23,7 +23,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.NewsSet">  </activity>
+        <activity android:name=".Activity.DocumentActivity">
+
+        </activity>
+        <activity android:name=".Activity.NewsSet"></activity>
         <activity android:name=".Activity.OfflineScreen" />
         <activity android:name=".Activity.ClassSelect" />
         <activity
@@ -34,7 +37,8 @@
             android:screenOrientation="landscape" />
         <activity android:name=".Activity.StudentProfileSelection" />
         <activity android:name=".Activity.SignUp" />
-        <activity android:name=".Activity.VideoPlay" />
+        <activity android:name=".Activity.VideoPlay"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode"/>
 
         <service
             android:name=".service.VideoLinkService"

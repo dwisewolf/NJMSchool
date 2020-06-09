@@ -9,7 +9,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.Quotes;
@@ -37,11 +39,9 @@ public class StudentProfileSelection extends AppCompatActivity {
         try {
             SchoolDiff a = (SchoolDiff) GlobalData.profiles.get(0);
             parents.setText(a.getFatherName() + "\nPhone - " + a.getMobileNum());
-        }catch (Exception e)
-        {
+        } catch (Exception e) {
 
         }
-
 
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -50,40 +50,43 @@ public class StudentProfileSelection extends AppCompatActivity {
         assert actionBar != null;
         actionBar.hide();
         studentList = findViewById(R.id.child_select_list);
-       // callQuote();
+        // callQuote();
+        try {
+            studentList.setAdapter(new StudentAdapter(GlobalData.profiles, studentList, new StudentAdapter.OnItemClickListener() {
 
-        studentList.setAdapter(new StudentAdapter(GlobalData.profiles, studentList, new StudentAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(SchoolDiff s) {
+                    if (s.getCategory().equals("TEACHER")) {
+                        GlobalData.regno = s.getUserid();
+                        Intent intent = new Intent(StudentProfileSelection.this, ClassSelect.class);
+                        intent.putExtra("name", s.getName());
+                        intent.putExtra("phone", s.getMobileNum());
+                        startActivity(intent);
+                    }
+                    if (s.getCategory().equals("STUDENT")) {
+                        GlobalData.regno = s.getUserid();
+                        getnews(s.getUserid());
+                        Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
+                        intent.putExtra("name", s.getName());
+                        intent.putExtra("class", s.getClas());
+                        intent.putExtra("sec", s.getCategory());
+                        intent.putExtra("phone", String.valueOf(s.getMobileNum()));
+                        startActivity(intent);
+                    }
 
 
-            @Override
-            public void onItemClick(SchoolDiff s) {
-                if (s.getCategory().equals("TEACHER")) {
-                    GlobalData.regno = s.getUserid();
-                    Intent intent = new Intent(StudentProfileSelection.this, ClassSelect.class);
-                    intent.putExtra("name", s.getName());
-                    intent.putExtra("phone", s.getMobileNum());
-                    startActivity(intent);
                 }
-                if (s.getCategory().equals("STUDENT")) {
-                    GlobalData.regno = s.getUserid();
-                    getnews(s.getUserid());
-                    Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
-                    intent.putExtra("name", s.getName());
-                    intent.putExtra("class", s.getClas());
-                    intent.putExtra("sec", s.getCategory());
-                    intent.putExtra("phone", String.valueOf(s.getMobileNum()));
-                    startActivity(intent);
-                }
+            }));
+            LinearLayoutManager added_liste_adapterlayoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            studentList.setLayoutManager(added_liste_adapterlayoutManager);
+        } catch (Exception e) {
+            Toast.makeText(this, "Your Network Error ..please restart App (SPS84)", Toast.LENGTH_SHORT).show();
+            FirebaseCrashlytics.getInstance().log(String.valueOf(e));
+        }
 
-
-            }
-        }));
-        LinearLayoutManager added_liste_adapterlayoutManager
-            = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        studentList.setLayoutManager(added_liste_adapterlayoutManager);
     }
-
-
 
     @Override
     public void onBackPressed() {

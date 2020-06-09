@@ -37,7 +37,9 @@ public class NewsSet extends AppCompatActivity {
     RadioButton checkedRadioButton_school,checkedRadioButton_stu;
     String school="",student_code="1",STU_CODE="ALL",News_="",expDates="";
     AutoCompleteTextView autoCompleteTextView;
-    String[] sudentname,studentcode;
+    String[] sudentname,studentcode,class_name={"PREP","LKG","UKG",
+        "CLASS 1","CLASS 2","CLASS 3","CLASS 4","CLASS 5","CLASS 6","CLASS 7","CLASS 8","CLASS 9","CLASS 10","CLASS 11","CLASS 12"};
+    int flag_class_student=0;  // 0 for class , 1 for student
     ProgressDialog progressDoalog;
     Button post;
     EditText news;
@@ -132,6 +134,9 @@ public class NewsSet extends AppCompatActivity {
         {
             public void onCheckedChanged(RadioGroup group, int checkedId)
             {
+                if (!school.equals("")){
+                    rGroup_school.setFocusable(false);
+                }
                 // This will get the radiobutton that has changed in its check state
                 RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
                 // This puts the value (true/false) into the variable
@@ -143,6 +148,14 @@ public class NewsSet extends AppCompatActivity {
                         case "ALL":
                           student_code="ALL";
                           autoCompleteTextView.setVisibility(View.GONE);
+                            break;
+                        case "Class":
+                            student_code="ALL";
+                            autoCompleteTextView.setThreshold(3);
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(NewsSet.this,android.R.layout.simple_dropdown_item_1line, sudentname);
+                            autoCompleteTextView.setAdapter(adapter);
+                            adapter.setNotifyOnChange(true);
+                            autoCompleteTextView.setVisibility(View.VISIBLE);
                             break;
                         case "Student":
                             if (school.equals("All")){
@@ -168,10 +181,15 @@ public class NewsSet extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View arg1, int position, long arg3) {
                 Object item = parent.getItemAtPosition(position);
-                for (int i=0;i<sudentname.length;i++){
-                if (sudentname[i].equals(String.valueOf(item))){
-                    STU_CODE=studentcode[i];
+                if(flag_class_student==1) {
+                    for (int i = 0; i < sudentname.length; i++) {
+                        if (sudentname[i].equals(String.valueOf(item))) {
+                            STU_CODE = studentcode[i];
+                        }
+                    }
                 }
+                else {
+                    student_code=autoCompleteTextView.getText().toString();
                 }
             }
         });
@@ -248,6 +266,9 @@ public class NewsSet extends AppCompatActivity {
                     school = school;
                 }
             });
+        }
+        else {
+            Toast.makeText(this, "Fill all the field", Toast.LENGTH_SHORT).show();
         }
     }
 

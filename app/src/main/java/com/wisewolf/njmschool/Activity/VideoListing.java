@@ -229,18 +229,18 @@ public class VideoListing extends AppCompatActivity {
                 }.getType();
                 List<Video> arrayList = gson.fromJson(json, type);
                 allVideoList = (ArrayList) arrayList;
-                aSize=String.valueOf(allVideoList.size());
+               // aSize=String.valueOf(allVideoList.size());
                 GlobalData.ReservallVideoList = allVideoList;
                 try {
                     allVideoList = (ArrayList<Video>) ObjectSerialiser.deserialize(sharedPrefs.getString("task", ObjectSerialiser.serialize(new ArrayList<Video>())));
-                    aSize=aSize+"   "+String.valueOf(allVideoList.size());
+                 //   aSize=aSize+"   "+String.valueOf(allVideoList.size());
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
                 allVideoList = (ArrayList) arrayList;
-                aSize=aSize+"   "+String.valueOf(allVideoList.size());
+             //   aSize=aSize+"   "+String.valueOf(allVideoList.size());
 
             }
         });
@@ -249,7 +249,7 @@ public class VideoListing extends AppCompatActivity {
         //TODO VIDEO SCHOOL WISE CUTTING
 
         allVideoList= schoolwise(allVideoList);
-        aSize=aSize+"   "+String.valueOf(allVideoList.size());
+     //   aSize=aSize+"   "+String.valueOf(allVideoList.size());
 
         actionBar.hide();
 
@@ -455,7 +455,35 @@ public class VideoListing extends AppCompatActivity {
                         // allVideoList.remove(videoList);
                     }
 
+                    if (classname.equals("NC7")) {
+
+                        ArrayList aList = new ArrayList();
+                        if (GlobalData.class7 != null) {
+                            aList = GlobalData.class7;
+                        }
+
+                        aList.add(videoList);
+
+                        GlobalData.class7 = (aList);
+
+                        // allVideoList.remove(videoList);
+                    }
+
                     if (classname.equals("C8L")) {
+
+                        ArrayList aList = new ArrayList();
+                        if (GlobalData.class8 != null) {
+                            aList = GlobalData.class8;
+                        }
+
+                        aList.add(videoList);
+
+                        GlobalData.class8 = (aList);
+
+                        // allVideoList.remove(videoList);
+                    }
+
+                    if (classname.equals("NC8")) {
 
                         ArrayList aList = new ArrayList();
                         if (GlobalData.class8 != null) {
@@ -729,7 +757,8 @@ public class VideoListing extends AppCompatActivity {
         GlobalData.classukgLS7 =new ArrayList();
         GlobalData.classnrlLS7 =new ArrayList();
 
-        finishAffinity();
+        finish();
+
     }
 
     private void configure() {
@@ -743,9 +772,7 @@ public class VideoListing extends AppCompatActivity {
             super.onPostExecute(s);
 
             no_of_videos.setText("Files - " + String.valueOf(addedLessons.size()));
-            aSize=aSize+"   t"+String.valueOf(GlobalData.addedVideos.size());
-            aSize=aSize+"   t"+String.valueOf(addedLessons.size());
-            shared_id.setText(aSize);
+
 
             VideoAddedAdapter videoAddedAdapter = new
                 VideoAddedAdapter(addedLessons, added_list);
@@ -761,7 +788,8 @@ public class VideoListing extends AppCompatActivity {
             super.onPreExecute();
             addedLessons=new ArrayList();
         //    aSize=aSize+"   x"+String.valueOf(GlobalData.addedVideos.size());
-            aSize=aSize+"  x "+String.valueOf(addedLessons.size());
+          //  aSize=aSize+"  x "+String.valueOf(addedLessons.size());
+
             mProgressDialog.show();
         }
 
@@ -786,9 +814,9 @@ public class VideoListing extends AppCompatActivity {
 
 
 
+
             try {
-                Toast.makeText(VideoListing.this, String.valueOf(allVideoList4.size()), Toast.LENGTH_SHORT).show();
-                if (StudentClass.equals("NRL")) {
+                 if (StudentClass.equals("NRL")) {
 
                     if (allVideoListnrl != null) {
 
@@ -2576,7 +2604,8 @@ public class VideoListing extends AppCompatActivity {
             }
 
             if (StudentClass.equals("8")) {
-                if (GlobalData.class8LS1 != null) {
+                addedLessons.addAll(allVideoList8);
+             /*   if (GlobalData.class8LS1 != null) {
                     addedLessons.addAll(GlobalData.class8LS1);
                 }
                 if (GlobalData.class8LS2 != null) {
@@ -2596,11 +2625,12 @@ public class VideoListing extends AppCompatActivity {
                 }
                 if (GlobalData.class8LS7 != null) {
                     addedLessons.addAll(GlobalData.class8LS7);
-                }
+                }*/
             }
 
             if (StudentClass.equals("7")) {
-                if (GlobalData.class7LS1 != null) {
+                addedLessons.addAll(allVideoList7);
+               /* if (GlobalData.class7LS1 != null) {
                     addedLessons.addAll(GlobalData.class7LS1);
                 }
                 if (GlobalData.class7LS2 != null) {
@@ -2620,7 +2650,7 @@ public class VideoListing extends AppCompatActivity {
                 }
                 if (GlobalData.class7LS7 != null) {
                     addedLessons.addAll(GlobalData.class7LS7);
-                }
+                }*/
             }
 
             if (StudentClass.equals("6")) {
@@ -3113,6 +3143,7 @@ public class VideoListing extends AppCompatActivity {
                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int which) {
                         finishAffinity();
+                        System.exit(0);
 
                    }
                })

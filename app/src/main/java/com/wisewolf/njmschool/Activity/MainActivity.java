@@ -1,26 +1,25 @@
 package com.wisewolf.njmschool.Activity;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -28,31 +27,23 @@ import com.vimeo.networking.Configuration;
 import com.vimeo.networking.VimeoClient;
 import com.vimeo.networking.callbacks.AuthCallback;
 import com.vimeo.networking.callbacks.ModelCallback;
-import com.vimeo.networking.model.Video;
 import com.vimeo.networking.model.VideoList;
 import com.vimeo.networking.model.error.VimeoError;
-import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
-import com.wisewolf.njmschool.Models.OfflineVideos;
-import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.ObjectSerialiser;
 import com.wisewolf.njmschool.R;
-import com.wisewolf.njmschool.RetrofitClientInstance;
 
-import java.io.File;
+import org.jsoup.Jsoup;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
-    ImageView education,logo,load;
+    ImageView education, logo, load;
     String uri = "/me/videos";
     TextView wait;
-    String  lastpage="";
+    String lastpage = "";
+    String currentVersion,new_Version;
 
     ArrayList allVideoList_1stcall = new ArrayList();
 
@@ -61,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         education = findViewById(R.id.education_gif);
-        logo=findViewById(R.id.logo_id);
-        load=findViewById(R.id.loading);
-        wait=findViewById(R.id.wait);
+        logo = findViewById(R.id.logo_id);
+        load = findViewById(R.id.loading);
+        wait = findViewById(R.id.wait);
         wait.setText("Project Configuration. Please wait");
 
         runOnUiThread(new Runnable() {
@@ -72,6 +63,13 @@ public class MainActivity extends AppCompatActivity {
 
                 Glide.with(MainActivity.this).asGif().load(R.raw.educat).into(education);
                 Glide.with(MainActivity.this).asGif().load(R.raw.loading).into(load);
+                try {
+                    currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+
+
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
 
 
             }
@@ -117,10 +115,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
         }
 
-        if (isNetworkAvailable()){
-            download();
-        }
-        else {
+        if (isNetworkAvailable()) {
+
+            GetVersionCode getVersionCode=new GetVersionCode();
+            getVersionCode.execute();
+
+
+        } else {
             new AlertDialog.Builder(MainActivity.this)
                 .setTitle("OOPS....")
                 .setMessage("You are not connected to INTERNET..")
@@ -142,10 +143,9 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
     }
 
-    private void download() {
+         private void download() {
         Downback DB = new Downback();
         DB.execute("");
     }
@@ -158,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-             GlobalData.vimeoclient=VimeoClient.getInstance();
+            GlobalData.vimeoclient = VimeoClient.getInstance();
             VimeoClient.getInstance().fetchNetworkContent(uri, new ModelCallback<VideoList>(VideoList.class) {
                 @Override
                 public void success(VideoList videoList) {
@@ -173,14 +173,14 @@ public class MainActivity extends AppCompatActivity {
 
                         GlobalData.allVideoList = (allVideoList);*/
 
-                        allVideoList_1stcall=videoList.data;
+                        allVideoList_1stcall = videoList.data;
 
 
-                     //   allVideoList.addAll(videoList.data);
+                        //   allVideoList.addAll(videoList.data);
                         String last_num = videoList.paging.last;
                         String[] parts = last_num.split("=");
                         int x = Integer.parseInt(parts[1]);
-                        lastpage=parts[1];
+                        lastpage = parts[1];
                         Log.d("eff", allVideoList.toString());
                         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
 
@@ -190,14 +190,12 @@ public class MainActivity extends AppCompatActivity {
                             for (int i = 2; i <= x; i++) {
                                 String uri = String.valueOf(i);
                                 uri = "/me/videos?page=" + uri;
-                                callApi(uri,i);
+                                callApi(uri, i);
                             }
-                        }
-                        else {
+                        } else {
                             Intent msgIntent = new Intent(MainActivity.this, SignUp.class);
                             startActivity(msgIntent);
                         }
-
 
 
                     }
@@ -215,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    void callApi(final String url, final int lp){
+    void callApi(final String url, final int lp) {
 
         VimeoClient.getInstance().fetchNetworkContent(url, new ModelCallback<VideoList>(VideoList.class) {
             @Override
@@ -228,8 +226,8 @@ public class MainActivity extends AppCompatActivity {
 
 
                     allVideoList_1stcall.addAll(videoList.data);
-                    GlobalData.allVideoList=(allVideoList_1stcall);
-                  // did now GlobalData.allVideoList=(allVideoList);
+                    GlobalData.allVideoList = (allVideoList_1stcall);
+                    // did now GlobalData.allVideoList=(allVideoList);
                     SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                     SharedPreferences.Editor editor = sharedPrefs.edit();
                     Gson gson = new Gson();
@@ -237,7 +235,7 @@ public class MainActivity extends AppCompatActivity {
 //            did now        String json = gson.toJson(allVideoList);
                     String json = gson.toJson(allVideoList_1stcall);
                     editor.putString("Allvideolist", json);
-                    editor.putString("size",String.valueOf(videoList.total));
+                    editor.putString("size", String.valueOf(videoList.total));
                     try {
                         editor.putString("task", ObjectSerialiser.serialize(allVideoList_1stcall));
                     } catch (IOException e) {
@@ -246,8 +244,8 @@ public class MainActivity extends AppCompatActivity {
                     editor.apply();
 
 
-                    wait.setText("Project Configuration. "+url);
-                    if (String.valueOf(lp).equals(lastpage)){
+                    wait.setText("Project Configuration. " + url);
+                    if (String.valueOf(lp).equals(lastpage)) {
 
                         wait.setText(" Done. ");
                         Intent msgIntent = new Intent(MainActivity.this, SignUp.class);
@@ -264,7 +262,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
     }
 
     private boolean isNetworkAvailable() {
@@ -274,4 +271,45 @@ public class MainActivity extends AppCompatActivity {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    private class GetVersionCode extends AsyncTask<Void, String, String> {
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            String newVersion = null;
+            try {
+                newVersion = Jsoup.connect("https://play.google.com/store/apps/details?id=" + MainActivity.this.getPackageName() + "&hl=it")
+                    .timeout(30000)
+                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
+                    .referrer("http://www.google.com")
+                    .get()
+                    .select(".hAyfc .htlgb")
+                    .get(7)
+                    .ownText();
+                new_Version=newVersion;
+                return newVersion;
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String onlineVersion) {
+            super.onPostExecute(onlineVersion);
+            Log.d("update", "Current version " + currentVersion + "playstore version " + onlineVersion);
+            if (onlineVersion != null && !onlineVersion.isEmpty()) {
+                if (Float.parseFloat(currentVersion) < Float.parseFloat(onlineVersion)) {
+                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                    } catch (android.content.ActivityNotFoundException anfe) {
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                    }
+                }
+                else {
+                    download();
+                }
+            }
+        }
+
+    }
 }

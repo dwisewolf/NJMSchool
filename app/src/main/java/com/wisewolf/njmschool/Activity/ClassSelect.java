@@ -19,7 +19,7 @@ public class ClassSelect extends AppCompatActivity {
     String[] TeacherClass = {"NURSERY", "LKG", "UKG", "CLASS I", "CLASS II",
         "CLASS III", "CLASS IV", "CLASS V", "CLASS VI", "CLASS VII", "CLASS VIII",
         "CLASS VI-NCERT", "CLASS VII-NCERT", "CLASS VIII-NCERT",
-        "CLASS IX", "CLASS X", "CLASS XI", "CLASS XII"};
+        "CLASS IX", "CLASS X", "CLASS XII_C", "CLASS XII_H", "CLASS XII_S"};
     String name, clas, phone, sect;
 
     @Override
@@ -63,30 +63,40 @@ public class ClassSelect extends AppCompatActivity {
                     classid = "VII";
                 } else if (item.equals("CLASS VIII")) {
                     classid = "VIII";
-                }
-           else if (item.equals("CLASS VI")) {
-                classid = "VI";
-            } else if (item.equals("CLASS VII")) {
-                classid = "VII";
-            } else if (item.equals("CLASS VIII")) {
-                classid = "VIII";
-            }
-                else if (item.equals("CLASS IX")) {
+                } else if (item.equals("CLASS VI-NCERT")) {
+                    classid = "VI";
+                    GlobalData.regno = "AND" + GlobalData.regno;
+                } else if (item.equals("CLASS VII-NCERT")) {
+                    classid = "VII";
+                    GlobalData.regno = "AND" + GlobalData.regno;
+                } else if (item.equals("CLASS VIII-NCERT")) {
+                    classid = "VIII";
+                    GlobalData.regno = "AND" + GlobalData.regno;
+                } else if (item.equals("CLASS IX")) {
                     classid = "IX";
                 } else if (item.equals("CLASS X")) {
                     classid = "X";
                 } else if (item.equals("CLASS XI")) {
                     classid = "XI";
-                } else if (item.equals("CLASS XII")) {
+                } else if (item.equals("CLASS XII_C")) {
                     classid = "XII";
-                } else classid = "";
+                    GlobalData.sect="C";
+                }
+                else if (item.equals("CLASS XII_H")) {
+                    classid = "XII";
+                    GlobalData.sect="H";
+                }
+                else if (item.equals("CLASS XII_S")) {
+                    classid = "XII";
+                    GlobalData.sect="S";
+                }else classid = "";
 
 
                 Intent intent = new Intent(ClassSelect.this, VideoListing.class);
                 intent.putExtra("name", name);
 
                 intent.putExtra("class", classid);
-                intent.putExtra("sec", classid);
+                intent.putExtra("sec", GlobalData.sect);
                 intent.putExtra("phone", phone);
                 startActivity(intent);
             }

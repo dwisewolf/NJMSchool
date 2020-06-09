@@ -3,6 +3,7 @@ package com.wisewolf.njmschool.Activity;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -15,6 +16,7 @@ import com.wisewolf.njmschool.R;
 
 public class Fullscreen extends AppCompatActivity {
     VideoView videoFull;
+    ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +37,11 @@ public class Fullscreen extends AppCompatActivity {
     }
 
     void media(String videoUrl) {
-
-
+        mProgressDialog = new ProgressDialog(Fullscreen.this);
+        mProgressDialog.setMessage("Internet Slow ! Please wait . . .");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
 
 
 
@@ -51,6 +56,7 @@ public class Fullscreen extends AppCompatActivity {
         videoFull.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {
+                mProgressDialog.cancel();
                 mediaController.setAnchorView(videoFull);
                 videoFull.start();
             }

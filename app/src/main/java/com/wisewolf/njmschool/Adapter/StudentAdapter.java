@@ -52,7 +52,6 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.Student
         return students.size();
     }
 
-
     class  StudentViewHolder extends RecyclerView.ViewHolder {
 
         TextView name,clss,sect,regno;
@@ -81,6 +80,5 @@ public class StudentAdapter  extends RecyclerView.Adapter<StudentAdapter.Student
             });
         }
     }
-
 
 }
