@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.vimeo.networking.model.Video;
+import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.R;
 
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
             holder.bgrndClr.setBackgroundColor(Color.parseColor("#FFFFCCCC"));
         }
 
-        holder.set((Video) recent_adds.get(position));
+        holder.set((ClassVideo) recent_adds.get(position));
         holder.bind(recent_adds.get(position), listener,position);
 
     }
@@ -71,7 +72,7 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Video item);
+        void onItemClick(ClassVideo item);
     }
 
     class ClassVideoViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -89,9 +90,9 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
             bgrndClr=itemView.findViewById(R.id.bgrndClr);
         }
 
-        public void set(Video video) {
+        public void set(ClassVideo video) {
             Glide.with(context)
-                .load(video.pictures.sizes.get(1).link) // image url
+                .load(video.getData().getPictures().getSizes().get(1).getLink()) // image url
 
 
 
@@ -99,11 +100,11 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
         .into( thumb);
 
             try {
-                if (video.description==null){
-                    subject.setText(video.name);
+                if (video.getData().getDescription()==null){
+                    subject.setText(video.getData().getName());
                     topic.setText("Not mentioned");
                 }
-                else {String[] x=video.description.split("-");
+                else {String[] x=video.getData().getDescription().split("-");
                     subject.setText(x[0]);
                     topic.setText(x[1]);}
 
@@ -114,12 +115,12 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
 
 
 
-                        String cname = video.name;
+                        String cname = video.getData().getName();
                         cname = cname.substring(3);
 
                         String lessonname = cname.substring(0, Math.min(cname.length(), 2));
 
-                        cname = (video.name.substring(5)).substring(0, Math.min(cname.length(), 3));
+                        cname = (video.getData().getName().substring(5)).substring(0, Math.min(cname.length(), 3));
                         part.setText(cname);
 
 
@@ -144,7 +145,7 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override public void onClick(View v) {
-                    listener.onItemClick((Video) o);
+                    listener.onItemClick((ClassVideo) o);
                     int previousItem = selectedItem;
                     selectedItem = position;
                     notifyItemChanged(previousItem);

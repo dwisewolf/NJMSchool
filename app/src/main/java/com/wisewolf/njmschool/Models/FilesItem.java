@@ -14,7 +14,7 @@ public class FilesItem{
 	private String link;
 
 	@SerializedName("fps")
-	private int fps;
+	private float fps;
 
 	@SerializedName("type")
 	private String type;
@@ -43,7 +43,7 @@ public class FilesItem{
 		return link;
 	}
 
-	public int getFps(){
+	public float getFps(){
 		return fps;
 	}
 

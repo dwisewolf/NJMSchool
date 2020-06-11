@@ -2,6 +2,8 @@ package com.wisewolf.njmschool.Models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 public class Videos{
 
 	@SerializedName("privacy")

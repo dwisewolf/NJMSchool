@@ -5,30 +5,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.wisewolf.njmschool.Globals.GlobalData;
+import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.News;
-import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.Adapter.StudentAdapter;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import kotlin.text.Regex;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class StudentProfileSelection extends AppCompatActivity {
     RecyclerView studentList;
+    ProgressDialog mProgressDialog;
     TextView parents;
+    String u_class,school;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,13 +51,17 @@ public class StudentProfileSelection extends AppCompatActivity {
 
         }
 
-
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
         studentList = findViewById(R.id.child_select_list);
+        mProgressDialog = new ProgressDialog(StudentProfileSelection.this);
+        mProgressDialog.setMessage("Loading. . .");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        mProgressDialog.setCancelable(true);
         // callQuote();
         try {
             studentList.setAdapter(new StudentAdapter(GlobalData.profiles, studentList, new StudentAdapter.OnItemClickListener() {
@@ -59,20 +71,26 @@ public class StudentProfileSelection extends AppCompatActivity {
                 public void onItemClick(SchoolDiff s) {
                     if (s.getCategory().equals("TEACHER")) {
                         GlobalData.regno = s.getUserid();
+                        String original = s.getUserid();
+                        Regex reg = new Regex("(?<=[0-9])(?=[A-Za-z])");
+                        String[] parts = reg.split(original, 2).toArray(new String[0]);
                         Intent intent = new Intent(StudentProfileSelection.this, ClassSelect.class);
                         intent.putExtra("name", s.getName());
+                        intent.putExtra("school", parts[1]);
                         intent.putExtra("phone", s.getMobileNum());
                         startActivity(intent);
                     }
                     if (s.getCategory().equals("STUDENT")) {
                         GlobalData.regno = s.getUserid();
-                        getnews(s.getUserid());
-                        Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
-                        intent.putExtra("name", s.getName());
-                        intent.putExtra("class", s.getClas());
-                        intent.putExtra("sec", s.getCategory());
-                        intent.putExtra("phone", String.valueOf(s.getMobileNum()));
-                        startActivity(intent);
+                     //   getnews(s.getUserid());
+
+                        school=s.getUserid().substring(0,1);
+                        u_class=s.getClas();
+                        mProgressDialog.show();
+                        getClassVideo(school,u_class,s);
+
+
+
                     }
 
 
@@ -84,6 +102,39 @@ public class StudentProfileSelection extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Your Network Error ..please restart App (SPS84)", Toast.LENGTH_SHORT).show();
             FirebaseCrashlytics.getInstance().log(String.valueOf(e));
+        }
+
+    }
+
+    private void getClassVideo(String school, String u_class, final SchoolDiff s) {
+        u_class = findClass(u_class);
+        try {
+            final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+            Call<List<ClassVideo>> call = service.getVideos(school, u_class);
+            call.enqueue(new Callback<List<ClassVideo>>() {
+                @Override
+                public void onResponse(Call<List<ClassVideo>> call, Response<List<ClassVideo>> response) {
+
+                    GlobalData.allVideoList = (ArrayList) response.body();
+                    mProgressDialog.cancel();
+                    Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
+                    intent.putExtra("name", s.getName());
+                    intent.putExtra("class", s.getClas());
+                    intent.putExtra("sec", s.getCategory());
+                    intent.putExtra("phone", String.valueOf(s.getMobileNum()));
+                    startActivity(intent);
+                }
+
+                @Override
+                public void onFailure(Call<List<ClassVideo>> call, Throwable t) {
+
+                }
+            });
+
+            // Response<List<ClassVideo>> response=   call.execute();
+
+        } catch (Exception e) {
+
         }
 
     }
@@ -115,5 +166,60 @@ String a="";
 
 
     }
+
+
+
+
+    private String findClass(String clas) {
+        String clasS = "";
+        switch(clas) {
+            case "PREP":
+                clasS=   "NR";
+                break;
+            case "LKG":
+                clasS="LK";
+                break;
+            case "UKG":
+                clasS= "UK";
+                break;
+            case "XII":
+            case "XI":
+                clasS= "C12";
+                break;
+            case "X":
+                clasS="C10";
+                break;
+            case "IX":
+               clasS= "C9";
+                break;
+            case "VIII":
+               clasS= "C8";
+                break;
+            case "VII":
+               clasS= "C7";
+                break;
+            case "VI":
+               clasS= "C6";
+                break;
+            case "V":
+               clasS= "C5";
+                break;
+            case "IV":
+               clasS= "C4";
+                break;
+            case "III":
+               clasS= "C3";
+                break;
+            case "II":
+               clasS= "C2";
+                break;
+            case "I":
+               clasS= "C1";
+                break;
+        }
+        return  clasS;
+    }
+
+
 
 }

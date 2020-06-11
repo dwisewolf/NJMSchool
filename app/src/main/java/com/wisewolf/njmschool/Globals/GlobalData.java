@@ -1,15 +1,18 @@
 package com.wisewolf.njmschool.Globals;
 
-import android.app.Application;
-
 import com.vimeo.networking.VimeoClient;
+import com.wisewolf.njmschool.Models.ClassVideo;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Response;
+
 public class GlobalData   {
 
     public static ArrayList allVideoList ;
+
+
 
     public static ArrayList ReservallVideoList ;
 
@@ -157,6 +160,5 @@ public class GlobalData   {
     public static ArrayList OfflineVideos ;
 
 
-
-
+    public static Response<List<ClassVideo>> all_VideoList;
 }

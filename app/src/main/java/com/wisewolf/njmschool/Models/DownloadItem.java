@@ -2,13 +2,15 @@ package com.wisewolf.njmschool.Models;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class DownloadItem{
 
 	@SerializedName("created_time")
 	private String createdTime;
 
 	@SerializedName("expires")
-	private String expires;
+	private Date expires;
 
 	@SerializedName("size")
 	private int size;
@@ -20,7 +22,7 @@ public class DownloadItem{
 	private String link;
 
 	@SerializedName("fps")
-	private int fps;
+	private float fps;
 
 	@SerializedName("type")
 	private String type;
@@ -38,7 +40,7 @@ public class DownloadItem{
 		return createdTime;
 	}
 
-	public String getExpires(){
+	public Date getExpires(){
 		return expires;
 	}
 
@@ -54,7 +56,7 @@ public class DownloadItem{
 		return link;
 	}
 
-	public int getFps(){
+	public float getFps(){
 		return fps;
 	}
 

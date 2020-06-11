@@ -1,5 +1,6 @@
 package com.wisewolf.njmschool;
 
+import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.Models.Response;
@@ -15,9 +16,10 @@ import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public class RetrofitClientInstance {
-    private static Retrofit retrofit,retrofitOut;
+    private static Retrofit retrofit, retrofitOut;
     private static final String BASE_URL = "http://139.59.79.78/";
 
     public static Retrofit getRetrofitInstance() {
@@ -29,6 +31,7 @@ public class RetrofitClientInstance {
         }
         return retrofit;
     }
+
     public static Retrofit getRetrofitInstance1(String baseurl) {
         if (retrofitOut == null) {
             retrofitOut = new retrofit2.Retrofit.Builder()
@@ -85,13 +88,16 @@ public class RetrofitClientInstance {
 
         @POST("/newsUpload/")
         @FormUrlEncoded
-        Call<News> set_News(      @Field("school_code") String school_code,
-                                        @Field("user_code") String user_code,
-                                        @Field("news") String news,
-                                        @Field("expiryDate") String expiryDate,
-                                        @Field("link") String link);
+        Call<News> set_News(@Field("school_code") String school_code,
+                            @Field("user_code") String user_code,
+                            @Field("news") String news,
+                            @Field("expiryDate") String expiryDate,
+                            @Field("link") String link);
 
-
+        @GET("/api/vimeo/videos/")
+        Call<List<ClassVideo>> getVideos(@Query(value = "school", encoded = true) String school,
+                                         @Query(value = "class", encoded = true) String user_class);
 
     }
+
 }

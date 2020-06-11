@@ -53,6 +53,7 @@ import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Exceptions.VimeoException;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Globals.SubjectList;
+import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.OfflineVideos;
 import com.wisewolf.njmschool.Models.VideoUp;
 import com.wisewolf.njmschool.R;
@@ -91,7 +92,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     String lesson_flag = "ALL";
     String details = ".-.-.", vURL = "",download_url="",download_name="",pass="WISEWOLF";
     TextView topic, head, teacher;
-    Video selectedVideo;
+    ClassVideo selectedVideo;
     ProgressDialog mProgressDialog;
 
     OfflineDatabase dbb;
@@ -165,7 +166,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                     }
                     else {for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
                         OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
-                        if (selectedVideo.name.equals(offlineVideos.getName()))
+                        if (selectedVideo.getData().getName().equals(offlineVideos.getName()))
                             found = 1;
 
 
@@ -174,13 +175,13 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                     if (found == 1) {
                         Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
                     } else {
-                        if (c.before(selectedVideo.download.get(0).expires)) {
-                            String url = selectedVideo.download.get(0).link;
-                            download_name = selectedVideo.name;
+                        if (c.before(selectedVideo.getData().getDownload().get(0).getExpires())) {
+                            String url = selectedVideo.getData().getDownload().get(0).getLink();
+                            download_name = selectedVideo.getData().getName();
                             download_url = url;
-                            nametostore = selectedVideo.name;
-                            extra1 = selectedVideo.pictures.sizes.get(selectedVideo.pictures.sizes.size()-1).link;
-                            extra2=selectedVideo.description;
+                            nametostore = selectedVideo.getData().getName();
+                            extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink();
+                            extra2=selectedVideo.getData().getDescription();
                             download();
                         } else {
                             new AlertDialog.Builder(VideoPlay.this)
@@ -774,19 +775,19 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         video_play_list.setAdapter(new Class_videoAdapter(VideoPlay.this, GlobalData.addedVideos, video_play_list, new Class_videoAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Video item) {
+            public void onItemClick(ClassVideo item) {
               //  Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
-                details = item.description;
-                media(item.files.get(0).link);
-                vURL = item.files.get(0).link;
+                details = item.getData().getDescription();
+                media(item.getData().getFiles().get(0).getLink());
+                vURL = item.getData().getFiles().get(0).getLink();
                 download.setVisibility(View.VISIBLE);
                 fullscreen.setVisibility(View.VISIBLE);
                 String regno=GlobalData.regno;
                 Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
-                String[] time=String.valueOf(item.createdTime).split("\\s+");
+                String[] time=String.valueOf(item.getData().getCreatedTime()).split("\\s+");
                 final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
 
-                Call<VideoUp> saveVideo = service.saveVideo(regno,item.name,item.files.get(0).link,item.description,item.pictures.sizes.get(selectedVideo.pictures.sizes.size()-1).link,time[3]);
+                Call<VideoUp> saveVideo = service.saveVideo(regno,item.getData().getName(),item.getData().getFiles().get(0).getLink(),item.getData().getDescription(),item.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink(),time[3]);
                 saveVideo.enqueue(new Callback<VideoUp>() {
                     @Override
                     public void onResponse(Call<VideoUp> call, retrofit2.Response<VideoUp> response) {
@@ -816,20 +817,20 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         video_play_list.setAdapter(new Class_videoAdapter(VideoPlay.this, selectedVideoList, video_play_list, new Class_videoAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Video item) {
+            public void onItemClick(ClassVideo item) {
                 selectedVideo=item;
                // Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
-                details = item.description;
-                media(item.files.get(0).link);
-                vURL = item.files.get(0).link;
+                details = item.getData().getDescription();
+                media(item.getData().getFiles().get(0).getLink());
+                vURL = item.getData().getFiles().get(0).getLink();
                 download.setVisibility(View.VISIBLE);
                 fullscreen.setVisibility(View.VISIBLE);
                 Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
                 String regno=GlobalData.regno;
-                String[] time=String.valueOf(item.createdTime).split("\\s+");
+                String[] time=String.valueOf(item.getData().getCreatedTime()).split("T");
                 final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
 
-                Call<VideoUp> saveVideo = service.saveVideo(regno,item.name,item.files.get(0).link,item.description,item.pictures.sizes.get(selectedVideo.pictures.sizes.size()-1).link,time[3]);
+                Call<VideoUp> saveVideo = service.saveVideo(regno,item.getData().getName(),item.getData().getFiles().get(0).getLink(),item.getData().getDescription(),item.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink(),time[1]);
                 saveVideo.enqueue(new Callback<VideoUp>() {
                     @Override
                     public void onResponse(Call<VideoUp> call, retrofit2.Response<VideoUp> response) {
@@ -861,8 +862,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             String lesn = "";
             if (StudentClass.equals("12") || StudentClass.equals("11") || StudentClass.equals("10")) {
                 for (int i = 0; i < selectedVideoList.size(); i++) {
-                    Video video = (Video) selectedVideoList.get(i);
-                    lesn = (video.name.substring(3));
+                   ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                    lesn = (video.getData().getName().substring(3));
                     lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                     if (lesn.equals(lesson_flag)) {
                         returnVideo.add(selectedVideoList.get(i));
@@ -875,15 +876,15 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
                 if (school.equals("AND")) {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
-                            lesn = (video.name.substring(3));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")) {
+                            lesn = (video.getData().getName().substring(3));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
                             }
                         } else {
-                            lesn = (video.name.substring(2));
+                            lesn = (video.getData().getName().substring(2));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
@@ -895,8 +896,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
                 } else {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        lesn = (video.name.substring(2));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        lesn = (video.getData().getName().substring(2));
                         lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                         if (lesn.equals(lesson_flag)) {
                             returnVideo.add(selectedVideoList.get(i));
@@ -910,15 +911,15 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
                 if (school.equals("AND")) {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
-                            lesn = (video.name.substring(3));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")) {
+                            lesn = (video.getData().getName().substring(3));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
                             }
                         } else {
-                            lesn = (video.name.substring(2));
+                            lesn = (video.getData().getName().substring(2));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
@@ -930,8 +931,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
                 } else {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        lesn = (video.name.substring(2));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        lesn = (video.getData().getName().substring(2));
                         lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                         if (lesn.equals(lesson_flag)) {
                             returnVideo.add(selectedVideoList.get(i));
@@ -945,15 +946,15 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
                 String school = GlobalData.regno.substring(0, Math.min(GlobalData.regno.length(), 3));
                 if (school.equals("AND")) {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")) {
-                            lesn = (video.name.substring(3));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")) {
+                            lesn = (video.getData().getName().substring(3));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
                             }
                         } else {
-                            lesn = (video.name.substring(2));
+                            lesn = (video.getData().getName().substring(2));
                             lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                             if (lesn.equals(lesson_flag)) {
                                 returnVideo.add(selectedVideoList.get(i));
@@ -965,8 +966,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
                 } else {
                     for (int i = 0; i < selectedVideoList.size(); i++) {
-                        Video video = (Video) selectedVideoList.get(i);
-                        lesn = (video.name.substring(2));
+                       ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                        lesn = (video.getData().getName().substring(2));
                         lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                         if (lesn.equals(lesson_flag)) {
                             returnVideo.add(selectedVideoList.get(i));
@@ -978,8 +979,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             } else {
 
                 for (int i = 0; i < selectedVideoList.size(); i++) {
-                    Video video = (Video) selectedVideoList.get(i);
-                    lesn = (video.name.substring(2));
+                   ClassVideo video = (ClassVideo) selectedVideoList.get(i);
+                    lesn = (video.getData().getName().substring(2));
                     lesn = lesn.substring(0, Math.min(lesn.length(), 2));
                     if (lesn.equals(lesson_flag)) {
                         returnVideo.add(selectedVideoList.get(i));
@@ -1067,8 +1068,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             videoList = GlobalData.addedVideos;
             String subj = "";
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1090,8 +1091,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             videoList = GlobalData.addedVideos;
             String subj = "";
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1113,8 +1114,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             videoList = GlobalData.addedVideos;
             String subj = "";
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1144,8 +1145,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(5));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(5));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1169,8 +1170,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1194,8 +1195,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1222,16 +1223,16 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         if (school.equals("AND")){
 
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
-                    subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")){
+                    subj = (video.getData().getName().substring(5));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals(subCode)) {
                         subject_videoList.add(videoList.get(i));
                     }
                 }
                 else {
-                    subj = (video.name.substring(4));
+                    subj = (video.getData().getName().substring(4));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
                         if (subj.equals(subCode)) {
@@ -1241,7 +1242,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-              /*  subj = (video.name.substring(5));
+              /*  subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1251,8 +1252,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         }
         else {
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(4));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(4));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1282,16 +1283,16 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         if (school.equals("AND")){
 
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
-                    subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")){
+                    subj = (video.getData().getName().substring(5));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals(subCode)) {
                         subject_videoList.add(videoList.get(i));
                     }
                 }
                 else {
-                    subj = (video.name.substring(4));
+                    subj = (video.getData().getName().substring(4));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
                         if (subj.equals(subCode)) {
@@ -1301,7 +1302,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-             /*   subj = (video.name.substring(5));
+             /*   subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1311,8 +1312,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         }
         else {
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(4));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(4));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1342,16 +1343,16 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         if (school.equals("AND")){
 
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                if (video.name.substring(0, Math.min(video.name.length(), 1)).equals("N")){
-                    subj = (video.name.substring(5));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                if (video.getData().getName().substring(0, Math.min(video.getData().getName().length(), 1)).equals("N")){
+                    subj = (video.getData().getName().substring(5));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals(subCode)) {
                         subject_videoList.add(videoList.get(i));
                     }
                 }
                 else {
-                    subj = (video.name.substring(4));
+                    subj = (video.getData().getName().substring(4));
                     subj = subj.substring(0, Math.min(subj.length(), 3));
                     if (subj.equals("EGG")||subj.equals("HNG")||subj.equals("MAT")||subj.equals("CMP")){
                         if (subj.equals(subCode)) {
@@ -1361,7 +1362,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
 
                 }
-              /*  subj = (video.name.substring(5));
+              /*  subj = (video.getData().getName().substring(5));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1371,8 +1372,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         }
         else {
             for (int i = 0; i < videoList.size(); i++) {
-                Video video = (Video) videoList.get(i);
-                subj = (video.name.substring(4));
+               ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(4));
                 subj = subj.substring(0, Math.min(subj.length(), 3));
                 if (subj.equals(subCode)) {
                     subject_videoList.add(videoList.get(i));
@@ -1401,8 +1402,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1426,8 +1427,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1451,8 +1452,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1476,8 +1477,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1501,8 +1502,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1526,8 +1527,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1551,8 +1552,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         videoList = GlobalData.addedVideos;
         String subj = "";
         for (int i = 0; i < videoList.size(); i++) {
-            Video video = (Video) videoList.get(i);
-            subj = (video.name.substring(4));
+           ClassVideo video = (ClassVideo) videoList.get(i);
+            subj = (video.getData().getName().substring(4));
             subj = subj.substring(0, Math.min(subj.length(), 3));
             if (subj.equals(subCode)) {
                 subject_videoList.add(videoList.get(i));
@@ -1574,7 +1575,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             mProgressDialog.show();
 
 
-        //Use a media controller so that you can scroll the video contents
+        //Use a media controller so that you can scroll theClassVideo contents
         //and also to pause, start the video.
         final MediaController mediaController = new MediaController(this);
 
