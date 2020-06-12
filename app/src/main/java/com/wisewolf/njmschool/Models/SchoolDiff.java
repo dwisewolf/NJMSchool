@@ -23,7 +23,7 @@ public class SchoolDiff{
 	private String name;
 
 	@SerializedName("section")
-	private Object section;
+	private String section;
 
 	@SerializedName("id")
 	private int id;
@@ -58,7 +58,7 @@ public class SchoolDiff{
 		return name;
 	}
 
-	public Object getSection(){
+	public String getSection(){
 		return section;
 	}
 

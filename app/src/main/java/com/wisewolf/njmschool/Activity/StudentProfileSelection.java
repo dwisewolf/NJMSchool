@@ -120,7 +120,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                     Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
                     intent.putExtra("name", s.getName());
                     intent.putExtra("class", s.getClas());
-                    intent.putExtra("sec", s.getCategory());
+                    intent.putExtra("sec", s.getSection().replaceAll("\\s+",""));
                     intent.putExtra("phone", String.valueOf(s.getMobileNum()));
                     startActivity(intent);
                 }

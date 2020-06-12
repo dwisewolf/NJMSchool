@@ -31,8 +31,9 @@ public class ClassSelect extends AppCompatActivity {
         "CLASS III", "CLASS IV", "CLASS V", "CLASS VI", "CLASS VII", "CLASS VIII",
         "CLASS VI-NCERT", "CLASS VII-NCERT", "CLASS VIII-NCERT",
         "CLASS IX", "CLASS X", "CLASS XII_C", "CLASS XII_H", "CLASS XII_S"};
-    String name, clas,school, phone, sect;
+    String name, clas, school, phone, sect;
     ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,19 +98,17 @@ public class ClassSelect extends AppCompatActivity {
                     classid = "XI";
                 } else if (item.equals("CLASS XII_C")) {
                     classid = "XII";
-                    GlobalData.sect="C";
-                }
-                else if (item.equals("CLASS XII_H")) {
+                    GlobalData.sect = "C";
+                } else if (item.equals("CLASS XII_H")) {
                     classid = "XII";
-                    GlobalData.sect="H";
-                }
-                else if (item.equals("CLASS XII_S")) {
+                    GlobalData.sect = "H";
+                } else if (item.equals("CLASS XII_S")) {
                     classid = "XII";
-                    GlobalData.sect="S";
-                }else classid = "";
+                    GlobalData.sect = "S";
+                } else classid = "";
 
                 mProgressDialog.show();
-                getClassVideo(school.substring(0,1),classid,name,GlobalData.sect,phone);
+                getClassVideo(school.substring(0, 1), classid, name, GlobalData.sect, phone);
 
             }
 
@@ -125,7 +124,7 @@ public class ClassSelect extends AppCompatActivity {
 
         name = (intent.getStringExtra("name"));
         phone = (intent.getStringExtra("phone"));
-school=(intent.getStringExtra("school"));
+        school = (intent.getStringExtra("school"));
 
     }
 
@@ -136,7 +135,7 @@ school=(intent.getStringExtra("school"));
     }
 
     private void getClassVideo(String school, String u_class, final String name, String sect, final String phone) {
-      clas=u_class;
+        clas = u_class;
         u_class = findClass(u_class);
         try {
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
@@ -173,51 +172,51 @@ school=(intent.getStringExtra("school"));
 
     private String findClass(String clas) {
         String clasS = "";
-        switch(clas) {
+        switch (clas) {
             case "PREP":
-                clasS=   "NR";
+                clasS = "NR";
                 break;
             case "LKG":
-                clasS="LK";
+                clasS = "LK";
                 break;
             case "UKG":
-                clasS= "UK";
+                clasS = "UK";
                 break;
             case "XII":
             case "XI":
-                clasS= "C12";
+                clasS = "C12";
                 break;
             case "X":
-                clasS="C10";
+                clasS = "C10";
                 break;
             case "IX":
-                clasS= "C9";
+                clasS = "C9";
                 break;
             case "VIII":
-                clasS= "C8";
+                clasS = "C8";
                 break;
             case "VII":
-                clasS= "C7";
+                clasS = "C7";
                 break;
             case "VI":
-                clasS= "C6";
+                clasS = "C6";
                 break;
             case "V":
-                clasS= "C5";
+                clasS = "C5";
                 break;
             case "IV":
-                clasS= "C4";
+                clasS = "C4";
                 break;
             case "III":
-                clasS= "C3";
+                clasS = "C3";
                 break;
             case "II":
-                clasS= "C2";
+                clasS = "C2";
                 break;
             case "I":
-                clasS= "C1";
+                clasS = "C1";
                 break;
         }
-        return  clasS;
+        return clasS;
     }
 }
