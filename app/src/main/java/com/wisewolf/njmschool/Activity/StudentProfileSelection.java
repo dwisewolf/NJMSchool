@@ -7,10 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +53,7 @@ public class StudentProfileSelection extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+
         studentList = findViewById(R.id.child_select_list);
         mProgressDialog = new ProgressDialog(StudentProfileSelection.this);
         mProgressDialog.setMessage("Loading. . .");
@@ -82,7 +80,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                     }
                     if (s.getCategory().equals("STUDENT")) {
                         GlobalData.regno = s.getUserid();
-                     //   getnews(s.getUserid());
+                         getnews(s.getUserid());
 
                         school=s.getUserid().substring(0,1);
                         u_class=s.getClas();
@@ -113,7 +111,8 @@ public class StudentProfileSelection extends AppCompatActivity {
             Call<List<ClassVideo>> call = service.getVideos(school, u_class);
             call.enqueue(new Callback<List<ClassVideo>>() {
                 @Override
-                public void onResponse(Call<List<ClassVideo>> call, Response<List<ClassVideo>> response) {
+                public void onResponse(Call<List<ClassVideo>> call, Response<List<ClassVideo>> response)
+                {
 
                     GlobalData.allVideoList = (ArrayList) response.body();
                     mProgressDialog.cancel();
@@ -160,15 +159,11 @@ public class StudentProfileSelection extends AppCompatActivity {
 String a="";
                 }
             });
-        }catch (Exception e){
-            String a="";
+        }catch (Exception ignored){
         }
 
 
     }
-
-
-
 
     private String findClass(String clas) {
         String clasS = "";
@@ -219,7 +214,5 @@ String a="";
         }
         return  clasS;
     }
-
-
 
 }

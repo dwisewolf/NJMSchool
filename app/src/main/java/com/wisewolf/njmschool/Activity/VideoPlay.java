@@ -222,7 +222,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             }
         });
 
-     //   videoListAdapter();
+        if (!StudentClass.equals("12")){ videoListAdapter();}
+
         media("android.resource://" + getPackageName() + "/" + R.raw.v1);
         vURL = "android.resource://" + getPackageName() + "/" + R.raw.v1;
         try {

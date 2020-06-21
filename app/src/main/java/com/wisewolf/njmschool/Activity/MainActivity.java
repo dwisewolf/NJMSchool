@@ -3,7 +3,6 @@ package com.wisewolf.njmschool.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -11,36 +10,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-import com.vimeo.networking.Configuration;
-import com.vimeo.networking.VimeoClient;
-import com.vimeo.networking.callbacks.AuthCallback;
-import com.vimeo.networking.callbacks.ModelCallback;
-import com.vimeo.networking.model.VideoList;
-import com.vimeo.networking.model.error.VimeoError;
-import com.wisewolf.njmschool.Globals.GlobalData;
-import com.wisewolf.njmschool.ObjectSerialiser;
 import com.wisewolf.njmschool.R;
 
 import org.jsoup.Jsoup;
 
-import java.io.IOException;
 import java.util.ArrayList;
-
-import static android.net.sip.SipErrorCode.TIME_OUT;
 
 public class MainActivity extends AppCompatActivity {
     private static int TIME_OUT = 2000;
@@ -66,8 +51,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
 
-             //   Glide.with(MainActivity.this).asGif().load(R.raw.school).into(education);
-           //    Glide.with(MainActivity.this).asGif().load(R.raw.loading).into(load);
+                Glide.with(MainActivity.this).asGif().load(R.raw.school).into(education);
+          //     Glide.with(MainActivity.this).asGif().load(R.raw.loading).into(load);
                 try {
                     currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
 
@@ -120,12 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-
-
-
-
-
-
 
     private boolean isNetworkAvailable() {
         ConnectivityManager connectivityManager
@@ -187,4 +166,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }, TIME_OUT);
     }
+
+
 }

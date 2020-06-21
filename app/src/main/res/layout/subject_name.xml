@@ -9,18 +9,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:cardCornerRadius="3dp"
+
+        android:layout_margin="3dp"
         app:cardElevation="3dp"
         app:cardUseCompatPadding="true">
 
-        <TextView
+        <com.wisewolf.njmschool.AutoResizeTextView
             android:background="@color/c3"
             android:id="@+id/sub_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/roboto_black"
-            android:padding="5dp"
+            android:padding="8dp"
             android:text="Political Science"
             android:textColor="@color/black"
-            android:textSize="13sp" />
+              />
     </androidx.cardview.widget.CardView>
 </LinearLayout>

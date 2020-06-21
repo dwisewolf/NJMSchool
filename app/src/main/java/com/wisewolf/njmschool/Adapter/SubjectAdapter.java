@@ -55,7 +55,7 @@ public class SubjectAdapter extends  RecyclerView.Adapter<SubjectAdapter.Subject
     @Override
     public void onBindViewHolder(@NonNull final SubjectViewHolder holder, final int position) {
 
-        holder.subj.setBackgroundColor(Color.parseColor("#99ff99"));
+        holder.subj.setBackgroundColor(Color.parseColor("#802196F3"));
 
         if (selectedItem == position) {
             holder.subj.setBackgroundColor(Color.parseColor("#FFFFFF"));
