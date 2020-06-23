@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class OfflineDatabase extends SQLiteOpenHelper {
     SQLiteDatabase dh;
     // Database Version
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     // Database Name
     private static final String DATABASE_NAME = "OfflineDB";
 
@@ -28,6 +28,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         String CREATE_TABLE_SITENAME = "CREATE TABLE tbl_item(id varchar PRIMARY KEY ,name varchar  ,salt_name varchar  ,dir_name varchar  ,inv_name varchar  ,location varchar ,userid varchar ,extra1 varcha,extra2 varchar   )";
         sqLiteDatabase.execSQL(CREATE_TABLE_SITENAME);
+
+        String CREATE_TABLE_DocName = "CREATE TABLE tbl_document(id varchar PRIMARY KEY ,name varchar  ,dir_name varchar ,location varchar ,userid varchar ,extra1 varchar  )";
+        sqLiteDatabase.execSQL(CREATE_TABLE_DocName);
 
     }
 
@@ -52,6 +55,30 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
 
             dh.insert("tbl_item", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String insertDocument(String name, String dir_name, String location, String userid, String extra1)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("[name]", name);
+
+            values.put("[inv_name]", dir_name);
+            values.put("[location]", location);
+            values.put("[userid]", userid);
+            values.put("[extra1]", extra1);
+
+
+            dh.insert("tbl_document", null, values);
             dh.close();
             return "y";
 

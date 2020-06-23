@@ -81,7 +81,7 @@ import static android.content.ContentValues.TAG;
 public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     RecyclerView subj_list, video_play_list;
     String StudentClass = "12", studentdiv = "S";
-    ImageView download, fullscreen;
+    ImageView download, fullscreen,notes;
     VideoView videoView;
     Spinner lesson_selectSpinner;
     ArrayList nowShowing = new ArrayList();
@@ -126,7 +126,8 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         head = findViewById(R.id.mainHead);
         topic = findViewById(R.id.topic);
         teacher = findViewById(R.id.teacher);
-
+notes=findViewById(R.id.document);
+notes.setVisibility(View.GONE);
 
         lessonSpinnerLoad();
         intent();
@@ -777,6 +778,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         video_play_list.setAdapter(new Class_videoAdapter(VideoPlay.this, GlobalData.addedVideos, video_play_list, new Class_videoAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(ClassVideo item) {
+                notescalculate(item);
               //  Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
                 details = item.getData().getDescription();
                 media(item.getData().getFiles().get(0).getLink());
@@ -812,6 +814,23 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
     }
 
+    private void notescalculate(ClassVideo item) {
+        String[] desc=item.getData().getDescription().split("-");
+        if (desc.length>3){
+            notes.setVisibility(View.VISIBLE);
+            String url="";
+
+            for (int i=3;i<desc.length;i++){
+                 if (i==3)
+                     url=desc[i];
+                 else
+                     url=url+"-"+desc[i];
+
+            }
+            Toast.makeText(this, "Notes Present", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void subj_wise_videoListAdapter(ArrayList selectedVideoList) {
         nowShowing = selectedVideoList;
         selectedVideoList = getLesson(selectedVideoList);
@@ -820,6 +839,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
             @Override
             public void onItemClick(ClassVideo item) {
                 selectedVideo=item;
+                notescalculate(item);
                // Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
                 details = item.getData().getDescription();
                 media(item.getData().getFiles().get(0).getLink());

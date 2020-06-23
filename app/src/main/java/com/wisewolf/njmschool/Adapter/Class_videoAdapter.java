@@ -152,6 +152,8 @@ public class Class_videoAdapter extends RecyclerView.Adapter<Class_videoAdapter.
                     notifyItemChanged(position);
                 }
             });
+
+
         }
     }
 

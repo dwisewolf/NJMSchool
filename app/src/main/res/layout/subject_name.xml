@@ -14,13 +14,12 @@
         app:cardElevation="3dp"
         app:cardUseCompatPadding="true">
 
-        <com.wisewolf.njmschool.AutoResizeTextView
+        <TextView
             android:background="@color/c3"
             android:id="@+id/sub_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/roboto_black"
-            android:padding="8dp"
+            android:padding="4dp"
             android:text="Political Science"
             android:textColor="@color/black"
               />
