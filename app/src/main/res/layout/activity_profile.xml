@@ -106,6 +106,22 @@
         app:layout_constraintGuide_percent="0.32" />
 
 
+    <ImageView
+        android:translationZ="10dp"
+
+        android:id="@+id/thumb"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline33"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline18"
+        app:srcCompat="@drawable/car3" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline19"
         android:layout_width="wrap_content"
@@ -220,7 +236,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/helvetica"
                                         android:gravity="bottom|center"
-                                        android:text="Photo Files"
+                                        android:text="Extracurricular"
                                         android:textColor="@color/black"
                                         android:textSize="22sp" />
 
@@ -264,7 +280,7 @@
                                         android:layout_weight="1"
                                         android:fontFamily="@font/helvetica"
                                         android:gravity="bottom|center"
-                                        android:text="Documents"
+                                        android:text="Daily Task"
                                         android:textColor="@color/black"
                                         android:textSize="22sp" />
 
@@ -276,8 +292,57 @@
                                         android:text="Data" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/feeds_card"
+                                android:layout_width="170dp"
+                                android:layout_height="match_parent"
+                                app:cardBackgroundColor="@color/c4"
+                                app:cardCornerRadius="8dp"
+                                app:cardElevation="5dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+                                    <ImageView
+                                        android:id="@+id/imageView2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="25dp"
+                                        android:layout_marginTop="25dp"
+                                        app:srcCompat="@drawable/thumbsup" />
+
+                                    <TextView
+                                        android:id="@+id/textView9"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:fontFamily="@font/helvetica"
+                                        android:gravity="bottom|center"
+                                        android:text="Feedback"
+                                        android:textColor="@color/black"
+                                        android:textSize="22sp" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="match_parent"
+                                        android:layout_weight="1"
+                                        android:gravity="top|center"
+                                        android:text="your suggestion/problems" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
                         </LinearLayout>
                     </HorizontalScrollView>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/teacherdetail_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    </androidx.recyclerview.widget.RecyclerView>
 
                     <TextView
                         android:id="@+id/lesonListFlag"
@@ -354,12 +419,25 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.94" />
 
+    <VideoView
+        android:id="@+id/introvideo"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline33"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline18" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.34" />
+        app:layout_constraintGuide_percent="0.61" />
 
     <ImageView
         android:id="@+id/imageView5"

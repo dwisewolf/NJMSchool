@@ -22,4 +22,7 @@
     <string name="studentname">studentname</string>
     <string name="post">post</string>
     <string name="expiry_date">Expiry Date</string>
+    <string name="no_task_added">No Task Added</string>
+    <string name="daily_task">Daily Task</string>
+    <string name="date">Date</string>
 </resources>

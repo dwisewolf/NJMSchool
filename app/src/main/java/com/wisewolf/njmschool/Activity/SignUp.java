@@ -10,6 +10,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -37,7 +38,7 @@ public class SignUp extends AppCompatActivity {
     ProgressDialog progressDoalog;
     private RecyclerView recyclerView;
     ImageView anim;
-    TextView check;
+    TextView check,fgpswd;
     EditText phone, password;
     CardView signUp,passCard;
 
@@ -48,12 +49,14 @@ public class SignUp extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
 
         anim = findViewById(R.id.child_gif2);
+        fgpswd = findViewById(R.id.fpasswd);
         check = findViewById(R.id.check);
         phone = findViewById(R.id.phone);
         password = findViewById(R.id.pass_field);
@@ -77,7 +80,12 @@ public class SignUp extends AppCompatActivity {
         progressDoalog.setMessage("Loading....");
         progressDoalog.show();
 
-
+fgpswd.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        fpswdbox();
+    }
+});
         /*Create handle for the RetrofitInstance interface*/
         final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
         Call<List<Response>> call = service.getAllStudents();
@@ -140,7 +148,8 @@ public class SignUp extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<List<SchoolDiff>> call, Throwable t) {
-                        Toast.makeText(SignUp.this, "Something is wrong", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUp.this, "Incorrect Password", Toast.LENGTH_SHORT).show();
+                        incorrectPassword();
                     }
                 });
 
@@ -162,6 +171,26 @@ public class SignUp extends AppCompatActivity {
             }
         });
     }
+
+    private void fpswdbox() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
+
+
+
+        alertDialogBuilder.setTitle("App Credentials ")
+            .setMessage("Contact School office")
+            .setPositiveButton("Call Now", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:7081803501"));
+                    startActivity(intent);
+                }
+            })
+            .setNegativeButton("NO", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
 
     private void checkLogin() {
         final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
@@ -212,6 +241,24 @@ public class SignUp extends AppCompatActivity {
 
                 }
             })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+    private void incorrectPassword() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
+
+
+
+        alertDialogBuilder.setTitle("App Credentials Wrong")
+            .setMessage("Contact School office")
+            .setPositiveButton("Call Now", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse("tel:7081803501"));
+                    startActivity(intent);
+                }
+            })
+            .setNegativeButton("NO", null)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
     }

@@ -2,6 +2,8 @@ package com.wisewolf.njmschool.Globals;
 
 import com.vimeo.networking.VimeoClient;
 import com.wisewolf.njmschool.Models.ClassVideo;
+import com.wisewolf.njmschool.Models.DailyTask;
+import com.wisewolf.njmschool.Models.TeacherDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -161,4 +163,10 @@ public class GlobalData   {
 
 
     public static Response<List<ClassVideo>> all_VideoList;
+    public static List<DailyTask> dailyTaskList ;
+    public static List<TeacherDetails> teacherDetails ;
+
+    public static String school_code ;
+    public static String classes ;
+
 }

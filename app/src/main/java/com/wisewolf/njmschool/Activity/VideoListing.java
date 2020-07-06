@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.os.AsyncTask;
@@ -19,8 +20,10 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
@@ -32,13 +35,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.vimeo.networking.Configuration;
 import com.vimeo.networking.VimeoClient;
+import com.vimeo.networking.callbacks.AuthCallback;
 import com.vimeo.networking.callbacks.ModelCallback;
 import com.vimeo.networking.model.Video;
 import com.vimeo.networking.model.VideoList;
 import com.vimeo.networking.model.error.VimeoError;
 import com.wisewolf.njmschool.Adapter.OfflineVideoAdapter;
+import com.wisewolf.njmschool.Adapter.PackageVideoAdapter;
 import com.wisewolf.njmschool.Adapter.RecentPlayedAdapter;
+import com.wisewolf.njmschool.Adapter.TeacherDetailAdapter;
 import com.wisewolf.njmschool.Adapter.VideoAddedAdapter;
 import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
@@ -74,24 +81,27 @@ public class VideoListing extends AppCompatActivity {
 
 
     String StudentClass = "12",pass="WISEWOLF",DcryptName="",DcryptSalt="",DcryptInv="";
-    RecyclerView added_list,offlineList,recentVideo;
+    RecyclerView added_list,offlineList,recentVideo,teacherDetails;
 
 
     private ProgressDialog mProgressDialog;
 
-    ImageView topic,logout;
+    ImageView topic,logout,thumb;
     int exitflag=0;
 
     ArrayList allVideoList = new ArrayList();
 
     TextView no_of_videos,offlineFlagTextview,playFlag,shared_id;
 
-    CardView mediaCard,photocard,docucard;
+    CardView mediaCard,photocard,docucard,feedcard;
     OfflineDatabase dbb;
+    VideoView intoVideo;
+    VideoList introlist;
 
     @Override
     protected void onResume() {
         super.onResume();
+        thumb.setVisibility(View.VISIBLE);
 
         try{
 
@@ -176,7 +186,11 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+        teacherDetails = findViewById(R.id.teacherdetail_list);
         shared_id = findViewById(R.id.shared_id);
+        feedcard = findViewById(R.id.feeds_card);
+        thumb = findViewById(R.id.thumb);
+        intoVideo = findViewById(R.id.introvideo);
         no_of_videos = findViewById(R.id.no_of_files);
         mediaCard=findViewById(R.id.media_card);
         photocard=findViewById(R.id.photo_card);
@@ -188,21 +202,25 @@ public class VideoListing extends AppCompatActivity {
         playFlag = findViewById(R.id.playListFlag);
         logout = findViewById(R.id.logout);
 
+        TeacherDetails();
+
         // media("android.resource://" + getPackageName() + "/" + R.raw.v1); tobe used in video play screen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+
         Intent intent=getIntent();
         getData(intent);
         dbb = new OfflineDatabase(getApplicationContext());
+
+        configVimeo();
        // offlinevideos();
 
 
-
         allVideoList = GlobalData.allVideoList;
-
 
 
         //TODO VIDEO SCHOOL WISE CUTTING
@@ -215,15 +233,23 @@ public class VideoListing extends AppCompatActivity {
         photocard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(VideoListing.this, "update coming soon....", Toast.LENGTH_SHORT).show();
+               startActivity(new Intent(VideoListing.this,AllClass.class));
             }
         });
         docucard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(VideoListing.this, "update coming soon....", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(VideoListing.this,DailyTask_Activity.class));
             }
         });
+
+        feedcard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(VideoListing.this,FeedbackActivity.class));
+            }
+        });
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -239,13 +265,10 @@ public class VideoListing extends AppCompatActivity {
         });
 
 
-
         // media(videoList.data.get(1).files.get(0).link);
 
 
-
         configure();
-
 
 
 
@@ -258,7 +281,61 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+        thumb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mediaPlay(introlist);
+            }
+        });
 
+
+    }
+
+    private void TeacherDetails() {
+if (GlobalData.teacherDetails!=null) {
+    teacherDetails.setAdapter(new TeacherDetailAdapter(GlobalData.teacherDetails, teacherDetails));
+    LinearLayoutManager added_liste_adapterlayoutManager
+        = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    teacherDetails.setLayoutManager(added_liste_adapterlayoutManager);
+}
+
+    }
+
+    private void configVimeo() {
+
+        final Configuration.Builder configBuilder =
+            new Configuration.Builder("70b8a941d1f7a9950d7c09d3abf322ba")
+                .setCacheDirectory(this.getCacheDir());
+        VimeoClient.initialize(configBuilder.build());
+
+
+        final VimeoClient mApiClient = VimeoClient.getInstance();
+        // ---- Client Credentials Auth ----
+        if (mApiClient.getVimeoAccount().getAccessToken() == null) {
+            VimeoClient.getInstance().authorizeWithClientCredentialsGrant(new AuthCallback() {
+                @Override
+                public void success() {
+                    String accessToken = VimeoClient.getInstance().getVimeoAccount().getAccessToken();
+                    Configuration.Builder configBuilder =
+                        new Configuration.Builder(accessToken);
+                    VimeoClient.initialize(configBuilder.build());
+
+
+                }
+
+                @Override
+                public void failure(VimeoError error) {
+                    String errorMessage = error.getDeveloperMessage();
+
+                }
+            });
+        }
+
+        if (mApiClient.getVimeoAccount().getAccessToken() == null) {
+            Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
+        }
+
+        introVid();
     }
 
     private void showNEwsAddAlert() {
@@ -302,9 +379,6 @@ public class VideoListing extends AppCompatActivity {
 
         alertDialog.show();
     }
-
-
-
 
     private void logout_funct() {
         GlobalData.addedVideos=new ArrayList();
@@ -731,6 +805,93 @@ public class VideoListing extends AppCompatActivity {
                .setIcon(android.R.drawable.ic_dialog_alert)
                .show();
        }
+    }
+
+    private void introVid() {
+        IntroVideo DB = new  IntroVideo();
+        DB.execute("");
+    }
+    private class IntroVideo extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String uri ;
+
+            uri = "/me/projects/2145024/videos";
+            VimeoClient.getInstance().fetchNetworkContent(uri, new ModelCallback<VideoList>(VideoList.class) {
+                @Override
+                public void success(VideoList videoList) {
+
+                    if (videoList != null && videoList.data != null && !videoList.data.isEmpty()) {
+                        mProgressDialog.cancel();
+                        int x=videoList.data.get(0).pictures.sizes.size();
+                        Glide.with(VideoListing.this)
+                            .load(videoList.data.get(0).pictures.sizes.get(x-1).linkWithPlayButton) // image url
+
+
+
+                            .centerCrop()
+                            .into( thumb);
+                        introlist=videoList;
+
+
+
+                    }
+                }
+
+                @Override
+                public void failure(VimeoError error) {
+                    String a=String.valueOf(error);
+                }
+            });
+            return null;
+
+        }
+
+
+    }
+
+    private void mediaPlay(VideoList videoList) {
+        mProgressDialog = new ProgressDialog(VideoListing.this);
+        mProgressDialog.setMessage(" Please wait . . .");
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.show();
+        final MediaController mediaController = new MediaController(this);
+
+        //  mediaController.setAnchorView(videoView);
+
+        intoVideo.setMediaController(mediaController);
+        intoVideo.setVideoURI(Uri.parse(videoList.data.get(0).files.get(0).link));
+        intoVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(final MediaPlayer mediaPlayer) {
+                mediaController.setAnchorView(intoVideo);
+                // videoView.start();
+                mediaPlayer.start();
+                mProgressDialog.cancel();
+                thumb.setVisibility(View.GONE);
+                mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                        mp.start();
+                        mProgressDialog.cancel();
+                    }
+                });
+            }
+        });
     }
 }
 

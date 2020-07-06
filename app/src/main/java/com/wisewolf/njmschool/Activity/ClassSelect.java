@@ -39,6 +39,7 @@ public class ClassSelect extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_select);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
@@ -125,6 +126,7 @@ public class ClassSelect extends AppCompatActivity {
         name = (intent.getStringExtra("name"));
         phone = (intent.getStringExtra("phone"));
         school = (intent.getStringExtra("school"));
+        GlobalData.school_code=school;
 
     }
 
@@ -136,6 +138,7 @@ public class ClassSelect extends AppCompatActivity {
 
     private void getClassVideo(String school, String u_class, final String name, String sect, final String phone) {
         clas = u_class;
+        GlobalData.classes=clas;
         u_class = findClass(u_class);
         try {
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);

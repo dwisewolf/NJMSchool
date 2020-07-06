@@ -14,26 +14,31 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.36388507" />
 
+    <TextView
+        android:id="@+id/notes"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="2dp"
+        android:text="Notes Download"
+        android:background="@drawable/primary_shape"
+        android:textColor="@color/lesson"
+        android:gravity="center"
+        android:paddingLeft="5dp"
+        app:layout_constraintBottom_toTopOf="@+id/guideline28"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline49"
+        app:layout_constraintTop_toTopOf="@+id/guideline25" />
+
     <Spinner
         android:id="@+id/lesson_select"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/guideline28"
-        app:layout_constraintEnd_toStartOf="@+id/guideline26"
+        app:layout_constraintEnd_toStartOf="@+id/guideline49"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline25" />
 
-    <ImageView
-        android:id="@+id/document"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="32dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/notes"
-        android:elevation="50dp"
-        android:translationZ="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
 
     <ImageView
         android:id="@+id/download"
@@ -53,8 +58,7 @@
         app:layout_constraintBottom_toTopOf="@+id/guideline23"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textView12"
@@ -179,5 +183,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.59507525" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline48"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.83994526" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline49"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent="0.5620438" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

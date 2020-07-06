@@ -1,5 +1,6 @@
 package com.wisewolf.njmschool.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,7 +11,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.AlgorithmParameters;
@@ -20,7 +23,10 @@ import java.text.SimpleDateFormat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
@@ -45,8 +52,12 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
-import com.vimeo.networking.model.Video;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
 import com.wisewolf.njmschool.Adapter.Class_videoAdapter;
 import com.wisewolf.njmschool.Adapter.SubjectAdapter;
 import com.wisewolf.njmschool.Database.OfflineDatabase;
@@ -66,6 +77,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -75,13 +87,14 @@ import javax.crypto.spec.SecretKeySpec;
 
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.content.ContentValues.TAG;
 
 public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     RecyclerView subj_list, video_play_list;
     String StudentClass = "12", studentdiv = "S";
-    ImageView download, fullscreen,notes;
+    ImageView download, fullscreen;
     VideoView videoView;
     Spinner lesson_selectSpinner;
     ArrayList nowShowing = new ArrayList();
@@ -90,10 +103,13 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"};
     String lessn_code[] = {"L1", "L2", "L3", "L4", "L5", "L6", "L7"};
     String lesson_flag = "ALL";
-    String details = ".-.-.", vURL = "",download_url="",download_name="",pass="WISEWOLF";
-    TextView topic, head, teacher;
+    String details = ".-.-.", documenturl,vURL = "",download_url="",download_name="",pass="WISEWOLF",document_name;
+    TextView topic, head, teacher,notes;
     ClassVideo selectedVideo;
     ProgressDialog mProgressDialog;
+
+    FirebaseStorage storage;
+    StorageReference storageRef;
 
     OfflineDatabase dbb;
     String nametostore="",salt_name="",dir_name="",inv_name="",location="",userid="",extra1="",extra2="";
@@ -104,16 +120,22 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video_listing);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+
         isStoragePermissionGranted();
         mProgressDialogInit();
         userid=GlobalData.regno;
         dbb = new OfflineDatabase(getApplicationContext());
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
         final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         subj_list = findViewById(R.id.subject_list);
         video_play_list = findViewById(R.id.video_play_list);
@@ -126,8 +148,34 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         head = findViewById(R.id.mainHead);
         topic = findViewById(R.id.topic);
         teacher = findViewById(R.id.teacher);
-notes=findViewById(R.id.document);
+notes=findViewById(R.id.notes);
 notes.setVisibility(View.GONE);
+notes.setOnClickListener(new View.OnClickListener() {
+    @Override
+    public void onClick(View v) {
+        String[] desc=documenturl.split("/");
+        int len=desc.length;
+        document_name=desc[len-1];
+        String loc = dbb.DocumentList(document_name);
+        if (!loc.equals("false")) {
+            File data = new File(loc);
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(data),"application/pdf");
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            Intent intent = Intent.createChooser(target, "Open File");
+            try {
+                mProgressDialog.cancel();
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // Instruct the user to install a PDF reader here, or something
+            }
+        } else {
+            GetDocuments getDocuments = new GetDocuments();
+            getDocuments.execute();
+        }
+    }
+});
 
         lessonSpinnerLoad();
         intent();
@@ -145,6 +193,7 @@ notes.setVisibility(View.GONE);
             public void onClick(View v) {
                 Intent intent = new Intent(VideoPlay.this, Fullscreen.class);
                 intent.putExtra("url", vURL);
+                intent.putExtra("page", "vp");
                 startActivity(intent);
             }
         });
@@ -468,7 +517,6 @@ notes.setVisibility(View.GONE);
                 location = rootFile.toString();
 
                 boolean a=rootFile.mkdirs();
-
 
 
                 URL url = new URL(download_url);
@@ -814,7 +862,7 @@ notes.setVisibility(View.GONE);
 
     }
 
-    private void notescalculate(ClassVideo item) {
+    private boolean notescalculate(ClassVideo item) {
         String[] desc=item.getData().getDescription().split("-");
         if (desc.length>3){
             notes.setVisibility(View.VISIBLE);
@@ -827,7 +875,13 @@ notes.setVisibility(View.GONE);
                      url=url+"-"+desc[i];
 
             }
+            documenturl=url;
             Toast.makeText(this, "Notes Present", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        else {
+            notes.setVisibility(View.GONE);
+            return false;
         }
     }
 
@@ -837,32 +891,79 @@ notes.setVisibility(View.GONE);
 
         video_play_list.setAdapter(new Class_videoAdapter(VideoPlay.this, selectedVideoList, video_play_list, new Class_videoAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(ClassVideo item) {
+            public void onItemClick(final ClassVideo item) {
                 selectedVideo=item;
-                notescalculate(item);
-               // Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
-                details = item.getData().getDescription();
-                media(item.getData().getFiles().get(0).getLink());
-                vURL = item.getData().getFiles().get(0).getLink();
-                download.setVisibility(View.VISIBLE);
-                fullscreen.setVisibility(View.VISIBLE);
-                Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
-                String regno=GlobalData.regno;
-                String[] time=String.valueOf(item.getData().getCreatedTime()).split("T");
-                final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+               // notescalculate(item);
 
-                Call<VideoUp> saveVideo = service.saveVideo(regno,item.getData().getName(),item.getData().getFiles().get(0).getLink(),item.getData().getDescription(),item.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink(),time[1]);
-                saveVideo.enqueue(new Callback<VideoUp>() {
-                    @Override
-                    public void onResponse(Call<VideoUp> call, retrofit2.Response<VideoUp> response) {
-                       // Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
-                    }
+                new AlertDialog.Builder(VideoPlay.this)
+                    .setTitle("Video Options")
+                    .setMessage("Please select one to continue...")
 
-                    @Override
-                    public void onFailure(Call<VideoUp> call, Throwable t) {
-                        Toast.makeText(VideoPlay.this, "Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton("Notes ", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                           if (notescalculate(item)) {
+                               String[] desc = documenturl.split("/");
+                               int len = desc.length;
+                               document_name = desc[len - 1];
+                               String loc = dbb.DocumentList(document_name);
+                               if (!loc.equals("false")) {
+                                   File data = new File(loc);
+                                   Intent target = new Intent(Intent.ACTION_VIEW);
+                                   target.setDataAndType(Uri.fromFile(data),"application/pdf");
+                                   target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                                   Intent intent = Intent.createChooser(target, "Open File");
+                                   try {
+                                       mProgressDialog.cancel();
+                                       startActivity(intent);
+                                   } catch (ActivityNotFoundException e) {
+                                       // Instruct the user to install a PDF reader here, or something
+                                   }
+                               } else {
+                                   GetDocuments getDocuments = new GetDocuments();
+                                   getDocuments.execute();
+                               }
+
+                           }
+                           else {
+                               Toast.makeText(VideoPlay.this, "No Notes added", Toast.LENGTH_SHORT).show();
+                           }
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton("Play", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            details = item.getData().getDescription();
+                            media(item.getData().getFiles().get(0).getLink());
+                            vURL = item.getData().getFiles().get(0).getLink();
+                            download.setVisibility(View.VISIBLE);
+                            fullscreen.setVisibility(View.VISIBLE);
+                            String regno=GlobalData.regno;
+                            Glide.with(VideoPlay.this).asGif().load(R.raw.download).into(download);
+                            String[] time=String.valueOf(item.getData().getCreatedTime()).split("T");
+                            final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+
+                            Call<VideoUp> saveVideo = service.saveVideo(regno,item.getData().getName(),item.getData().getFiles().get(0).getLink(),item.getData().getDescription(),item.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink(),time[1]);
+                            saveVideo.enqueue(new Callback<VideoUp>() {
+                                @Override
+                                public void onResponse(Call<VideoUp> call, Response<VideoUp> response) {
+                                    //Toast.makeText(VideoPlay.this, "Video Uploaded", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onFailure(Call<VideoUp> call, Throwable t) {
+                                    Toast.makeText(VideoPlay.this, "Error", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
+                    })
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
 
             }
 
@@ -1021,6 +1122,7 @@ notes.setVisibility(View.GONE);
     }
 
     private void getVideosList(String s) {
+        notes.setVisibility(View.GONE);
         switch (StudentClass) {
             case "NRL":
                 classNRL(s);
@@ -1659,5 +1761,104 @@ notes.setVisibility(View.GONE);
             Log.v(TAG,"Permission: "+permissions[0]+ "was "+grantResults[0]);
             //resume tasks needing this permission
         }
+    }
+
+    private void downloadDocument(byte[] bytes) throws IOException {
+        String rootDir;
+        File rootFile;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+            else
+                rootFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    + File.separator + "Fil");
+            boolean a=rootFile.mkdirs();
+            File data = new File(rootFile, document_name);
+            OutputStream op = new FileOutputStream(data);
+            op.write(bytes);
+
+            // dir_name = rootDir;
+            String location = rootFile.toString();
+            dbb.insertDocument(document_name,String.valueOf(rootFile),String.valueOf(data),userid,extra1);
+
+            Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(data),"application/pdf");
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            Intent intent = Intent.createChooser(target, "Open File");
+            try {
+                mProgressDialog.cancel();
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // Instruct the user to install a PDF reader here, or something
+            }
+
+
+        } catch (Exception E) {
+            String a = String.valueOf(E);
+            Toast.makeText(this, a, Toast.LENGTH_LONG).show();
+        }
+
+    }
+
+
+    private class GetDocuments extends AsyncTask<Void, String, String> {
+        String a = "";
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.setCancelable(false);
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            StorageReference gsReference = null;
+            String a = String.valueOf(1);
+            try {
+                gsReference = storage.getReferenceFromUrl(documenturl);
+                final long FIVE_MEGABYTE = 5120 * 5120;
+                gsReference.getBytes(FIVE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                    @Override
+                    public void onSuccess(byte[] bytes) {
+                        String a = String.valueOf(1);
+                        try {
+                            downloadDocument(bytes);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        String a = String.valueOf(1);
+
+                    }
+                });
+
+
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "False";
+            }
+
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(String onlineVersion) {
+            super.onPostExecute(onlineVersion);
+
+            if (onlineVersion.equals("False")) {
+                Toast.makeText(VideoPlay.this, "Error link", Toast.LENGTH_SHORT).show();
+                mProgressDialog.cancel();
+            }
+        }
+
     }
 }

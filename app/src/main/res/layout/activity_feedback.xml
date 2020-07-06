@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activity.FeedbackActivity">
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toTopOf="@+id/guideline52"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/feedbck" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline52"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.24" />
+
+    <ScrollView
+        android:id="@+id/scrollView4"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline52">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:fontFamily="@font/helvetica"
+                android:text="FEEDBACK HELP TO IMPROVE"
+                android:textColor="@color/black"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:fontFamily="@font/helvetica"
+                android:text="Share your concerns of APP with us . We will try to solve it as soon as possible."
+                android:textColor="@color/black"
+                android:textSize="12sp" />
+
+            <EditText
+                android:id="@+id/feedbox"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_margin="15dp"
+                android:background="@drawable/primary_shape"
+                android:ems="10"
+                android:gravity="top"
+                android:hint="write here"
+                android:inputType="textPersonName"
+                android:padding="15dp" />
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/c3"
+                android:text="save" />
+        </LinearLayout>
+    </ScrollView>
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/trans"
+        android:orientation="vertical"
+        android:translationZ="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline52">
+
+        <LinearLayout
+            android:id="@+id/botomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:behavior_peekHeight="50dp"
+            app:layout_behavior="@string/bottom_sheet_behavior">
+
+            <LinearLayout
+                android:id="@+id/newsPage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/top_cornershape"
+                android:orientation="vertical"
+                android:translationZ="30dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/guideline16">
+
+                <TextView
+                    android:layout_width="110dp"
+                    android:layout_height="5dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="75dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginRight="75dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/Basic"></TextView>
+
+                <TextView
+                    android:id="@+id/commentHead"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/robotoregular"
+                    android:text="Replies"
+                    android:textColor="@color/black"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/repyList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+                <TextView
+                    android:id="@+id/writecomment"
+                    android:layout_width="match_parent"
+                    android:layout_height="35dp"
+                    android:layout_gravity="bottom"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:background="@color/Basic"
+                    android:fontFamily="@font/helvetica"
+                    android:gravity="center"
+                    android:text="Write your comments"
+                    android:textColor="@color/white"
+
+                    android:textStyle="bold" />
+
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,6 +3,9 @@ package com.wisewolf.njmschool.Activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,6 +17,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
+import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.R;
 
@@ -30,8 +34,9 @@ import java.util.ArrayList;
 public class DocumentActivity extends AppCompatActivity {
     FirebaseStorage storage;
     StorageReference storageRef;
-    String clas;
+    String name;
     ArrayList reference = new ArrayList();
+
     String url = "gs://njms-2e633.appspot.com/class1/Hindi Grammar/KDAG-C1L1HNGP1.pdf";
 
     @Override
@@ -40,7 +45,12 @@ public class DocumentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_document);
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
+        Intent intent=getIntent();
+        url=intent.getStringExtra("url");
         //findClassForDocument(GlobalData.clas);
+        String[] desc=url.split("/");
+        int len=desc.length;
+        name=desc[len-1];
         GetDocuments getDocuments = new GetDocuments();
         getDocuments.execute();
 
@@ -50,9 +60,11 @@ public class DocumentActivity extends AppCompatActivity {
         StorageReference storageRef = storage.getReference();
 
 
+
+
     }
 
-    private void download(byte[] bytes) throws IOException {
+    private void downloadDocument(byte[] bytes) throws IOException {
         String rootDir;
         File rootFile;
         try {
@@ -62,12 +74,25 @@ public class DocumentActivity extends AppCompatActivity {
                 rootFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
                     + File.separator + "Fil");
 
-            File data = new File(rootFile, "C1L1HNGP1.pdf");
+            File data = new File(rootFile, "name");
             OutputStream op = new FileOutputStream(data);
             op.write(bytes);
 
             // dir_name = rootDir;
             String location = rootFile.toString();
+
+             Intent target = new Intent(Intent.ACTION_VIEW);
+            target.setDataAndType(Uri.fromFile(data),"application/pdf");
+            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            Intent intent = Intent.createChooser(target, "Open File");
+            try {
+                startActivity(intent);
+            } catch (ActivityNotFoundException e) {
+                // Instruct the user to install a PDF reader here, or something
+            }
+
+
         } catch (Exception E) {
             String a = String.valueOf(E);
         }
@@ -87,7 +112,7 @@ public class DocumentActivity extends AppCompatActivity {
                 public void onSuccess(byte[] bytes) {
                     String a = String.valueOf(1);
                     try {
-                        download(bytes);
+                        downloadDocument(bytes);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

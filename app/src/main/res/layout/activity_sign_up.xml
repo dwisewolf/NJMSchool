@@ -185,6 +185,16 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.64" />
 
+    <TextView
+        android:id="@+id/fpasswd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="forgot password?"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/guideline8"
+        app:layout_constraintTop_toTopOf="@+id/guideline13" />
+
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline12"
         android:layout_width="wrap_content"

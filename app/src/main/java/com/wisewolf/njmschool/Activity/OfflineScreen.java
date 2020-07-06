@@ -46,6 +46,7 @@ public class OfflineScreen extends AppCompatActivity {
         setContentView(R.layout.activity_offline_screen);
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;

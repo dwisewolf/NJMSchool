@@ -35,6 +35,7 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
         videoFull=findViewById(R.id.OffvideoFull);
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;

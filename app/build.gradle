@@ -7,20 +7,23 @@ apply plugin: 'com.google.firebase.crashlytics'
 
 android {
     compileSdkVersion 29
+
     buildToolsVersion "29.0.2"
 
     defaultConfig {
         applicationId "com.wisewolf.njmschool"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 7
-        versionName "7.0"
+        versionCode 12
+        versionName "12.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     compileOptions {
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     signingConfigs {
         release {
             storeFile file("njmsKey.keystore")
@@ -36,9 +39,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
     lintOptions {
         abortOnError false
     }
+
 }
 
 dependencies {
@@ -77,5 +82,7 @@ dependencies {
     implementation 'com.github.HamidrezaAmz:MagicalExoPlayer:1.0.15'
 
     implementation 'com.android.support:multidex:1.0.3'
-
+    implementation 'com.google.firebase:firebase-firestore:21.4.3'
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.1.0"
+    implementation 'com.google.android.material:material:1.1.0'
 }

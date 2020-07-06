@@ -15,9 +15,9 @@ import java.util.ArrayList;
 public class OfflineDatabase extends SQLiteOpenHelper {
     SQLiteDatabase dh;
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 5;
     // Database Name
-    private static final String DATABASE_NAME = "OfflineDB";
+    private static final String DATABASE_NAME = "OfflineDB5";
 
     public OfflineDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -31,6 +31,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         String CREATE_TABLE_DocName = "CREATE TABLE tbl_document(id varchar PRIMARY KEY ,name varchar  ,dir_name varchar ,location varchar ,userid varchar ,extra1 varchar  )";
         sqLiteDatabase.execSQL(CREATE_TABLE_DocName);
+
+        String CREATE_TABLE_taskid = "CREATE TABLE tbl_taskid(id varchar PRIMARY KEY ,userid varchar ,taskid varchar  )";
+        sqLiteDatabase.execSQL(CREATE_TABLE_taskid);
 
     }
 
@@ -72,13 +75,34 @@ public class OfflineDatabase extends SQLiteOpenHelper {
             ContentValues values = new ContentValues();
             values.put("[name]", name);
 
-            values.put("[inv_name]", dir_name);
+            values.put("[dir_name]", dir_name);
             values.put("[location]", location);
             values.put("[userid]", userid);
             values.put("[extra1]", extra1);
 
 
             dh.insert("tbl_document", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String inserttaskID( String userid, String taskid)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put("[userid]", userid);
+            values.put("[taskid]", taskid);
+
+
+            dh.insert("tbl_taskid", null, values);
             dh.close();
             return "y";
 
@@ -131,6 +155,79 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
     }
 
+    public String DocumentList(String Dname) {
+        dh = this.getReadableDatabase();
+        GlobalData.OfflineVideos=null;
+        String select = "select * from tbl_document  WHERE name ='"+Dname+"'";
+        Cursor cursor = dh.rawQuery(select, null);
+        ArrayList offlinelist=new ArrayList<OfflineVideos>();
+
+        if (cursor.moveToFirst()) {
+            int i = 0;
+            String name,   dir_name,   location,   userid,   extra1;
+            do {
+
+
+                name=cursor.getString(cursor.getColumnIndex("name"));
+                dir_name=cursor.getString(cursor.getColumnIndex("dir_name"));
+                location=cursor.getString(cursor.getColumnIndex("location"));
+                userid=cursor.getString(cursor.getColumnIndex("userid"));
+                extra1=cursor.getString(cursor.getColumnIndex("extra1"));
+
+
+
+
+            }
+            while (cursor.moveToNext());
+            dh.close();
+           return location;
+
+        }
+        else {
+            dh.close();
+            return "false";
+
+        }
+
+
+
+    }
+
+    public String taskId(String userid1) {
+        dh = this.getReadableDatabase();
+
+        String select = "select * from tbl_taskid  WHERE userid ='"+userid1+"'";
+        Cursor cursor = dh.rawQuery(select, null);
+       String  taskid1="";
+        String userid,   taskid="";
+        if (cursor.moveToFirst()) {
+            int i = 0;
+
+            do {
+
+
+                userid=cursor.getString(cursor.getColumnIndex("userid"));
+                taskid1=cursor.getString(cursor.getColumnIndex("taskid"));
+
+                taskid=taskid+taskid1+",";
+
+            }
+            while (cursor.moveToNext());
+            dh.close();
+            return taskid;
+
+        }
+        else {
+            dh.close();
+            return taskid;
+
+        }
+
+
+
+    }
+
+
     public void OfflineVideossFull() {
         dh = this.getReadableDatabase();
         GlobalData.OfflineVideos=null;
@@ -180,6 +277,20 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
 
         query = "delete from tbl_item WHERE name ='"+name+"'";
+        Log.e("Query", query);
+        dh.execSQL(query);
+
+
+
+    }
+
+    public void deletetask(String userid,String taskid) {
+        dh = this.getWritableDatabase();
+
+        String query;
+
+
+        query = "delete from tbl_taskid WHERE userid ='"+userid+"' and taskid='"+taskid+"'";
         Log.e("Query", query);
         dh.execSQL(query);
 

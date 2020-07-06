@@ -28,7 +28,7 @@ import org.jsoup.Jsoup;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    private static int TIME_OUT = 2000;
+    private static int TIME_OUT = 1000;
     ImageView education, logo, load;
     String uri = "/me/videos";
     TextView wait;
