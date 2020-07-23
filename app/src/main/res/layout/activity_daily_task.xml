@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.45" />
+        app:layout_constraintGuide_percent="0.31" />
 
     <ImageView
         android:scaleType="fitXY"
@@ -24,7 +24,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/onlineclass" />
+        app:srcCompat="@drawable/task" />
 
     <ScrollView
         android:id="@+id/scrollView3"
@@ -64,6 +64,15 @@
                 android:textColor="@color/black"
                 android:textSize="12sp" />
 
+            <TextView
+                android:textColor="@color/black"
+                android:gravity="center"
+                android:id="@+id/textView9"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="7dp"
+                android:text="(click Date to change )" />
+
             <androidx.recyclerview.widget.RecyclerView
 
                 android:id="@+id/taskList"
@@ -79,7 +88,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.39534885" />
+        app:layout_constraintGuide_percent="0.31" />
 
     <TextView
         android:id="@+id/textView13"

@@ -20,6 +20,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="4dp"
+            android:autoSizeTextType="uniform"
+android:autoSizeMinTextSize="2dp"
+            android:autoSizeMaxTextSize="12dp"
+            app:autoSizeTextType="uniform"
             android:text="Political Science"
             android:textColor="@color/black"
               />

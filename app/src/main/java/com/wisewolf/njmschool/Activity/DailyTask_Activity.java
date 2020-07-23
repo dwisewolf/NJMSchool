@@ -53,6 +53,10 @@ public class DailyTask_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_daily_task);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.hide();
+
 
         dailyTaskList = findViewById(R.id.taskList);
         datess = findViewById(R.id.date_id);
@@ -77,9 +81,7 @@ public class DailyTask_Activity extends AppCompatActivity {
         formattedDate = df.format(c);
 
 
-        ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        actionBar.hide();
+
 
 
         datess.setOnClickListener(new View.OnClickListener() {

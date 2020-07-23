@@ -48,7 +48,7 @@ public class StudentProfileSelection extends AppCompatActivity {
             parents.setText(a.getFatherName() + "\nPhone - " + a.getMobileNum());
         }
         catch (Exception e) {
-
+            parents.setText("Student blocked by Office");
         }
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -73,6 +73,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                 public void onItemClick(SchoolDiff s) {
                     if (s.getCategory().equals("TEACHER")) {
                         GlobalData.regno = s.getUserid();
+                        GlobalData.name = s.getName();
                         String original = s.getUserid();
                         Regex reg = new Regex("(?<=[0-9])(?=[A-Za-z])");
                         String[] parts = reg.split(original, 2).toArray(new String[0]);
@@ -84,6 +85,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                     }
                     if (s.getCategory().equals("STUDENT")) {
                         GlobalData.regno = s.getUserid();
+                        GlobalData.name = s.getName();
                          getnews(s.getUserid());
 
                         school=s.getUserid().substring(0,1);

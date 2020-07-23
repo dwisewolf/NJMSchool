@@ -38,9 +38,9 @@ public class SignUp extends AppCompatActivity {
     ProgressDialog progressDoalog;
     private RecyclerView recyclerView;
     ImageView anim;
-    TextView check,fgpswd;
+    TextView check, fgpswd;
     EditText phone, password;
-    CardView signUp,passCard;
+    CardView signUp, passCard;
 
 
     @Override
@@ -61,7 +61,7 @@ public class SignUp extends AppCompatActivity {
         phone = findViewById(R.id.phone);
         password = findViewById(R.id.pass_field);
         signUp = findViewById(R.id.button);
-        passCard=findViewById(R.id.password);
+        passCard = findViewById(R.id.password);
         passCard.setVisibility(View.GONE);
 
         checkLogin();
@@ -80,12 +80,12 @@ public class SignUp extends AppCompatActivity {
         progressDoalog.setMessage("Loading....");
         progressDoalog.show();
 
-fgpswd.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        fpswdbox();
-    }
-});
+        fgpswd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fpswdbox();
+            }
+        });
         /*Create handle for the RetrofitInstance interface*/
         final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
         Call<List<Response>> call = service.getAllStudents();
@@ -93,25 +93,23 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
         check.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Call <Validation> savePost = service.savePost(phone.getText().toString());
+                Call<Validation> savePost = service.savePost(phone.getText().toString());
                 savePost.enqueue(new Callback<Validation>() {
                     @Override
                     public void onResponse(Call<Validation> call, retrofit2.Response<Validation> response) {
                         try {
-                            if (response.body().getResults().equals("Mobile Number is Valid...")){
+                            if (response.body().getResults().equals("Mobile Number is Valid...")) {
 
                                 Toast.makeText(SignUp.this, "Enter password to register", Toast.LENGTH_SHORT).show();
                                 check.setText("Enter password to register....");
                                 signUp.setVisibility(View.VISIBLE);
                                 passCard.setVisibility(View.VISIBLE);
 
-                            }
-                            else {
+                            } else {
                                 Toast.makeText(SignUp.this, "Number not present !! Please contact School office", Toast.LENGTH_LONG).show();
                             }
 
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
                             Toast.makeText(SignUp.this, e.toString(), Toast.LENGTH_SHORT).show();
                         }
 
@@ -124,24 +122,22 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
                     }
                 });
 
-
             }
         });
-        
+
         signUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                Call<List<SchoolDiff>> get_categ = service.get_Categ(phone.getText().toString(),password.getText().toString());
+                Call<List<SchoolDiff>> get_categ = service.get_Categ(phone.getText().toString(), password.getText().toString());
                 get_categ.enqueue(new Callback<List<SchoolDiff>>() {
                     @Override
                     public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
-                        if (response!=null||response.body().get(0)!=null) {
-                            GlobalData.profiles=response.body();
-                            savePass(phone.getText().toString(),password.getText().toString());
+                        if (response != null || response.body().get(0) != null) {
+                            GlobalData.profiles = response.body();
+                            savePass(phone.getText().toString(), password.getText().toString());
 
-                        }
-                        else {
+                        } else {
                             Toast.makeText(SignUp.this, "Bad Network", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -176,7 +172,6 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
 
 
-
         alertDialogBuilder.setTitle("App Credentials ")
             .setMessage("Contact School office")
             .setPositiveButton("Call Now", new DialogInterface.OnClickListener() {
@@ -196,9 +191,8 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
         final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
         String logged = sp1.getString("login", "");
 
-        if (logged.equals("logged"))
-        {
-            showsnack(sp1.getString("username", ""),sp1.getString("pass", ""));
+        if (logged.equals("logged")) {
+            showsnack(sp1.getString("username", ""), sp1.getString("pass", ""));
         }
     }
 
@@ -206,24 +200,22 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
 
 
-
         alertDialogBuilder.setTitle("App Credentials")
-            .setMessage("Proceed with saved Credentials of "+ username)
+            .setMessage("Proceed with saved Credentials of " + username)
             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
 
-                    Call<List<SchoolDiff>> get_categ = service.get_Categ(username,pass);
+                    Call<List<SchoolDiff>> get_categ = service.get_Categ(username, pass);
                     get_categ.enqueue(new Callback<List<SchoolDiff>>() {
                         @Override
                         public void onResponse(Call<List<SchoolDiff>> call, retrofit2.Response<List<SchoolDiff>> response) {
-                            if (response!=null||response.body().get(0)!=null) {
-                                GlobalData.profiles=response.body();
+                            if (response != null || response.body().get(0) != null) {
+                                GlobalData.profiles = response.body();
                                 Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
                                 startActivity(msgIntent);
 
-                            }
-                            else {
+                            } else {
                                 Toast.makeText(SignUp.this, "Bad Network", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -244,9 +236,9 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
     }
+
     private void incorrectPassword() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
-
 
 
         alertDialogBuilder.setTitle("App Credentials Wrong")
@@ -268,7 +260,6 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(SignUp.this);
 
 
-
         alertDialogBuilder.setTitle("App Credentials")
             .setMessage("Do you want to save the username and password ?")
             .setPositiveButton("YES", new DialogInterface.OnClickListener() {
@@ -276,9 +267,9 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
 
                     final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
                     SharedPreferences.Editor editor = sp1.edit();
-                    editor . putString("username", phone);
-                    editor . putString("pass", pass);
-                    editor . putString("login", "logged");
+                    editor.putString("username", phone);
+                    editor.putString("pass", pass);
+                    editor.putString("login", "logged");
                     editor.apply();
 
                     Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
@@ -290,9 +281,9 @@ fgpswd.setOnClickListener(new View.OnClickListener() {
                     final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
                     SharedPreferences.Editor editor = sp1.edit();
 
-                    editor . putString("username", phone);
-                    editor . putString("pass", pass);
-                    editor . putString("login", "Not-logged");
+                    editor.putString("username", phone);
+                    editor.putString("pass", pass);
+                    editor.putString("login", "Not-logged");
                     editor.commit();
 
                     Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);

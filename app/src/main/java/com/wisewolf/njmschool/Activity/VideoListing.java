@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +34,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vimeo.networking.Configuration;
@@ -91,12 +93,15 @@ public class VideoListing extends AppCompatActivity {
 
     ArrayList allVideoList = new ArrayList();
 
-    TextView no_of_videos,offlineFlagTextview,playFlag,shared_id;
+    TextView offlineFlagTextview,playFlag,news_id;
 
-    CardView mediaCard,photocard,docucard,feedcard;
+    CardView mediaCard,photocard,docucard,feedcard,mcqCard,examCard;
     OfflineDatabase dbb;
     VideoView intoVideo;
     VideoList introlist;
+
+    private BottomSheetBehavior sheetBehavior;
+    private LinearLayout bottom_sheet;
 
     @Override
     protected void onResume() {
@@ -187,22 +192,32 @@ public class VideoListing extends AppCompatActivity {
         });
 
         teacherDetails = findViewById(R.id.teacherdetail_list);
-        shared_id = findViewById(R.id.shared_id);
-        feedcard = findViewById(R.id.feeds_card);
+
+
         thumb = findViewById(R.id.thumb);
         intoVideo = findViewById(R.id.introvideo);
-        no_of_videos = findViewById(R.id.no_of_files);
-        mediaCard=findViewById(R.id.media_card);
-        photocard=findViewById(R.id.photo_card);
-        docucard=findViewById(R.id.docu_card);
+
+
+        mediaCard=findViewById(R.id.mediaFile);
+        photocard=findViewById(R.id.extracir);
+        docucard=findViewById(R.id.dailyTask);
+        feedcard = findViewById(R.id.feedbackD);
+        mcqCard = findViewById(R.id.mcqQ);
+        examCard = findViewById(R.id.examD);
+
+
         offlineList=findViewById(R.id.offline_list);
         offlineFlagTextview=findViewById(R.id.lesonListFlag);
         added_list = findViewById(R.id.added_list);
         recentVideo = findViewById(R.id.recent_video);
         playFlag = findViewById(R.id.playListFlag);
         logout = findViewById(R.id.logout);
+        news_id = findViewById(R.id.newss_id);
 
         TeacherDetails();
+        bottomSheet();
+
+
 
         // media("android.resource://" + getPackageName() + "/" + R.raw.v1); tobe used in video play screen
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -264,6 +279,20 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+        mcqCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(VideoListing.this,ExamActivity.class));
+            }
+        });
+
+        examCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(VideoListing.this, "Coming soon...", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
         // media(videoList.data.get(1).files.get(0).link);
 
@@ -289,6 +318,54 @@ public class VideoListing extends AppCompatActivity {
         });
 
 
+    }
+
+    private void bottomSheet() {
+        bottom_sheet = findViewById(R.id.bottom_sheet);
+        sheetBehavior = BottomSheetBehavior.from(bottom_sheet);
+
+        // click event for show-dismiss bottom sheet
+        news_id.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+                } else {
+                    sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+
+                }
+            }
+        });
+// callback for do something
+
+
+        sheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
     }
 
     private void TeacherDetails() {
@@ -521,14 +598,9 @@ if (GlobalData.teacherDetails!=null) {
 
     private void configure() {
 
-        no_of_videos.setText("Files - " + String.valueOf(allVideoList.size()));
-
-
-
+      // no_of_videos.setText("Files - " + String.valueOf(allVideoList.size()));
         GlobalData.addedVideos = allVideoList;
     }
-
-
 
     private ArrayList schoolwise(ArrayList allVideoList) {
         ArrayList arrayList=new ArrayList();
@@ -811,6 +883,7 @@ if (GlobalData.teacherDetails!=null) {
         IntroVideo DB = new  IntroVideo();
         DB.execute("");
     }
+
     private class IntroVideo extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {

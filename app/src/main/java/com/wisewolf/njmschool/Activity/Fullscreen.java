@@ -32,12 +32,13 @@ public class Fullscreen extends AppCompatActivity {
 
         videoFull=findViewById(R.id.videoFull);
         Intent intent=getIntent();
+        int current=Integer.valueOf(intent.getStringExtra("current"));
         String vURL=intent.getStringExtra("url");
-        media(vURL);
+        media(vURL,current);
 
     }
 
-    void media(String videoUrl) {
+    void media(String videoUrl, final int current) {
         mProgressDialog = new ProgressDialog(Fullscreen.this);
         mProgressDialog.setMessage("Internet Slow ! Please wait . . .");
         mProgressDialog.setIndeterminate(true);
@@ -60,6 +61,7 @@ public class Fullscreen extends AppCompatActivity {
                 mProgressDialog.cancel();
                 mediaController.setAnchorView(videoFull);
                 videoFull.start();
+                videoFull.seekTo(current);
             }
         });
 

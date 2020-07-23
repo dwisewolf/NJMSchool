@@ -156,6 +156,7 @@ public class GlobalData   {
     public static String sect ;
     public static String regno ;
     public static String categ ;
+    public static String name ;
 
     public static VimeoClient vimeoclient ;
 

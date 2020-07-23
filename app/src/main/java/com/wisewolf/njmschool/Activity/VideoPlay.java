@@ -191,10 +191,18 @@ notes.setOnClickListener(new View.OnClickListener() {
         fullscreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(VideoPlay.this, Fullscreen.class);
-                intent.putExtra("url", vURL);
-                intent.putExtra("page", "vp");
-                startActivity(intent);
+                try {
+                    int current=videoView.getCurrentPosition();
+                    Intent intent = new Intent(VideoPlay.this, Fullscreen.class);
+                    intent.putExtra("url", vURL);
+                    intent.putExtra("page", "vp");
+                    intent.putExtra("current", String.valueOf(current));
+                    startActivity(intent);
+
+                }catch (Exception E){
+                    Toast.makeText(VideoPlay.this, "Video Error", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

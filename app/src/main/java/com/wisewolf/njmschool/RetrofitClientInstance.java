@@ -3,7 +3,11 @@ package com.wisewolf.njmschool;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.DailyTask;
 import com.wisewolf.njmschool.Models.FeedbackReplyModel;
+import com.wisewolf.njmschool.Models.MCCQ;
+import com.wisewolf.njmschool.Models.MCQSubmit;
 import com.wisewolf.njmschool.Models.News;
+import com.wisewolf.njmschool.Models.QuizHead;
+import com.wisewolf.njmschool.Models.QuizQuestion;
 import com.wisewolf.njmschool.Models.Quotes;
 import com.wisewolf.njmschool.Models.Response;
 import com.wisewolf.njmschool.Models.SchoolDiff;
@@ -103,19 +107,48 @@ public class RetrofitClientInstance {
 
         @POST("/stuTaskData/")
         @FormUrlEncoded
-        Call<List<DailyTask>> get_DailyTask(@Field("school_code") String school_code ,
+        Call<List<DailyTask>> get_DailyTask(@Field("school_code") String school_code,
                                             @Field("clas") String clas,
                                             @Field("date") String dt);
 
         @POST("/notesData/")
         @FormUrlEncoded
-        Call<List<TeacherDetails>> get_teacherDetails(@Field("school_code") String school_code ,
-                                                 @Field("clas") String clas);
+        Call<List<TeacherDetails>> get_teacherDetails(@Field("school_code") String school_code,
+                                                      @Field("clas") String clas);
 
         @POST("/feedBackData/")
         @FormUrlEncoded
-        Call<List<FeedbackReplyModel>> get_feedbackReply(@Field("school_code") String school_code ,
-                                                          @Field("userid") String userid);
+        Call<List<FeedbackReplyModel>> get_feedbackReply(@Field("school_code") String school_code,
+                                                         @Field("userid") String userid);
+
+        @POST("/MCQResData/")
+        @FormUrlEncoded
+        Call<List<QuizHead>> get_QuizHead(@Field("school") String school_code,
+                                          @Field("userid") String userid,
+                                          @Field("clas") String clas,
+                                          @Field("date") String date_id);
+
+        @POST("/MCQ_QueData/")
+        @FormUrlEncoded
+        Call<QuizQuestion> get_QuizQuestions(@Field("school") String school_code,
+                                             @Field("clas") String clas,
+                                             @Field("title") String title);
+
+        @POST("/MCQansData/")
+        @FormUrlEncoded
+        Call<MCCQ> saveMCQ_Answer(@Field("userid") String userid,
+                                  @Field("clas") String clas,
+                                  @Field("title") String title,
+                                  @Field("subject") String subject,
+                                  @Field("question") String question,
+                                  @Field("answer") String answer);
+
+        @POST("/MCQcheckansData/")
+        @FormUrlEncoded
+        Call<MCQSubmit> saveMCQ_Result(@Field("userid") String userid,
+                                       @Field("clas") String clas,
+                                       @Field("title") String title,
+                                       @Field("subject") String subject);
 
     }
 

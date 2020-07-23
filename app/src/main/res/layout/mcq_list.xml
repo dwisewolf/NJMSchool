@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:background="@drawable/rectbasic"
+    android:orientation="vertical"
+    android:layout_margin="10dp"
+    android:padding="5dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:background="@drawable/rectblack"
+        android:layout_margin="10dp"
+        android:padding="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:textSize="17sp"
+            android:fontFamily="@font/robotoregular"
+            android:id="@+id/subj_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Subject" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:fontFamily="@font/robotoregular"
+            android:id="@+id/title_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Title" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:fontFamily="@font/robotoregular"
+            android:id="@+id/desc_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Desc" />
+
+        <TextView
+            android:gravity="center"
+            android:textColor="@color/Basic"
+            android:textSize="17sp"
+            android:fontFamily="@font/robotoregular"
+            android:id="@+id/time_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Time" />
+
+        <TextView
+            android:layout_marginTop="5dp"
+            android:gravity="left"
+            android:textColor="@color/black"
+            android:textSize="15sp"
+            android:fontFamily="@font/robotoregular"
+            android:id="@+id/examDate_test"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Desc" />
+
+    </LinearLayout>
+
+    <TextView
+        android:textColor="@color/red"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:id="@+id/textView23"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Take Test Now >>>" />
+</LinearLayout>
