@@ -24,6 +24,10 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textColor="@color/accent_material_light" />
+            <com.jsibbold.zoomage.ZoomageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/que_image"></com.jsibbold.zoomage.ZoomageView>
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -100,6 +104,7 @@
 
 
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:textAppearance="@color/abc_background_cache_hint_selector_material_dark"
@@ -110,6 +115,7 @@
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"/>
             <TextView
+                android:visibility="gone"
                 android:layout_width="wrap_content"
                 android:layout_height="24dp"
                 android:textAppearance="@color/abc_background_cache_hint_selector_material_dark"

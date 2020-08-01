@@ -10,6 +10,26 @@ public class QuizQuestion
 
     private String[] questions_list;
 
+    private String[] flag_list;
+
+    private String[] url_list;
+
+    public String[] getFlag_list() {
+        return flag_list;
+    }
+
+    public void setFlag_list(String[] flag_list) {
+        this.flag_list = flag_list;
+    }
+
+    public String[] getUrl_list() {
+        return url_list;
+    }
+
+    public void setUrl_list(String[] url_list) {
+        this.url_list = url_list;
+    }
+
     public String[] getAsnwers_list ()
     {
         return asnwers_list;

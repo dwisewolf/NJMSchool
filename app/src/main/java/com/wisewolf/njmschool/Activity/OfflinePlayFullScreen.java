@@ -72,8 +72,8 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
     public void onBackPressed() {
 
         new AlertDialog.Builder(OfflinePlayFullScreen.this)
-            .setTitle("SECURITY ALERT")
-            .setMessage("Video Re encryption")
+            .setTitle(" ALERT")
+            .setMessage("Do you want to close this video?")
 
             // Specifying a listener allows you to take an action before dismissing the dialog.
             // The dialog is automatically dismissed when a dialog button is clicked.

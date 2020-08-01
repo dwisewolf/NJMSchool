@@ -16,16 +16,23 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.wisewolf.njmschool.R;
 
 import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private static int TIME_OUT = 1000;
@@ -77,8 +84,9 @@ public class MainActivity extends AppCompatActivity {
 
         if (isNetworkAvailable()) {
 
-            GetVersionCode getVersionCode=new GetVersionCode();
-            getVersionCode.execute();
+
+            getBillNo();
+          /*  */
 
 
         } else {
@@ -166,6 +174,55 @@ public class MainActivity extends AppCompatActivity {
             }
         }, TIME_OUT);
     }
+    private void getBillNo() {
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("server").get()
+            .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    List<DocumentSnapshot> aaq=   queryDocumentSnapshots.getDocuments();
+                    DocumentSnapshot ne = aaq.get(0);
+                    Object a= ne.get("up");
+                    a =a.toString();
+                    if (a.equals("down")) {
+                        alertbox();
+                    }
+                    else {
+                        GetVersionCode getVersionCode=new GetVersionCode();
+                        getVersionCode.execute();
+                    }
+
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    String a="";
+                }
+            });
+
+
+
+
+    }
+
+    private void alertbox() {
+        new AlertDialog.Builder(MainActivity.this)
+            .setTitle("OOPS....")
+            .setMessage("ServerDown..")
+
+            // Specifying a listener allows you to take an action before dismissing the dialog.
+            // The dialog is automatically dismissed when a dialog button is clicked.
+            .setPositiveButton("close", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAffinity();
+
+                }
+            })
+
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
 
 }

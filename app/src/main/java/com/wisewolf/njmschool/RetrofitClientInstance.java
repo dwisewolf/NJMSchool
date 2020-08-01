@@ -141,7 +141,8 @@ public class RetrofitClientInstance {
                                   @Field("title") String title,
                                   @Field("subject") String subject,
                                   @Field("question") String question,
-                                  @Field("answer") String answer);
+                                  @Field("answer") String answer,
+                                  @Field("que_Image") String que_Image);
 
         @POST("/MCQcheckansData/")
         @FormUrlEncoded
@@ -149,6 +150,8 @@ public class RetrofitClientInstance {
                                        @Field("clas") String clas,
                                        @Field("title") String title,
                                        @Field("subject") String subject);
+
+
 
     }
 

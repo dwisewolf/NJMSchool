@@ -11,13 +11,14 @@ import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.OfflineVideos;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class OfflineDatabase extends SQLiteOpenHelper {
     SQLiteDatabase dh;
     // Database Version
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     // Database Name
-    private static final String DATABASE_NAME = "OfflineDB5";
+    private static final String DATABASE_NAME = "OfflineDB6";
 
     public OfflineDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,6 +35,9 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         String CREATE_TABLE_taskid = "CREATE TABLE tbl_taskid(id varchar PRIMARY KEY ,userid varchar ,taskid varchar  )";
         sqLiteDatabase.execSQL(CREATE_TABLE_taskid);
+
+        String CREATE_TABLE_optionTest = "CREATE TABLE optionTest(id varchar PRIMARY KEY ,userid varchar ,optionId varchar  )";
+        sqLiteDatabase.execSQL(CREATE_TABLE_optionTest);
 
     }
 
@@ -293,6 +297,57 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         query = "delete from tbl_taskid WHERE userid ='"+userid+"' and taskid='"+taskid+"'";
         Log.e("Query", query);
         dh.execSQL(query);
+
+
+
+    }
+
+    public String insertoptionTest( String userid, String test)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+
+            values.put("[userid]", userid);
+            values.put("[optionId]", test);
+
+
+            dh.insert("optionTest", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String getOptiontest(String userid) {
+        dh = this.getReadableDatabase();
+
+        String select = "select * from optionTest  WHERE userid ='"+userid+"'";
+        Cursor cursor = dh.rawQuery(select, null);
+        String test="";
+        if (cursor.moveToFirst()) {
+            int i = 0;
+
+            do {
+
+                test=cursor.getString(cursor.getColumnIndex("optionId"));
+
+
+            }
+            while (cursor.moveToNext());
+            dh.close();
+            return test;
+
+        }
+        else {
+            dh.close();
+            return test;
+
+        }
 
 
 

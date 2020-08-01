@@ -63,6 +63,8 @@ public class FeedbackActivity extends AppCompatActivity {
         feedbox = findViewById(R.id.feedbox);
         repyList = findViewById(R.id.repyList);
         save = findViewById(R.id.save);
+
+
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
 
@@ -71,14 +73,14 @@ public class FeedbackActivity extends AppCompatActivity {
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-if (!feedbox.getText().toString().equals("")) {
-    Feedback feedback = new Feedback();
-    feedback.setSchool(GlobalData.school_code);
-    feedback.setMsg(feedbox.getText().toString());
-    feedback.setUser(GlobalData.regno);
-    feedback.setDate(formattedDate);
-    addDb(feedback);
-}
+         if (!feedbox.getText().toString().equals("")) {
+             Feedback feedback = new Feedback();
+             feedback.setSchool(GlobalData.school_code);
+             feedback.setMsg(feedbox.getText().toString());
+             feedback.setUser(GlobalData.regno);
+             feedback.setDate(formattedDate);
+             addDb(feedback);
+         }
 else {
     Toast.makeText(FeedbackActivity.this, "Fill your feedback", Toast.LENGTH_SHORT).show();
 }

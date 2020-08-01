@@ -4,20 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/Basic"
     tools:context=".Activity.VideoListing">
 
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toTopOf="@+id/guideline19"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/greenimg" />
+
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
@@ -96,19 +87,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.1" />
+        app:layout_constraintGuide_percent="0.08" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline18"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.32" />
+        app:layout_constraintGuide_percent="0.25" />
 
 
-    <ImageView
+    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
         android:translationZ="10dp"
-
+        android:scaleType="fitXY"
         android:id="@+id/thumb"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -120,7 +111,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline18"
-        app:srcCompat="@drawable/car3" />
+        android:src="@drawable/njms" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline19"
@@ -158,18 +149,38 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    >
                     <TextView
+                        android:layout_weight="1"
                         android:id="@+id/newss_id"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="15dp"
                         android:background="@color/Basic"
-                        android:drawableLeft="@drawable/doc_pic"
                         android:gravity="center"
                         android:padding="15dp"
-                        android:text="NEWS OR NOTICE"
+                        android:text="NOTICE"
                         android:textColor="@color/white"
-                        android:textSize="17dp" />
+                        android:textSize="14dp" />
+                    <TextView
+                        android:layout_weight="1"
+                        android:id="@+id/instructions_id"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="15dp"
+                        android:background="@color/Basic"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="INSTRUCTIONS"
+                        android:textColor="@color/white"
+                        android:textSize="14dp" />
+                </LinearLayout>
+
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -390,7 +401,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="MCQ" />
+                                        android:text="Unit Test" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
@@ -438,12 +449,38 @@
                         </LinearLayout>
                     </LinearLayout>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/teacherdetail_list"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        >
+                        <TextView
+                            android:layout_weight="1"
+                            android:id="@+id/teachersid"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="15dp"
+                            android:background="@color/Basic"
+                            android:gravity="center"
+                            android:padding="15dp"
+                            android:text="TEACHERS DETAILS"
+                            android:textColor="@color/white"
+                            android:textSize="14dp" />
 
-                    </androidx.recyclerview.widget.RecyclerView>
+                        <TextView
+                            android:layout_weight="1"
+                            android:id="@+id/offlinevideos_id"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="15dp"
+                            android:background="@color/Basic"
+                            android:gravity="center"
+                            android:padding="15dp"
+                            android:text="OFFLINE VIDEOS"
+                            android:textColor="@color/white"
+                            android:textSize="14dp" />
+                    </LinearLayout>
+
 
                     <TextView
                         android:id="@+id/lesonListFlag"
@@ -454,19 +491,23 @@
                         android:fontFamily="@font/helvetica"
                         android:text="ADDED LESSONS"
                         android:textColor="@color/black"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:visibility="gone" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/offline_list"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        tools:visibility="gone" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/added_list"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="27dp"
-                        android:layout_marginEnd="28dp" />
+                        android:layout_marginEnd="28dp"
+                        tools:visibility="gone" />
 
                     <TextView
                         android:id="@+id/playListFlag"
@@ -478,12 +519,14 @@
                         android:text="RECENT PLAYED"
                         android:textColor="@color/black"
                         android:textStyle="bold"
-                        android:visibility="gone" />
+                        android:visibility="gone"
+                        tools:visibility="gone" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recent_video"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:visibility="gone" />
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -520,25 +563,14 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.94" />
 
-    <VideoView
-        android:id="@+id/introvideo"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/guideline33"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/guideline18" />
+
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline33"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.61" />
+        app:layout_constraintGuide_percent="0.51" />
 
     <ImageView
         android:id="@+id/imageView5"
@@ -577,6 +609,8 @@
         <include
 
             layout="@layout/activity_video_t_est" />
+        <include
+            layout="@layout/instruction_videos" />
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

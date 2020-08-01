@@ -1,10 +1,12 @@
 package com.wisewolf.njmschool.Activity;
 
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.wisewolf.njmschool.Adapter.QuizHeadAdapter;
 import com.wisewolf.njmschool.Adapter.StudentAdapter;
+import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.QuizHead;
@@ -36,6 +39,7 @@ public class ExamActivity extends AppCompatActivity {
 RecyclerView mcq_recycler;
     String formattedDate="";
     TextView mcqHead;
+    OfflineDatabase dbb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +49,7 @@ RecyclerView mcq_recycler;
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+        dbb = new OfflineDatabase(getApplicationContext());
 
         getDate();
 
@@ -59,6 +64,7 @@ RecyclerView mcq_recycler;
 
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA.getDefault());
           formattedDate = df.format(c);
+          formattedDate="2020-08-10";
     }
 
 
@@ -76,11 +82,24 @@ RecyclerView mcq_recycler;
                                 @Override
                                 public void onItemClick(QuizHead s) {
                                  if (s.getDate().equals(formattedDate)) {
-                                     Intent intent = new Intent(ExamActivity.this, QuestionsActivity.class);
-                                     intent.putExtra("title", s.getTitle());
-                                     intent.putExtra("subject", s.getSubject());
-                                     intent.putExtra("time", s.getTime());
-                                     startActivity(intent);
+                                     String topic=s.getSubject().toUpperCase();
+                                     if (topic.equals("HINDI")||topic.equals("PHYSICAL EDUCATION")||topic.equals("COMPUTER SCIENCE")|| topic.equals("PSYCHOLOGY"))
+                                     {
+                                         String a =testdone();
+                                         if (a.equals("")){
+                                             DoTest(s);
+                                         }
+                                         else {
+                                             alertBox();
+                                         }
+                                     }
+                                     else {
+                                         Intent intent = new Intent(ExamActivity.this, QuestionsActivity.class);
+                                         intent.putExtra("title", s.getTitle());
+                                         intent.putExtra("subject", s.getSubject());
+                                         intent.putExtra("time", s.getTime());
+                                         startActivity(intent);
+                                     }
                                  }else
                                      Toast.makeText(ExamActivity.this, "Exam Date is on "+s.getDate(), Toast.LENGTH_SHORT).show();
                                 }
@@ -108,6 +127,55 @@ RecyclerView mcq_recycler;
             String a="";
         }
 
+
+    }
+
+    private void DoTest(final QuizHead s) {
+        new AlertDialog.Builder(ExamActivity.this)
+            .setTitle("Choose the CORRECT subject.")
+            .setMessage(
+                "You will not be able to change the subject later")
+
+            // Specifying a listener allows you to take an action before dismissing the dialog.
+            // The dialog is automatically dismissed when a dialog button is clicked.
+            .setPositiveButton("Proceed", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    dbb.insertoptionTest(GlobalData.regno, "1");
+                    Intent intent = new Intent(ExamActivity.this, QuestionsActivity.class);
+                    intent.putExtra("title", s.getTitle());
+                    intent.putExtra("subject", s.getSubject());
+                    intent.putExtra("time", s.getTime());
+                    startActivity(intent);
+
+                }
+            })
+
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+
+    }
+
+    private void alertBox() {
+        new AlertDialog.Builder(ExamActivity.this)
+            .setTitle("Message")
+            .setMessage("Sorry! You have already attempted one optional subject ")
+
+            // Specifying a listener allows you to take an action before dismissing the dialog.
+            // The dialog is automatically dismissed when a dialog button is clicked.
+            .setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+
+
+                }
+            })
+
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
+    private String testdone() {
+
+        return dbb.getOptiontest(GlobalData.regno);
 
     }
 }

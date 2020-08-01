@@ -26,6 +26,57 @@
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/task" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@drawable/top_cornershape"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline50">
+
+
+        <TextView
+            android:id="@+id/notadded"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_black"
+            android:gravity="center"
+            android:text="@string/daily_task"
+            android:textColor="@color/black"
+            android:textSize="17sp" />
+
+        <TextView
+            android:id="@+id/date_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/roboto_black"
+            android:gravity="center"
+            android:text="@string/date"
+            android:textColor="@color/black"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="(click Date to change )"
+            android:textColor="@color/black"
+            android:textSize="7dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+
+            android:id="@+id/taskList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginTop="25dp" />
+    </LinearLayout>
+
     <ScrollView
         android:id="@+id/scrollView3"
         android:layout_width="0dp"
@@ -35,52 +86,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline51">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/top_cornershape"
-            android:orientation="vertical">
-
-
-            <TextView
-                android:id="@+id/notadded"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_black"
-                android:gravity="center"
-                android:text="@string/daily_task"
-                android:textColor="@color/black"
-                android:textSize="17sp" />
-
-            <TextView
-                android:id="@+id/date_id"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:fontFamily="@font/roboto_black"
-                android:gravity="center"
-                android:text="@string/date"
-                android:textColor="@color/black"
-                android:textSize="12sp" />
-
-            <TextView
-                android:textColor="@color/black"
-                android:gravity="center"
-                android:id="@+id/textView9"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="7dp"
-                android:text="(click Date to change )" />
-
-            <androidx.recyclerview.widget.RecyclerView
-
-                android:id="@+id/taskList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginTop="25dp" />
-        </LinearLayout>
     </ScrollView>
 
     <androidx.constraintlayout.widget.Guideline

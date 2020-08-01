@@ -16,12 +16,17 @@ import android.widget.Toast;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.jsibbold.zoomage.ZoomageView;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.MCCQ;
 import com.wisewolf.njmschool.Models.MCQSubmit;
 import com.wisewolf.njmschool.Models.QuizQuestion;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
+
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -31,10 +36,13 @@ public class QuestionsActivity extends AppCompatActivity {
     TextView tv;
     Button submitbutton, quitbutton;
     RadioGroup radio_g;
+    ZoomageView que_image;
     RadioButton rb1, rb2, rb3, rb4;
     String questions[];
     String answers[];
     String opt[];
+    String flags[];
+    String image[];
     int flag = 0;
     ProgressDialog mProgressDialog;
     String name = "", title, subject, time;
@@ -61,7 +69,7 @@ public class QuestionsActivity extends AppCompatActivity {
         title = intent.getStringExtra("title");
         subject = intent.getStringExtra("subject");
         time = intent.getStringExtra("time");
-
+que_image=findViewById(R.id.que_image);
 
 
         submitbutton = (Button) findViewById(R.id.button3);
@@ -75,7 +83,7 @@ public class QuestionsActivity extends AppCompatActivity {
         rb4 = (RadioButton) findViewById(R.id.radioButton4);
 
 
-        getQuizHead("", "", title);
+        getQuizHead(title);
         submitbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,13 +98,13 @@ public class QuestionsActivity extends AppCompatActivity {
                     RadioButton uans = (RadioButton) findViewById(radio_g.getCheckedRadioButtonId());
                     String ansText = uans.getText().toString();
 //              Toast.makeText(getApplicationContext(), ansText, Toast.LENGTH_SHORT).show();
-                    postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText);
+                    postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText,image[flag]);
                     if (ansText.equals(answers[flag])) {
                         correct++;
-                        Toast.makeText(getApplicationContext(), "Correct", Toast.LENGTH_SHORT).show();
+
                     } else {
                         wrong++;
-                        Toast.makeText(getApplicationContext(), "Wrong", Toast.LENGTH_SHORT).show();
+
                     }
 
                     flag++;
@@ -105,6 +113,15 @@ public class QuestionsActivity extends AppCompatActivity {
                         score.setText("" + correct);
 
                     if (flag < questions.length) {
+                        if (flags[flag].equals("true")) {
+                            que_image.setVisibility(View.VISIBLE);
+                            Glide.with(QuestionsActivity.this)
+                                .load("http://139.59.79.78/media/"+image[flag])
+                                .into(que_image);
+                        }
+                        else {
+                            que_image.setVisibility(View.GONE);
+                        }
                         tv.setText(questions[flag]);
                         rb1.setText(opt[flag * 4]);
                         rb2.setText(opt[flag * 4 + 1]);
@@ -112,7 +129,7 @@ public class QuestionsActivity extends AppCompatActivity {
                         rb4.setText(opt[flag * 4 + 3]);
                     } else {
                         marks = correct;
-                        postMCQ_Result(GlobalData.regno, GlobalData.clas, title, subject);
+                        postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
 
                     }
                     radio_g.clearCheck();
@@ -125,7 +142,7 @@ public class QuestionsActivity extends AppCompatActivity {
         quitbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                postMCQ_Result(GlobalData.regno, GlobalData.clas, title, subject);
+                postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
 
             }
         });
@@ -140,12 +157,12 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
-    private void getQuizHead(String school, String clas, String title) {
+    private void getQuizHead( String title) {
         mProgressDialog.show();
 
         try {
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<QuizQuestion> call = service.get_QuizQuestions("KAS", "VII", title);
+            Call<QuizQuestion> call = service.get_QuizQuestions(GlobalData.school_code, GlobalData.classes, title);
             call.enqueue(new Callback<QuizQuestion>() {
                 @Override
                 public void onResponse(Call<QuizQuestion> call, Response<QuizQuestion> response) {
@@ -155,6 +172,8 @@ public class QuestionsActivity extends AppCompatActivity {
                             timer(response.body().getQuestions_list().length);
                             questions = new String[response.body().getQuestions_list().length];
                             answers = new String[response.body().getAsnwers_list().length];
+                            flags = new String[response.body().getFlag_list().length];
+                            image = new String[response.body().getUrl_list().length];
 
                             int size = 0;
 
@@ -172,6 +191,16 @@ public class QuestionsActivity extends AppCompatActivity {
                             for (int i = 0; i < response.body().getAsnwers_list().length; i++) {
                                 answers[i] = response.body().getAsnwers_list()[i];
                             }
+
+                            for (int i = 0; i < response.body().getFlag_list().length; i++) {
+                                flags[i] = response.body().getFlag_list()[i];
+                            }
+
+                            for (int i = 0; i < response.body().getUrl_list().length; i++) {
+                                image[i] = response.body().getUrl_list()[i];
+                            }
+
+
                             int pos = 0;
                             for (int i = 0; i < response.body().getOptions_list().length; i++) {
                                 for (int j = 0; j < response.body().getOptions_list()[i].length; j++) {
@@ -182,6 +211,11 @@ public class QuestionsActivity extends AppCompatActivity {
                             }
 
                             tv.setText(questions[flag]);
+                            if (flags[flag].equals("true")) {
+                                Glide.with(QuestionsActivity.this)
+                                    .load("http://139.59.79.78/media/"+image[flag])
+                                .into(que_image);
+                            }
                             rb1.setText(opt[0]);
                             rb2.setText(opt[1]);
                             rb3.setText(opt[2]);
@@ -214,11 +248,11 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
-    private void postMCQ_Answer(String userid, String clas, String title, String subject, String question, String answer) {
+    private void postMCQ_Answer(String userid, String clas, String title, String subject, String question, String answer,String image) {
         try {
             mProgressDialog.show();
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<MCCQ> call = service.saveMCQ_Answer("KAS125", "VII", title, subject, question, answer);
+            Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer,image);
             call.enqueue(new Callback<MCCQ>() {
                 @Override
                 public void onResponse(Call<MCCQ> call, Response<MCCQ> response) {
@@ -243,7 +277,7 @@ public class QuestionsActivity extends AppCompatActivity {
         try {
             mProgressDialog.show();
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<MCQSubmit> call = service.saveMCQ_Result("KAS125", "VII", title, subject);
+            Call<MCQSubmit> call = service.saveMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
             call.enqueue(new Callback<MCQSubmit>() {
                 @Override
                 public void onResponse(Call<MCQSubmit> call, Response<MCQSubmit> response) {
@@ -278,7 +312,11 @@ public class QuestionsActivity extends AppCompatActivity {
         new CountDownTimer(dur, 1000) {
 
             public void onTick(long millisUntilFinished) {
-                textView.setText("Minutes remaining: " + millisUntilFinished / 60000);
+                String text = String.format(Locale.getDefault(), "Time Remaining %02d min: %02d sec",
+                    TimeUnit.MILLISECONDS.toMinutes(millisUntilFinished) % 60,
+                    TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished) % 60);
+                textView.setText(text);
+
                 //here you can have your logic to set text to edittext
             }
 
@@ -287,7 +325,7 @@ public class QuestionsActivity extends AppCompatActivity {
                 if (flag!=length){
                     int count=length-flag;
                     for (int i=0;i<count;i++){
-                        postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], "TIMED OUT");
+                        postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], "TIMED OUT","");
                         wrong++;
 
                     }

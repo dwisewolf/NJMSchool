@@ -102,6 +102,9 @@ public class SignUp extends AppCompatActivity {
 
                                 Toast.makeText(SignUp.this, "Enter password to register", Toast.LENGTH_SHORT).show();
                                 check.setText("Enter password to register....");
+                                phone.setFocusable(false);
+                                password.requestFocus();
+                                check.setVisibility(View.INVISIBLE);
                                 signUp.setVisibility(View.VISIBLE);
                                 passCard.setVisibility(View.VISIBLE);
 

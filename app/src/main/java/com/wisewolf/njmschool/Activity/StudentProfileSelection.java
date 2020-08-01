@@ -159,6 +159,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<List<News>> call, Response<List<News>> response) {
                     String a="";
+                    GlobalData.newsForstudent=response.body();
                 }
 
                 @Override
@@ -215,46 +216,62 @@ String a="";
         switch(clas) {
             case "PREP":
                 clasS=   "NR";
+                GlobalData.clas="NRL";
                 break;
             case "LKG":
                 clasS="LK";
+                GlobalData.clas="LKG";
                 break;
             case "UKG":
                 clasS= "UK";
+                GlobalData.clas="UKG";
                 break;
             case "XII":
-            case "XI":
                 clasS= "C12";
+                GlobalData.clas="12";
+            case "XI":
+                clasS= "C11";
+                GlobalData.clas="11";
                 break;
             case "X":
                 clasS="C10";
+                GlobalData.clas="10";
                 break;
             case "IX":
                clasS= "C9";
+                GlobalData.clas="9";
                 break;
             case "VIII":
                clasS= "C8";
+                GlobalData.clas="8";
                 break;
             case "VII":
                clasS= "C7";
+                GlobalData.clas="7";
                 break;
             case "VI":
                clasS= "C6";
+                GlobalData.clas="6";
                 break;
             case "V":
                clasS= "C5";
+                GlobalData.clas="5";
                 break;
             case "IV":
                clasS= "C4";
+                GlobalData.clas="4";
                 break;
             case "III":
                clasS= "C3";
+                GlobalData.clas="3";
                 break;
             case "II":
                clasS= "C2";
+                GlobalData.clas="2";
                 break;
             case "I":
                clasS= "C1";
+                GlobalData.clas="1";
                 break;
         }
         return  clasS;

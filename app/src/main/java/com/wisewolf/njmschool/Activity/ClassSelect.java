@@ -186,8 +186,9 @@ public class ClassSelect extends AppCompatActivity {
                 clasS = "UK";
                 break;
             case "XII":
-            case "XI":
                 clasS = "C12";
+            case "XI":
+                clasS = "C11";
                 break;
             case "X":
                 clasS = "C10";

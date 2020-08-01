@@ -68,7 +68,7 @@ public class QuizHeadAdapter extends RecyclerView.Adapter<QuizHeadAdapter.QuizHe
         public void set(QuizHead o) {
             subj.setText(o.getSubject());
             title.setText("Title - " +o.getTitle());
-            desc.setText("Details -  :"+o.getDescription());
+            desc.setText("Chapter -  :"+o.getDescription());
             time.setText("Time (Min) : "+o.getTime());
             date.setText("Exam Date : "+o.getDate());
 

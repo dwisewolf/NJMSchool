@@ -3,6 +3,7 @@ package com.wisewolf.njmschool.Globals;
 import com.vimeo.networking.VimeoClient;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.DailyTask;
+import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.TeacherDetails;
 
 import java.util.ArrayList;
@@ -166,6 +167,7 @@ public class GlobalData   {
     public static Response<List<ClassVideo>> all_VideoList;
     public static List<DailyTask> dailyTaskList ;
     public static List<TeacherDetails> teacherDetails ;
+    public static List<News> newsForstudent ;
 
     public static String school_code ;
     public static String classes ;

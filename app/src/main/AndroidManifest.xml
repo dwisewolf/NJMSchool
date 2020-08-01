@@ -23,9 +23,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.ExamActivity">
-
-        </activity>
+        <activity android:name=".Activity.NEwsListActivity"></activity>
+        <activity android:name=".Activity.ExamActivity"></activity>
         <activity android:name=".Activity.FeedbackActivity" />
         <activity android:name=".Activity.DailyTask_Activity" />
         <activity
@@ -76,10 +75,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.QuestionsActivity">
-
-        </activity>
+        <activity android:name=".Activity.QuestionsActivity"></activity>
         <activity android:name=".Activity.ResultActivity" />
+        <activity android:name=".Activity.OfflineScreenUser" />
 
         <uses-library
             android:name="org.apache.http.legacy"

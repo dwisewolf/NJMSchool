@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.http.SslCertificate;
@@ -14,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -34,7 +37,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vimeo.networking.Configuration;
@@ -52,6 +61,7 @@ import com.wisewolf.njmschool.Adapter.VideoAddedAdapter;
 import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.ClassVideo;
+import com.wisewolf.njmschool.Models.News;
 import com.wisewolf.njmschool.Models.OfflineVideos;
 import com.wisewolf.njmschool.Models.VideoUp;
 import com.wisewolf.njmschool.ObjectSerialiser;
@@ -84,29 +94,32 @@ public class VideoListing extends AppCompatActivity {
 
     String StudentClass = "12",pass="WISEWOLF",DcryptName="",DcryptSalt="",DcryptInv="";
     RecyclerView added_list,offlineList,recentVideo,teacherDetails;
+    FirebaseStorage storage;
+    StorageReference storageRef;
 
 
     private ProgressDialog mProgressDialog;
 
-    ImageView topic,logout,thumb;
+    ImageView topic,logout;
+    SubsamplingScaleImageView thumb;
     int exitflag=0;
 
     ArrayList allVideoList = new ArrayList();
 
-    TextView offlineFlagTextview,playFlag,news_id;
+    TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers;
 
     CardView mediaCard,photocard,docucard,feedcard,mcqCard,examCard;
     OfflineDatabase dbb;
     VideoView intoVideo;
     VideoList introlist;
 
-    private BottomSheetBehavior sheetBehavior;
-    private LinearLayout bottom_sheet;
+    private BottomSheetBehavior sheetBehavior,sheetBehavior_instruct;
+    private LinearLayout bottom_sheet,bottom_sheet_instr;
 
     @Override
     protected void onResume() {
         super.onResume();
-        thumb.setVisibility(View.VISIBLE);
+       // intrthumb.setVisibility(View.VISIBLE);
 
         try{
 
@@ -142,7 +155,7 @@ public class VideoListing extends AppCompatActivity {
                     public void onResponse(Call<List<VideoUp>> call, Response<List<VideoUp>> response) {
 
 
-                        playFlag.setVisibility(View.VISIBLE);
+
                         added_list.setVisibility(View.GONE);
                         recentVideo.setAdapter(new RecentPlayedAdapter(VideoListing.this, (ArrayList) response.body(), recentVideo, new RecentPlayedAdapter.OnItemClickListener() {
                             @Override
@@ -196,6 +209,7 @@ public class VideoListing extends AppCompatActivity {
 
         thumb = findViewById(R.id.thumb);
         intoVideo = findViewById(R.id.introvideo);
+       // intrthumb = findViewById(R.id.introthumb);
 
 
         mediaCard=findViewById(R.id.mediaFile);
@@ -204,18 +218,25 @@ public class VideoListing extends AppCompatActivity {
         feedcard = findViewById(R.id.feedbackD);
         mcqCard = findViewById(R.id.mcqQ);
         examCard = findViewById(R.id.examD);
+        offlinepage = findViewById(R.id.offlinevideos_id);
+        closevideo=findViewById(R.id.closevideo);
+        teachers=findViewById(R.id.teachersid);
 
 
         offlineList=findViewById(R.id.offline_list);
         offlineFlagTextview=findViewById(R.id.lesonListFlag);
         added_list = findViewById(R.id.added_list);
         recentVideo = findViewById(R.id.recent_video);
-        playFlag = findViewById(R.id.playListFlag);
+
         logout = findViewById(R.id.logout);
         news_id = findViewById(R.id.newss_id);
+        instructions = findViewById(R.id.instructions_id);
 
         TeacherDetails();
         bottomSheet();
+        bottomSheetInstructions();
+
+
 
 
 
@@ -233,7 +254,7 @@ public class VideoListing extends AppCompatActivity {
 
         configVimeo();
        // offlinevideos();
-
+        notice();
 
         allVideoList = GlobalData.allVideoList;
 
@@ -310,25 +331,79 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
-        thumb.setOnClickListener(new View.OnClickListener() {
+      /*  intrthumb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mediaPlay(introlist);
             }
+        });*/
+
+      offlinepage.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              Intent intent=new Intent(VideoListing.this,OfflineScreenUser.class);
+
+              startActivity(intent);
+          }
+      });
+
+
+    }
+
+    private void notice() {
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+        String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.JPG" ;
+        if (GlobalData.clas.equals("12")){
+            school=GlobalData.school_code+"/class"+GlobalData.clas+GlobalData.sect+"/notice.JPG" ;
+        }
+
+        StorageReference islandRef = storageRef.child(school);
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        islandRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                Bitmap bmp= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+
+
+                thumb.setImage(ImageSource.bitmap(bmp));
+                // Data for "images/island.jpg" is returns, use this as needed
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                String a="";
+            }
         });
-
-
     }
 
     private void bottomSheet() {
         bottom_sheet = findViewById(R.id.bottom_sheet);
         sheetBehavior = BottomSheetBehavior.from(bottom_sheet);
+        TextView close=findViewById(R.id.closeTeacher);
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            }
+        });
 
         // click event for show-dismiss bottom sheet
         news_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                startActivity(new Intent(VideoListing.this,NEwsListActivity.class));
+
+            }
+        });
+
+        teachers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    if (sheetBehavior.getState() != BottomSheetBehavior.STATE_EXPANDED) {
                     sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
 
                 } else {
@@ -368,13 +443,79 @@ public class VideoListing extends AppCompatActivity {
         });
     }
 
+
+    private void bottomSheetInstructions() {
+        bottom_sheet_instr = findViewById(R.id.bottom_sheet_instructions);
+        sheetBehavior_instruct = BottomSheetBehavior.from(bottom_sheet_instr);
+
+        closevideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sheetBehavior_instruct.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                intoVideo.stopPlayback();
+                intoVideo.suspend();
+            }
+        });
+
+        // click event for show-dismiss bottom sheet
+        instructions.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+
+                    Intent intent=new Intent(VideoListing.this,FullScreen2.class);
+                    intent.putExtra("url", introlist.data.get(0).files.get(0).link);
+                    startActivity(intent);
+            /*    if (sheetBehavior_instruct.getState() != BottomSheetBehavior.STATE_EXPANDED) {
+                    sheetBehavior_instruct.setState(BottomSheetBehavior.STATE_EXPANDED);
+                    mediaPlay(introlist);
+                } else {
+                    sheetBehavior_instruct.setState(BottomSheetBehavior.STATE_COLLAPSED);
+                    intoVideo.stopPlayback();
+                    intoVideo.suspend();
+                }*/
+            }
+        });
+// callback for do something
+
+
+        sheetBehavior_instruct.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int newState) {
+                switch (newState) {
+                    case BottomSheetBehavior.STATE_HIDDEN:
+                        break;
+                    case BottomSheetBehavior.STATE_EXPANDED: {
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_COLLAPSED: {
+                        intoVideo.stopPlayback();
+                        intoVideo.suspend();
+
+                    }
+                    break;
+                    case BottomSheetBehavior.STATE_DRAGGING:
+                        break;
+                    case BottomSheetBehavior.STATE_SETTLING:
+                        break;
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
+    }
+
     private void TeacherDetails() {
-if (GlobalData.teacherDetails!=null) {
-    teacherDetails.setAdapter(new TeacherDetailAdapter(GlobalData.teacherDetails, teacherDetails));
-    LinearLayoutManager added_liste_adapterlayoutManager
-        = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-    teacherDetails.setLayoutManager(added_liste_adapterlayoutManager);
-}
+        if (GlobalData.teacherDetails != null) {
+            teacherDetails.setAdapter(new TeacherDetailAdapter(GlobalData.teacherDetails, teacherDetails));
+            LinearLayoutManager added_liste_adapterlayoutManager
+                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+            teacherDetails.setLayoutManager(added_liste_adapterlayoutManager);
+        }
 
     }
 
@@ -909,14 +1050,16 @@ if (GlobalData.teacherDetails!=null) {
                     if (videoList != null && videoList.data != null && !videoList.data.isEmpty()) {
                         mProgressDialog.cancel();
                         int x=videoList.data.get(0).pictures.sizes.size();
-                        Glide.with(VideoListing.this)
+                      /*  Glide.with(VideoListing.this)
                             .load(videoList.data.get(0).pictures.sizes.get(x-1).linkWithPlayButton) // image url
 
 
 
                             .centerCrop()
-                            .into( thumb);
+                            .into( intrthumb);*/
                         introlist=videoList;
+
+
 
 
 
@@ -955,7 +1098,7 @@ if (GlobalData.teacherDetails!=null) {
                 // videoView.start();
                 mediaPlayer.start();
                 mProgressDialog.cancel();
-                thumb.setVisibility(View.GONE);
+             //   intrthumb.setVisibility(View.GONE);
                 mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
                     @Override
                     public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {

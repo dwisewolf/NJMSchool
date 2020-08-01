@@ -19,6 +19,9 @@ public class News{
 	@SerializedName("modifyDate")
 	private String modifyDate;
 
+	@SerializedName("class_code")
+	private String class_code;
+
 	@SerializedName("link")
 	private String link;
 
@@ -58,5 +61,9 @@ public class News{
 
 	public String getAddDate(){
 		return addDate;
+	}
+
+	public String getclass_code(){
+		return class_code;
 	}
 }

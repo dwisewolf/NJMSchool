@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.wisewolf.njmschool.R;
 
 public class ResultActivity extends AppCompatActivity {
-    TextView tv, tv2, tv3;
+
     Button btnRestart;
 
     @Override
@@ -29,9 +29,7 @@ public class ResultActivity extends AppCompatActivity {
         actionBar.hide();
 
 
-        tv = (TextView)findViewById(R.id.tvres);
-        tv2 = (TextView)findViewById(R.id.tvres2);
-        tv3 = (TextView)findViewById(R.id.tvres3);
+
         btnRestart = (Button) findViewById(R.id.btnRestart);
 
         StringBuffer sb = new StringBuffer();
@@ -42,9 +40,7 @@ public class ResultActivity extends AppCompatActivity {
         int total=Integer.valueOf(QuestionsActivity.correct)+Integer.valueOf(QuestionsActivity.wrong);
         StringBuffer sb3 = new StringBuffer();
         sb3.append("Final Score: " + QuestionsActivity.correct + "/"+String.valueOf(total));
-        tv.setText(sb);
-        tv2.setText(sb2);
-        tv3.setText(sb3);
+
 
         QuestionsActivity.correct=0;
         QuestionsActivity.wrong=0;
@@ -52,7 +48,7 @@ public class ResultActivity extends AppCompatActivity {
         btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(getApplicationContext(),ExamActivity.class);
+                Intent in = new Intent(getApplicationContext(),VideoListing.class);
                 startActivity(in);
             }
         });
