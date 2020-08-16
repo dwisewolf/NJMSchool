@@ -106,7 +106,8 @@ public class VideoListing extends AppCompatActivity {
 
     ArrayList allVideoList = new ArrayList();
 
-    TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers;
+    TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers,
+    refresh_media;
 
     CardView mediaCard,photocard,docucard,feedcard,mcqCard,examCard;
     OfflineDatabase dbb;
@@ -114,6 +115,7 @@ public class VideoListing extends AppCompatActivity {
     VideoList introlist;
 
     private BottomSheetBehavior sheetBehavior,sheetBehavior_instruct;
+
     private LinearLayout bottom_sheet,bottom_sheet_instr;
 
     @Override
@@ -181,6 +183,7 @@ public class VideoListing extends AppCompatActivity {
 
 
     }
+
     private void mProgressDialogInit() {
         mProgressDialog = new ProgressDialog(VideoListing.this);
         mProgressDialog.setMessage("Please wait . . .");
@@ -231,6 +234,7 @@ public class VideoListing extends AppCompatActivity {
         logout = findViewById(R.id.logout);
         news_id = findViewById(R.id.newss_id);
         instructions = findViewById(R.id.instructions_id);
+        refresh_media = findViewById(R.id.reset_shrdpref);
 
         TeacherDetails();
         bottomSheet();
@@ -314,6 +318,20 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+        refresh_media.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoListing.this);
+
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString("date", "");
+                editor.apply();
+
+                refresh();
+
+            }
+        });
+
 
         // media(videoList.data.get(1).files.get(0).link);
 
@@ -350,12 +368,33 @@ public class VideoListing extends AppCompatActivity {
 
     }
 
+    private void refresh() {
+        new AlertDialog.Builder(VideoListing.this)
+            .setTitle("Refresh APP")
+            .setMessage(" close the app and restart")
+
+            // Specifying a listener allows you to take an action before dismissing the dialog.
+            // The dialog is automatically dismissed when a dialog button is clicked.
+            .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    finishAffinity();
+                    System.exit(0);
+
+                }
+            })
+
+            // A null listener allows the button to dismiss the dialog and take no further action.
+            .setNegativeButton("Cancel", null)
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
+    }
+
     private void notice() {
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-        String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.JPG" ;
+        String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.jpg" ;
         if (GlobalData.clas.equals("12")){
-            school=GlobalData.school_code+"/class"+GlobalData.clas+GlobalData.sect+"/notice.JPG" ;
+            school=GlobalData.school_code+"/class"+GlobalData.clas+GlobalData.sect+"/notice.jpg" ;
         }
 
         StorageReference islandRef = storageRef.child(school);
@@ -442,7 +481,6 @@ public class VideoListing extends AppCompatActivity {
             }
         });
     }
-
 
     private void bottomSheetInstructions() {
         bottom_sheet_instr = findViewById(R.id.bottom_sheet_instructions);
@@ -908,7 +946,6 @@ public class VideoListing extends AppCompatActivity {
 
     }
 
-
     private void getData(Intent intent) {
         TextView name,clas,phn,sec;
         name=findViewById(R.id.name_id);
@@ -932,8 +969,10 @@ public class VideoListing extends AppCompatActivity {
                 StudentClass = "UKG";
                 break;
             case "XII":
-            case "XI":
                 StudentClass = "12";
+                break;
+            case "XI":
+                StudentClass = "11";
                 break;
             case "X":
                 StudentClass = "10";
@@ -993,8 +1032,6 @@ public class VideoListing extends AppCompatActivity {
             }
         });
     }*/
-
-
 
     @Override
     public void onBackPressed() {
@@ -1110,4 +1147,3 @@ public class VideoListing extends AppCompatActivity {
         });
     }
 }
-

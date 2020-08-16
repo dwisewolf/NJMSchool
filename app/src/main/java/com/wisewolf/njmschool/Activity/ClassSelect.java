@@ -38,6 +38,8 @@ public class ClassSelect extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_class_select);
+
+
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
 
@@ -187,6 +189,7 @@ public class ClassSelect extends AppCompatActivity {
                 break;
             case "XII":
                 clasS = "C12";
+                break;
             case "XI":
                 clasS = "C11";
                 break;

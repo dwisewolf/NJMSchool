@@ -388,7 +388,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Q"
+                                        android:text="U"
                                         android:textColor="@color/Basic"
                                         android:textStyle="bold"
                                         android:fontFamily="@font/robotoregular"
@@ -481,7 +481,18 @@
                             android:textSize="14dp" />
                     </LinearLayout>
 
-
+                    <TextView
+                        android:layout_weight="1"
+                        android:id="@+id/reset_shrdpref"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_margin="15dp"
+                        android:background="@color/Basic"
+                        android:gravity="center"
+                        android:padding="15dp"
+                        android:text="Refresh Media files"
+                        android:textColor="@color/white"
+                        android:textSize="14dp" />
                     <TextView
                         android:id="@+id/lesonListFlag"
                         android:layout_width="wrap_content"

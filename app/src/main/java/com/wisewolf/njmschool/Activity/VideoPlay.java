@@ -58,6 +58,15 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import com.vimeo.networking.Configuration;
+import com.vimeo.networking.VimeoClient;
+import com.vimeo.networking.callbacks.AuthCallback;
+import com.vimeo.networking.callbacks.ModelCallback;
+import com.vimeo.networking.model.Video;
+import com.vimeo.networking.model.VideoFile;
+import com.vimeo.networking.model.VideoList;
+import com.vimeo.networking.model.error.VimeoError;
+import com.vimeo.networking.model.playback.Play;
 import com.wisewolf.njmschool.Adapter.Class_videoAdapter;
 import com.wisewolf.njmschool.Adapter.SubjectAdapter;
 import com.wisewolf.njmschool.Database.OfflineDatabase;
@@ -100,8 +109,12 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     ArrayList nowShowing = new ArrayList();
 
 
-    String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7"};
-    String lessn_code[] = {"L1", "L2", "L3", "L4", "L5", "L6", "L7"};
+    String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7",
+                      "Lesson 8", "Lesson 9", "Lesson 10", "Lesson 11", "Lesson 12", "Lesson 13", "Lesson 14",
+        "Lesson 15", "Lesson 16", "Lesson 17", "Lesson 18", "Lesson 19", "Lesson 20"};
+    String lessn_code[] = {"L1", "L2", "L3", "L4", "L5", "L6", "L7",
+                           "L8", "L9", "L0", "M1", "M2", "M3", "M4",
+        "M5", "M6", "M7", "M8", "M9", "M0"};
     String lesson_flag = "ALL";
     String details = ".-.-.", documenturl,vURL = "",download_url="",download_name="",pass="WISEWOLF",document_name;
     TextView topic, head, teacher,notes;
@@ -242,34 +255,9 @@ notes.setOnClickListener(new View.OnClickListener() {
                             extra2=selectedVideo.getData().getDescription();
                             download();
                         } else {
-                            new AlertDialog.Builder(VideoPlay.this)
-                                .setTitle("SECURITY ALERT")
-                                .setMessage("Please Restart the app to follow security policy.\n" +
-                                    "Download Link Expires every day.")
 
-                                // Specifying a listener allows you to take an action before dismissing the dialog.
-                                // The dialog is automatically dismissed when a dialog button is clicked.
-                                .setPositiveButton("Restart", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(VideoPlay.this);
-                                        SharedPreferences.Editor editor = sharedPrefs.edit();
-                                        editor.putString("size", "0");
-                                        editor.putString("Allvideolist", "");
-                                        editor.apply();
-                                        logout_funct();
-                                        if(Build.VERSION.SDK_INT>=16 && Build.VERSION.SDK_INT<21){
-                                            finishAffinity();
-                                        } else if(Build.VERSION.SDK_INT>=21){
-                                            finishAffinity();
-                                        }
+                            configVimeo(selectedVideo);
 
-                                    }
-                                })
-
-                                // A null listener allows the button to dismiss the dialog and take no further action.
-                                .setNegativeButton("Later", null)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
-                                .show();
                         }
                     }
 
@@ -487,6 +475,7 @@ notes.setOnClickListener(new View.OnClickListener() {
             mProgressDialog.dismiss();
             if (!s.equals("f")){
                 dbb.insertinto(nametostore,salt_name,dir_name,inv_name,location,userid,extra1,extra2);
+                String a="";
             }
 
 
@@ -765,14 +754,27 @@ notes.setOnClickListener(new View.OnClickListener() {
                 }
             });
         }
-        if (StudentClass.equals("11")) {
-            subjectAdapter = new SubjectAdapter(SubjectList.class1, subj_list, new SubjectAdapter.OnItemClickListener() {
+        if (StudentClass.equals("11"))  {
+            String[] list;
+            if (studentdiv.equals("C")) {
+
+                list = SubjectList.class11_COMR;
+            } else if (studentdiv.equals("H")) {
+                list = SubjectList.class11_HUM;
+            } else if (studentdiv.equals("S")) {
+                list = SubjectList.class11_SCI;
+            } else {
+                list = SubjectList.class11_COMM;
+            }
+
+            subjectAdapter = new SubjectAdapter(list, subj_list, new SubjectAdapter.OnItemClickListener() {
                 @Override
                 public void onItemClick(String s) {
                     getVideosList(s);
                 }
             });
         }
+
         if (StudentClass.equals("12")) {
             String[] list;
             if (studentdiv.equals("C")) {
@@ -1260,6 +1262,77 @@ notes.setOnClickListener(new View.OnClickListener() {
     }
 
     private void class11(String subject) {
+        String subCode = "";
+        if (studentdiv.equals("S")) {
+            for (int i = 0; i < SubjectList.class11_SCI.length; i++) {
+                if (SubjectList.class11_SCI[i].equals(subject)) {
+                    subCode = SubjectList.class11_SCI_code[i];
+                }
+
+            }
+            ArrayList subject_videoList = new ArrayList();
+            ArrayList videoList = new ArrayList();
+            videoList = GlobalData.addedVideos;
+            String subj = "";
+            for (int i = 0; i < videoList.size(); i++) {
+                ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+            subj_wise_videoListAdapter(subject_videoList);
+
+
+        } else if (studentdiv.equals("H")) {
+            for (int i = 0; i < SubjectList.class11_HUM.length; i++) {
+                if (SubjectList.class11_HUM[i].equals(subject)) {
+                    subCode = SubjectList.class11_HUM_code[i];
+                }
+
+            }
+            ArrayList subject_videoList = new ArrayList();
+            ArrayList videoList = new ArrayList();
+            videoList = GlobalData.addedVideos;
+            String subj = "";
+            for (int i = 0; i < videoList.size(); i++) {
+                ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+            subj_wise_videoListAdapter(subject_videoList);
+
+
+        } else {
+            for (int i = 0; i < SubjectList.class11_COMR.length; i++) {
+                if (SubjectList.class11_COMR[i].equals(subject)) {
+                    subCode = SubjectList.class11_COMR_code[i];
+                }
+
+            }
+            ArrayList subject_videoList = new ArrayList();
+            ArrayList videoList = new ArrayList();
+            videoList = GlobalData.addedVideos;
+            String subj = "";
+            for (int i = 0; i < videoList.size(); i++) {
+                ClassVideo video = (ClassVideo) videoList.get(i);
+                subj = (video.getData().getName().substring(5));
+                subj = subj.substring(0, Math.min(subj.length(), 3));
+                if (subj.equals(subCode)) {
+                    subject_videoList.add(videoList.get(i));
+                }
+
+            }
+            subj_wise_videoListAdapter(subject_videoList);
+
+
+        }
     }
 
     private void class10(String subject) {
@@ -1867,6 +1940,102 @@ notes.setOnClickListener(new View.OnClickListener() {
                 mProgressDialog.cancel();
             }
         }
+
+    }
+
+    private void configVimeo(ClassVideo selectedVideo) {
+
+        final Configuration.Builder configBuilder =
+            new Configuration.Builder("70b8a941d1f7a9950d7c09d3abf322ba")
+                .setCacheDirectory(this.getCacheDir());
+        VimeoClient.initialize(configBuilder.build());
+
+
+        final VimeoClient mApiClient = VimeoClient.getInstance();
+        // ---- Client Credentials Auth ----
+        if (mApiClient.getVimeoAccount().getAccessToken() == null) {
+            VimeoClient.getInstance().authorizeWithClientCredentialsGrant(new AuthCallback() {
+                @Override
+                public void success() {
+                    String accessToken = VimeoClient.getInstance().getVimeoAccount().getAccessToken();
+                    Configuration.Builder configBuilder =
+                        new Configuration.Builder(accessToken);
+                    VimeoClient.initialize(configBuilder.build());
+
+
+                }
+
+                @Override
+                public void failure(VimeoError error) {
+                    String errorMessage = error.getDeveloperMessage();
+
+                }
+            });
+        }
+
+        if (mApiClient.getVimeoAccount().getAccessToken() == null) {
+            Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
+        }
+
+        DwndVideo();
+    }
+
+    private void DwndVideo() {
+        DwndVideos DB = new  DwndVideos();
+        DB.execute("");
+    }
+
+    private class DwndVideos extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mProgressDialog.show();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+
+
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String uri ;
+
+            uri =  selectedVideo.getData().getUri();
+            VimeoClient.getInstance().fetchNetworkContent(uri, new ModelCallback<Video>(Video.class) {
+                @Override
+                public void success(Video video) {
+
+
+
+                    String a="";
+                    String url = video.download.get(0).link;
+                    for (int i=0;i<video.download.size();i++){
+                        if (video.download.get(i).getHeight()==480){
+                            download_url = video.download.get(i).link;
+                        }
+                    }
+                    download_name = selectedVideo.getData().getName();
+
+                    nametostore = selectedVideo.getData().getName();
+                    extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink();
+                    extra2=selectedVideo.getData().getDescription();
+                    download();
+                    // use the video
+                }
+
+                @Override
+                public void failure(VimeoError error) {
+                    String a="";
+                    // voice the error
+                }
+            });
+
+            return null;
+
+        }
+
 
     }
 }

@@ -14,8 +14,8 @@ android {
         applicationId "com.wisewolf.njmschool"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode 13
-        versionName "13.0"
+        versionCode 17
+        versionName "17.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -87,4 +87,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.1.0'
     implementation 'com.jsibbold:zoomage:1.3.1'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+    implementation "com.google.android.exoplayer:exoplayer:2.11.7"//exo player
 }

@@ -12,7 +12,7 @@
 
     <TextView
         android:textColor="@color/black"
-
+        android:elevation="10dp"
         android:id="@+id/textView22"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,8 +21,9 @@
         android:layout_marginStart="30dp"
         android:layout_marginEnd="30dp"
         android:gravity="center"
-        android:textSize="17sp"
-        android:text="Result will be published by School" />
+        android:textSize="22sp"
+        android:layout_marginTop="50dp"
+        android:text="Results will be published by the school " />
 
     <ImageView
         android:id="@+id/imageView2"

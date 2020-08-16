@@ -14,8 +14,11 @@ import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.Models.TeacherDetails;
 import com.wisewolf.njmschool.Models.VideoUp;
 
-import java.util.List;
 
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -30,10 +33,17 @@ public class RetrofitClientInstance {
     private static final String BASE_URL = "http://139.59.79.78/";
 
     public static Retrofit getRetrofitInstance() {
+        OkHttpClient.Builder client = new OkHttpClient.Builder();
+        client.connectTimeout(20, TimeUnit.SECONDS);
+        client.readTimeout(20, TimeUnit.SECONDS);
+        client.writeTimeout(20, TimeUnit.SECONDS);
         if (retrofit == null) {
+
+
             retrofit = new retrofit2.Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
+                .client(client.build())
                 .build();
         }
         return retrofit;

@@ -48,8 +48,9 @@ public class ResultActivity extends AppCompatActivity {
         btnRestart.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent in = new Intent(getApplicationContext(),VideoListing.class);
+                Intent in = new Intent(getApplicationContext(),ExamActivity.class);
                 startActivity(in);
+                finish();
             }
         });
     }

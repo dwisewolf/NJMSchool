@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
     private void alertbox() {
         new AlertDialog.Builder(MainActivity.this)
             .setTitle("OOPS....")
-            .setMessage("ServerDown..")
+            .setMessage("We are working on our servers to improve the app! Please try again later")
 
             // Specifying a listener allows you to take an action before dismissing the dialog.
             // The dialog is automatically dismissed when a dialog button is clicked.

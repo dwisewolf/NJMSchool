@@ -7,12 +7,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.DailyTask;
@@ -23,8 +27,13 @@ import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.Adapter.StudentAdapter;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 
+import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import kotlin.text.Regex;
 import retrofit2.Call;
@@ -58,12 +67,14 @@ public class StudentProfileSelection extends AppCompatActivity {
         assert actionBar != null;
         actionBar.hide();
 
+
+
         studentList = findViewById(R.id.child_select_list);
         mProgressDialog = new ProgressDialog(StudentProfileSelection.this);
         mProgressDialog.setMessage("Loading. . .");
         mProgressDialog.setIndeterminate(true);
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        mProgressDialog.setCancelable(true);
+        mProgressDialog.setCancelable(false);
         // callQuote();
         try {
             studentList.setAdapter(new StudentAdapter(GlobalData.profiles, studentList, new StudentAdapter.OnItemClickListener() {
@@ -92,8 +103,7 @@ public class StudentProfileSelection extends AppCompatActivity {
                         u_class=s.getClas();
                         mProgressDialog.show();
 
-                        getClassVideo(school,u_class,s,s.getUserid().substring(0,3));
-
+                        checkDate(school,u_class,s,s.getUserid().substring(0,3));
 
 
                     }
@@ -112,6 +122,64 @@ public class StudentProfileSelection extends AppCompatActivity {
 
     }
 
+    private void checkDate(String school, String u_class, SchoolDiff s, String schoolname) {
+        Date c = Calendar.getInstance().getTime();
+        System.out.println("Current time => " + c);
+        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+        String formattedDate = df.format(c)+s.getUserid();
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(StudentProfileSelection.this);
+        String date=sharedPrefs.getString("date", "");
+
+        if (date.equals(formattedDate)) {
+            getAllvideoList();
+            getTeachers();
+            final String cls=u_class;
+            u_class = findClass(u_class);
+
+            mProgressDialog.cancel();
+            GlobalData.school_code=schoolname;
+            GlobalData.classes=cls;
+            Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
+            intent.putExtra("name", schoolname);
+            intent.putExtra("class", s.getClas());
+            intent.putExtra("sec", s.getSection());
+            intent.putExtra("phone", String.valueOf(s.getMobileNum()));
+            startActivity(intent);
+        }
+        else {
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.putString("date", formattedDate);
+            editor.apply();
+            getClassVideo(school,u_class,s,schoolname);
+        }
+
+    }
+
+    private void getTeachers() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(StudentProfileSelection.this);
+        Gson gson = new Gson();
+        String json = sharedPrefs.getString("Teachers", "");
+
+        Type type2 = new TypeToken<List<TeacherDetails>>() {
+        }.getType();
+        GlobalData.teacherDetails= gson.fromJson(json, type2);
+
+    }
+
+    private void getAllvideoList() {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(StudentProfileSelection.this);
+        Gson gson = new Gson();
+        String json = sharedPrefs.getString("AllVideolist", "");
+
+        Type type2 = new TypeToken< List<ClassVideo>> () {
+        }.getType();
+        ArrayList arrayList = (ArrayList) gson.fromJson(json, type2);
+        GlobalData.allVideoList=arrayList;
+
+
+    }
+
     private void getClassVideo(final String school, String u_class, final SchoolDiff s, final String schoolname) {
         final String cls=u_class;
         u_class = findClass(u_class);
@@ -125,9 +193,11 @@ public class StudentProfileSelection extends AppCompatActivity {
                 {
 
                     GlobalData.allVideoList = (ArrayList) response.body();
+                    addAllVideolist((ArrayList) response.body());
                     GlobalData.school_code=schoolname;
                     GlobalData.classes=cls;
                     getDailyTask(schoolname, cls,s.getName(),s.getClas(),s.getSection().replaceAll("\\s+",""),String.valueOf(s.getMobileNum()));
+
 
                 }
 
@@ -140,9 +210,26 @@ public class StudentProfileSelection extends AppCompatActivity {
             // Response<List<ClassVideo>> response=   call.execute();
 
         } catch (Exception e) {
-
         }
 
+    }
+
+    private void saveTeachers(List<TeacherDetails> body) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(StudentProfileSelection.this);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        Gson gson = new Gson();
+        String AllVideolist = gson.toJson(body);
+        editor.putString("Teachers", AllVideolist);
+        editor.apply();
+    }
+
+    private void addAllVideolist(ArrayList body) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(StudentProfileSelection.this);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        Gson gson = new Gson();
+        String AllVideolist = gson.toJson(body);
+        editor.putString("AllVideolist", AllVideolist);
+        editor.apply();
     }
 
     @Override
@@ -181,6 +268,7 @@ String a="";
                 @Override
                 public void onResponse(Call<List<TeacherDetails>> call, Response<List<TeacherDetails>> response) {
                     GlobalData.teacherDetails = response.body();
+                    saveTeachers(response.body());
                     mProgressDialog.cancel();
                     Intent intent = new Intent(StudentProfileSelection.this, VideoListing.class);
                     intent.putExtra("name", name);
@@ -229,6 +317,7 @@ String a="";
             case "XII":
                 clasS= "C12";
                 GlobalData.clas="12";
+                break;
             case "XI":
                 clasS= "C11";
                 GlobalData.clas="11";
