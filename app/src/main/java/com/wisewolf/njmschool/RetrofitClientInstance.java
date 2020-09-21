@@ -6,6 +6,8 @@ import com.wisewolf.njmschool.Models.FeedbackReplyModel;
 import com.wisewolf.njmschool.Models.MCCQ;
 import com.wisewolf.njmschool.Models.MCQSubmit;
 import com.wisewolf.njmschool.Models.News;
+import com.wisewolf.njmschool.Models.NotesMod;
+import com.wisewolf.njmschool.Models.NoticeMod;
 import com.wisewolf.njmschool.Models.QuizHead;
 import com.wisewolf.njmschool.Models.QuizQuestion;
 import com.wisewolf.njmschool.Models.Quotes;
@@ -13,8 +15,6 @@ import com.wisewolf.njmschool.Models.Response;
 import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.Models.TeacherDetails;
 import com.wisewolf.njmschool.Models.VideoUp;
-
-
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,7 +30,8 @@ import retrofit2.http.Query;
 
 public class RetrofitClientInstance {
     private static Retrofit retrofit, retrofitOut;
-    private static final String BASE_URL = "http://139.59.79.78/";
+
+    private static final String BASE_URL = "http://165.22.215.243/";
 
     public static Retrofit getRetrofitInstance() {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
@@ -161,8 +162,15 @@ public class RetrofitClientInstance {
                                        @Field("title") String title,
                                        @Field("subject") String subject);
 
+        @POST("/notesFList/")
+        @FormUrlEncoded
+        Call<List<NotesMod>> getNotes(@Field(value = "school", encoded = true) String school,
+                                      @Field(value = "clas", encoded = true) String user_class);
 
-
+        @POST("/noteiceFList/")
+        @FormUrlEncoded
+        Call<List<NoticeMod>> getNoticeImg  (@Field(value = "school", encoded = true) String school,
+                                       @Field(value = "clas", encoded = true) String user_class);
     }
 
 }

@@ -37,6 +37,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -46,12 +47,35 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.PlaybackParameters;
+import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.BandwidthMeter;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
@@ -70,6 +94,7 @@ import com.vimeo.networking.model.playback.Play;
 import com.wisewolf.njmschool.Adapter.Class_videoAdapter;
 import com.wisewolf.njmschool.Adapter.SubjectAdapter;
 import com.wisewolf.njmschool.Database.OfflineDatabase;
+import com.wisewolf.njmschool.DownloadTask;
 import com.wisewolf.njmschool.Exceptions.VimeoException;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Globals.SubjectList;
@@ -100,13 +125,21 @@ import retrofit2.Response;
 
 import static android.content.ContentValues.TAG;
 
-public class VideoPlay extends AppCompatActivity implements VimeoCallback {
+public class VideoPlay extends AppCompatActivity implements  Player.EventListener{
     RecyclerView subj_list, video_play_list;
     String StudentClass = "12", studentdiv = "S";
     ImageView download, fullscreen;
     VideoView videoView;
     Spinner lesson_selectSpinner;
     ArrayList nowShowing = new ArrayList();
+
+    SimpleExoPlayer player;
+    Handler mHandler;
+    Runnable mRunnable;
+    private String mVedioUrl;
+    PlayerView exoplayerView;
+    ProgressBar progressBar;
+    String dnFlag="";
 
 
     String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7",
@@ -115,6 +148,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
     String lessn_code[] = {"L1", "L2", "L3", "L4", "L5", "L6", "L7",
                            "L8", "L9", "L0", "M1", "M2", "M3", "M4",
         "M5", "M6", "M7", "M8", "M9", "M0"};
+
     String lesson_flag = "ALL";
     String details = ".-.-.", documenturl,vURL = "",download_url="",download_name="",pass="WISEWOLF",document_name;
     TextView topic, head, teacher,notes;
@@ -137,7 +171,7 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
 
         isStoragePermissionGranted();
         mProgressDialogInit();
-        userid=GlobalData.regno;
+        userid = GlobalData.regno;
         dbb = new OfflineDatabase(getApplicationContext());
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
@@ -161,64 +195,64 @@ public class VideoPlay extends AppCompatActivity implements VimeoCallback {
         head = findViewById(R.id.mainHead);
         topic = findViewById(R.id.topic);
         teacher = findViewById(R.id.teacher);
-notes=findViewById(R.id.notes);
-notes.setVisibility(View.GONE);
-notes.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
-        String[] desc=documenturl.split("/");
-        int len=desc.length;
-        document_name=desc[len-1];
-        String loc = dbb.DocumentList(document_name);
-        if (!loc.equals("false")) {
-            File data = new File(loc);
-            Intent target = new Intent(Intent.ACTION_VIEW);
-            target.setDataAndType(Uri.fromFile(data),"application/pdf");
-            target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        exoplayerView = findViewById(R.id.exoplayerView);
+        progressBar = findViewById(R.id.progressBar);
 
-            Intent intent = Intent.createChooser(target, "Open File");
-            try {
-                mProgressDialog.cancel();
-                startActivity(intent);
-            } catch (ActivityNotFoundException e) {
-                // Instruct the user to install a PDF reader here, or something
+        notes = findViewById(R.id.notes);
+        notes.setVisibility(View.GONE);
+        notes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String[] desc = documenturl.split("/");
+                int len = desc.length;
+                document_name = desc[len - 1];
+                String loc = dbb.DocumentList(document_name);
+                if (!loc.equals("false")) {
+                    File data = new File(loc);
+                    Intent target = new Intent(Intent.ACTION_VIEW);
+                    target.setDataAndType(Uri.fromFile(data), "application/pdf");
+                    target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+                    Intent intent = Intent.createChooser(target, "Open File");
+                    try {
+                        mProgressDialog.cancel();
+                        startActivity(intent);
+                    } catch (ActivityNotFoundException e) {
+                        // Instruct the user to install a PDF reader here, or something
+                    }
+                } else {
+                    GetDocuments getDocuments = new GetDocuments();
+                    getDocuments.execute();
+                }
             }
-        } else {
-            GetDocuments getDocuments = new GetDocuments();
-            getDocuments.execute();
-        }
-    }
-});
+        });
 
         lessonSpinnerLoad();
         intent();
         try {
             subjectAdapter();
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(String.valueOf(e));
         }
-
 
 
         fullscreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    int current=videoView.getCurrentPosition();
+                    long current = player.getCurrentPosition();
                     Intent intent = new Intent(VideoPlay.this, Fullscreen.class);
                     intent.putExtra("url", vURL);
                     intent.putExtra("page", "vp");
                     intent.putExtra("current", String.valueOf(current));
                     startActivity(intent);
 
-                }catch (Exception E){
+                } catch (Exception E) {
                     Toast.makeText(VideoPlay.this, "Video Error", Toast.LENGTH_SHORT).show();
                 }
 
             }
         });
-
 
 
         download.setOnClickListener(new View.OnClickListener() {
@@ -232,45 +266,54 @@ notes.setOnClickListener(new View.OnClickListener() {
 
                     SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
                     String date = sd.format(new Date());
-                    if (GlobalData.OfflineVideos==null){
-                        found=0;
-                    }
-                    else {for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
-                        OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
-                        if (selectedVideo.getData().getName().equals(offlineVideos.getName()))
-                            found = 1;
-
-
-                    }}
-
-                    if (found == 1) {
-                        Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
+                    if (GlobalData.OfflineVideos == null) {
+                        found = 0;
                     } else {
-                        if (c.before(selectedVideo.getData().getDownload().get(0).getExpires())) {
-                            String url = selectedVideo.getData().getDownload().get(0).getLink();
-                            download_name = selectedVideo.getData().getName();
-                            download_url = url;
-                            nametostore = selectedVideo.getData().getName();
-                            extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink();
-                            extra2=selectedVideo.getData().getDescription();
-                            download();
-                        } else {
+                        for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
+                            OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
+                            if (selectedVideo.getData().getName().equals(offlineVideos.getName()))
+                                found = 1;
 
-                            configVimeo(selectedVideo);
 
                         }
                     }
 
+                    if (found == 1) {
+                        Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
+                    }  else {
+                        if (dnFlag.equals("")) {
+                            if (c.before(selectedVideo.getData().getDownload().get(0).getExpires())) {
+                                String url = selectedVideo.getData().getDownload().get(0).getLink();
+                                download_name = selectedVideo.getData().getName();
+                                download_url = url;
+                                nametostore = selectedVideo.getData().getName();
+                                extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size() - 1).getLink();
+                                extra2 = selectedVideo.getData().getDescription();
+                                download();
+                            } else {
+
+                                configVimeo(selectedVideo);
+
+                            }
+                        }
+                        else {
+                            Toast.makeText(VideoPlay.this, "one download is in progress", Toast.LENGTH_SHORT).show();
+                            mProgressDialog.show();
+                        }
+                    }
+
+                } catch (Exception ignored) {
                 }
-                catch (Exception ignored){}
 
 
             }
         });
 
-        if (!StudentClass.equals("12")){ videoListAdapter();}
+        if (!StudentClass.equals("12")) {
+            videoListAdapter();
+        }
 
-        media("android.resource://" + getPackageName() + "/" + R.raw.v1);
+        media("android.resource://" + getPackageName() + "/" + R.raw.v1, 1);
         vURL = "android.resource://" + getPackageName() + "/" + R.raw.v1;
         try {
             lesson_selectSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -287,8 +330,7 @@ notes.setOnClickListener(new View.OnClickListener() {
                 }
 
             });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             FirebaseCrashlytics.getInstance().log(String.valueOf(e));
         }
 
@@ -299,142 +341,6 @@ notes.setOnClickListener(new View.OnClickListener() {
         super.onResume();
     }
 
-    private void logout_funct() {
-        GlobalData.addedVideos=new ArrayList();
-        GlobalData.ReservallVideoList =new ArrayList();
-
-        GlobalData.addedVideos =new ArrayList();
-        GlobalData.class1 =new ArrayList();
-        GlobalData.class2 =new ArrayList();
-        GlobalData.class3 =new ArrayList();
-        GlobalData.class4 =new ArrayList();
-        GlobalData.class5 =new ArrayList();
-        GlobalData.class6 =new ArrayList();
-        GlobalData.classN6 =new ArrayList();
-        GlobalData.class7 =new ArrayList();
-        GlobalData.class8 =new ArrayList();
-        GlobalData.class9 =new ArrayList();
-        GlobalData.class10 =new ArrayList();
-        GlobalData.class11 =new ArrayList();
-        GlobalData.class12 =new ArrayList();
-        GlobalData.classlkg =new ArrayList();
-        GlobalData.classukg =new ArrayList();
-        GlobalData.classNRL =new ArrayList();
-
-        GlobalData.class1LS1 =new ArrayList();
-        GlobalData.class2LS1 =new ArrayList();
-        GlobalData.class3LS1 =new ArrayList();
-        GlobalData.class4LS1 =new ArrayList();
-        GlobalData.class5LS1 =new ArrayList();
-        GlobalData.class6LS1 =new ArrayList();
-        GlobalData.class7LS1 =new ArrayList();
-        GlobalData.class8LS1 =new ArrayList();
-        GlobalData.class9LS1 =new ArrayList();
-        GlobalData.class10LS1 =new ArrayList();
-        GlobalData.class11LS1 =new ArrayList();
-        GlobalData.class12LS1 =new ArrayList();
-        GlobalData.classlkgLS1 =new ArrayList();
-        GlobalData.classukgLS1 =new ArrayList();
-        GlobalData.classnrlLS1 =new ArrayList();
-
-        GlobalData.class1LS2=new ArrayList();
-        GlobalData.class2LS2 =new ArrayList();
-        GlobalData.class3LS2 =new ArrayList();
-        GlobalData.class4LS2 =new ArrayList();
-        GlobalData.class5LS2 =new ArrayList();
-        GlobalData.class6LS2 =new ArrayList();
-        GlobalData.class7LS2 =new ArrayList();
-        GlobalData.class8LS2 =new ArrayList();
-        GlobalData.class9LS2 =new ArrayList();
-        GlobalData.class10LS2 =new ArrayList();
-        GlobalData.class11LS2 =new ArrayList();
-        GlobalData.class12LS2 =new ArrayList();
-        GlobalData.classlkgLS2 =new ArrayList();
-        GlobalData.classukgLS2 =new ArrayList();
-        GlobalData.classnrlLS2 =new ArrayList();
-
-        GlobalData.class1LS3 =new ArrayList();
-        GlobalData.class2LS3 =new ArrayList();
-        GlobalData.class3LS3 =new ArrayList();
-        GlobalData.class4LS3 =new ArrayList();
-        GlobalData.class5LS3 =new ArrayList();
-        GlobalData.class6LS3 =new ArrayList();
-        GlobalData.class7LS3 =new ArrayList();
-        GlobalData.class8LS3 =new ArrayList();
-        GlobalData.class9LS3 =new ArrayList();
-        GlobalData.class10LS3 =new ArrayList();
-        GlobalData.class11LS3 =new ArrayList();
-        GlobalData.class12LS3 =new ArrayList();
-        GlobalData.classlkgLS3 =new ArrayList();
-        GlobalData.classukgLS3 =new ArrayList();
-        GlobalData.classnrlLS3 =new ArrayList();
-
-        GlobalData.class1LS4 =new ArrayList();
-        GlobalData.class2LS4 =new ArrayList();
-        GlobalData.class3LS4 =new ArrayList();
-        GlobalData.class4LS4 =new ArrayList();
-        GlobalData.class5LS4 =new ArrayList();
-        GlobalData.class6LS4 =new ArrayList();
-        GlobalData.class7LS4 =new ArrayList();
-        GlobalData.class8LS4 =new ArrayList();
-        GlobalData.class9LS4 =new ArrayList();
-        GlobalData.class10LS4 =new ArrayList();
-        GlobalData.class11LS4 =new ArrayList();
-        GlobalData.class12LS4 =new ArrayList();
-        GlobalData.classlkgLS4 =new ArrayList();
-        GlobalData.classukgLS4 =new ArrayList();
-        GlobalData.classnrlLS4 =new ArrayList();
-
-        GlobalData.class1LS5 =new ArrayList();
-        GlobalData.class2LS5=new ArrayList();
-        GlobalData.class3LS5 =new ArrayList();
-        GlobalData.class4LS5 =new ArrayList();
-        GlobalData.class5LS5 =new ArrayList();
-        GlobalData.class6LS5 =new ArrayList();
-        GlobalData.class7LS5 =new ArrayList();
-        GlobalData.class8LS5 =new ArrayList();
-        GlobalData.class9LS5 =new ArrayList();
-        GlobalData.class10LS5 =new ArrayList();
-        GlobalData.class11LS5 =new ArrayList();
-        GlobalData.class12LS5 =new ArrayList();
-        GlobalData.classlkgLS5 =new ArrayList();
-        GlobalData.classukgLS5 =new ArrayList();
-        GlobalData.classnrlLS5 =new ArrayList();
-
-        GlobalData.class1LS6 =new ArrayList();
-        GlobalData.class2LS6=new ArrayList();
-        GlobalData.class3LS6 =new ArrayList();
-        GlobalData.class4LS6 =new ArrayList();
-        GlobalData.class5LS6 =new ArrayList();
-        GlobalData.class6LS6 =new ArrayList();
-        GlobalData.class7LS6 =new ArrayList();
-        GlobalData.class8LS6 =new ArrayList();
-        GlobalData.class9LS6 =new ArrayList();
-        GlobalData.class10LS6 =new ArrayList();
-        GlobalData.class11LS6 =new ArrayList();
-        GlobalData.class12LS6 =new ArrayList();
-        GlobalData.classlkgLS6 =new ArrayList();
-        GlobalData.classukgLS6 =new ArrayList();
-        GlobalData.classnrlLS6 =new ArrayList();
-
-        GlobalData.class1LS7 =new ArrayList();
-        GlobalData.class2LS7=new ArrayList();
-        GlobalData.class3LS7 =new ArrayList();
-        GlobalData.class4LS7 =new ArrayList();
-        GlobalData.class5LS7 =new ArrayList();
-        GlobalData.class6LS7 =new ArrayList();
-        GlobalData.class7LS7 =new ArrayList();
-        GlobalData.class8LS7 =new ArrayList();
-        GlobalData.class9LS7 =new ArrayList();
-        GlobalData.class10LS7 =new ArrayList();
-        GlobalData.class11LS7 =new ArrayList();
-        GlobalData.class12LS7 =new ArrayList();
-        GlobalData.classlkgLS7 =new ArrayList();
-        GlobalData.classukgLS7 =new ArrayList();
-        GlobalData.classnrlLS7 =new ArrayList();
-
-
-    }
 
     private void mProgressDialogInit() {
         mProgressDialog = new ProgressDialog(VideoPlay.this);
@@ -446,9 +352,11 @@ notes.setOnClickListener(new View.OnClickListener() {
 
     private void download() {
         try{
+            mProgressDialog.cancel();
             videoView.pause();
             if (videoView.isPlaying())
                 videoView.stopPlayback();
+          //  new DownloadTask(VideoPlay.this,download_url,download_name,extra1,extra2);
             Downback DB = new Downback();
             DB.execute("");
         }
@@ -467,6 +375,7 @@ notes.setOnClickListener(new View.OnClickListener() {
             mProgressDialog.setCanceledOnTouchOutside(false);
             mProgressDialog.setCancelable(false);
             mProgressDialog.show();
+            dnFlag="qwertyuiop";
         }
 
         @Override
@@ -476,6 +385,7 @@ notes.setOnClickListener(new View.OnClickListener() {
             if (!s.equals("f")){
                 dbb.insertinto(nametostore,salt_name,dir_name,inv_name,location,userid,extra1,extra2);
                 String a="";
+                dnFlag="";
             }
 
 
@@ -487,9 +397,7 @@ notes.setOnClickListener(new View.OnClickListener() {
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.setMax(100);
             mProgressDialog.setProgress(values[0]);
-            if (values[0]==100){
-                mProgressDialog.setMessage("Encrypting your video");
-            }
+
         }
 
         @Override
@@ -497,16 +405,16 @@ notes.setOnClickListener(new View.OnClickListener() {
 
 
             String s = "";
-            String name = download_name;
+            String name =  download_name + ".des";
 
             try {
                 String rootDir;
                 File rootFile ;
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                    rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+                    rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
                 else
                     rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                        + File.separator + "Fil");
+                        + File.separator + "njms");
 
 
 
@@ -539,9 +447,10 @@ notes.setOnClickListener(new View.OnClickListener() {
                         publishProgress((int) (total * 100 / fileLength));
                     f.write(buffer, 0, len1);
                 }
+
                 f.close();
-                encry(buffer, new File(rootFile,
-                    name),rootFile);
+               /* encry(buffer, new File(rootFile,
+                    name),rootFile);*/
 
                 s = "sucess";
 
@@ -568,7 +477,7 @@ notes.setOnClickListener(new View.OnClickListener() {
             String date = sd.format(new Date());
             String name = download_name + ".des";
      /*   String rootDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            + File.separator + "Fil";
+            + File.separator + "njms";
         File rootFile = new File(rootDir);
         rootFile.mkdir();*/
             // encrypted file
@@ -839,7 +748,7 @@ notes.setOnClickListener(new View.OnClickListener() {
                 notescalculate(item);
               //  Toast.makeText(VideoPlay.this, "playing -" + item.name, Toast.LENGTH_SHORT).show();
                 details = item.getData().getDescription();
-                media(item.getData().getFiles().get(0).getLink());
+                media(item.getData().getFiles().get(0).getLink(),2);
                 vURL = item.getData().getFiles().get(0).getLink();
                 download.setVisibility(View.VISIBLE);
                 fullscreen.setVisibility(View.VISIBLE);
@@ -911,35 +820,9 @@ notes.setOnClickListener(new View.OnClickListener() {
 
                     // Specifying a listener allows you to take an action before dismissing the dialog.
                     // The dialog is automatically dismissed when a dialog button is clicked.
-                    .setPositiveButton("Notes ", new DialogInterface.OnClickListener() {
+                    .setPositiveButton("Download ", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                           if (notescalculate(item)) {
-                               String[] desc = documenturl.split("/");
-                               int len = desc.length;
-                               document_name = desc[len - 1];
-                               String loc = dbb.DocumentList(document_name);
-                               if (!loc.equals("false")) {
-                                   File data = new File(loc);
-                                   Intent target = new Intent(Intent.ACTION_VIEW);
-                                   target.setDataAndType(Uri.fromFile(data),"application/pdf");
-                                   target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-                                   Intent intent = Intent.createChooser(target, "Open File");
-                                   try {
-                                       mProgressDialog.cancel();
-                                       startActivity(intent);
-                                   } catch (ActivityNotFoundException e) {
-                                       // Instruct the user to install a PDF reader here, or something
-                                   }
-                               } else {
-                                   GetDocuments getDocuments = new GetDocuments();
-                                   getDocuments.execute();
-                               }
-
-                           }
-                           else {
-                               Toast.makeText(VideoPlay.this, "No Notes added", Toast.LENGTH_SHORT).show();
-                           }
+                            configVimeo(selectedVideo);
                         }
                     })
 
@@ -948,8 +831,19 @@ notes.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             details = item.getData().getDescription();
-                            media(item.getData().getFiles().get(0).getLink());
+                            String[] detail = details.split("-");
+                            topic.setText(detail[0]);
+                            head.setText(detail[1]);
+                            teacher.setText(detail[2]);
+                           // media(item.getData().getFiles().get(0).getLink(),2);
                             vURL = item.getData().getFiles().get(0).getLink();
+                         //   long current=player.getCurrentPosition();
+                            Intent intent = new Intent(VideoPlay.this, Fullscreen.class);
+                            intent.putExtra("url", vURL);
+                            intent.putExtra("page", "vp");
+                            intent.putExtra("current", String.valueOf(0));
+                            startActivity(intent);
+                       /*     vURL = item.getData().getFiles().get(0).getLink();
                             download.setVisibility(View.VISIBLE);
                             fullscreen.setVisibility(View.VISIBLE);
                             String regno=GlobalData.regno;
@@ -968,7 +862,7 @@ notes.setOnClickListener(new View.OnClickListener() {
                                 public void onFailure(Call<VideoUp> call, Throwable t) {
                                     Toast.makeText(VideoPlay.this, "Error", Toast.LENGTH_SHORT).show();
                                 }
-                            });
+                            });*/
                         }
                     })
                     .setIcon(android.R.drawable.ic_dialog_alert)
@@ -1767,11 +1661,19 @@ notes.setOnClickListener(new View.OnClickListener() {
         subj_wise_videoListAdapter(subject_videoList);
     }
 
-    void media(String videoUrl) {
-        String[] detail = details.split("-");
-        topic.setText(detail[0]);
-        head.setText(detail[1]);
-        teacher.setText(detail[2]);
+    void media(String videoUrl,int value) {
+        if (value==2) {
+            mVedioUrl = videoUrl;
+            setUp();
+            String[] detail = details.split("-");
+            topic.setText(detail[0]);
+            head.setText(detail[1]);
+            teacher.setText(detail[2]);
+            videoView.stopPlayback();
+            videoView.setVisibility(View.GONE);
+        }
+        else {
+
 
             mProgressDialog.setMessage("Please wait . . .");
             mProgressDialog.setIndeterminate(true);
@@ -1779,30 +1681,31 @@ notes.setOnClickListener(new View.OnClickListener() {
             mProgressDialog.show();
 
 
-        //Use a media controller so that you can scroll theClassVideo contents
-        //and also to pause, start the video.
-        final MediaController mediaController = new MediaController(this);
+            //Use a media controller so that you can scroll theClassVideo contents
+            //and also to pause, start the video.
+            final MediaController mediaController = new MediaController(this);
 
-        //  mediaController.setAnchorView(videoView);
+            //  mediaController.setAnchorView(videoView);
 
-        videoView.setMediaController(mediaController);
-        videoView.setVideoURI(Uri.parse(videoUrl));
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(final MediaPlayer mediaPlayer) {
-                mediaController.setAnchorView(videoView);
-               // videoView.start();
-                mediaPlayer.start();
-                mProgressDialog.cancel();
-                mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                    @Override
-                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-                        mp.start();
-                        mProgressDialog.cancel();
-                    }
-                });
-            }
-        });
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(Uri.parse(videoUrl));
+            videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(final MediaPlayer mediaPlayer) {
+                    mediaController.setAnchorView(videoView);
+                    // videoView.start();
+                    mediaPlayer.start();
+                    mProgressDialog.cancel();
+                    mediaPlayer.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                        @Override
+                        public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+                            mp.start();
+                            mProgressDialog.cancel();
+                        }
+                    });
+                }
+            });
+        }
 
     }
 
@@ -1826,16 +1729,6 @@ notes.setOnClickListener(new View.OnClickListener() {
     }
 
     @Override
-    public void vimeoURLCallback(String callback) {
-
-    }
-
-    @Override
-    public void videoExceptionCallback(VimeoException exceptionCallback) {
-
-    }
-
-    @Override
     public void onRequestPermissionsResult(int requestCode, @NotNull String[] permissions, @NotNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
@@ -1849,10 +1742,10 @@ notes.setOnClickListener(new View.OnClickListener() {
         File rootFile;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-                rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+                rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
             else
                 rootFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                    + File.separator + "Fil");
+                    + File.separator + "njms");
             boolean a=rootFile.mkdirs();
             File data = new File(rootFile, document_name);
             OutputStream op = new FileOutputStream(data);
@@ -1881,7 +1774,6 @@ notes.setOnClickListener(new View.OnClickListener() {
         }
 
     }
-
 
     private class GetDocuments extends AsyncTask<Void, String, String> {
         String a = "";
@@ -2010,12 +1902,43 @@ notes.setOnClickListener(new View.OnClickListener() {
 
 
                     String a="";
+                    int found=0;
                     String url = video.download.get(0).link;
                     for (int i=0;i<video.download.size();i++){
                         if (video.download.get(i).getHeight()==480){
                             download_url = video.download.get(i).link;
+                            found=1;
                         }
                     }
+                    if (found==0) {
+                        for (int i = 0; i < video.download.size(); i++) {
+                            if (video.download.get(i).getHeight() == 360) {
+                                download_url = video.download.get(i).link;
+                                found = 1;
+                            }
+                        }
+                    }
+                    if (found==0){
+                        for (int i = 0; i < video.download.size(); i++) {
+                            if (video.download.get(i).getHeight() == 240) {
+                                download_url = video.download.get(i).link;
+                                found = 1;
+                            }
+                        }
+                    }
+
+                    if (found==0){
+
+
+                                download_url = video.download.get(0).link;
+
+
+
+                    }
+
+
+
+
                     download_name = selectedVideo.getData().getName();
 
                     nametostore = selectedVideo.getData().getName();
@@ -2037,5 +1960,143 @@ notes.setOnClickListener(new View.OnClickListener() {
         }
 
 
+    }
+
+    private void setUp() {
+        initializePlayer();
+        if (mVedioUrl == null) {
+            return;
+        }
+        buildMediaSource(Uri.parse(mVedioUrl));
+    }
+
+    private void initializePlayer() {
+        if (player == null) {
+            // 1. Create a default TrackSelector
+            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            TrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+            // 2. Create the player
+            player =
+                ExoPlayerFactory.newSimpleInstance(this, trackSelector);
+            exoplayerView.setPlayer(player);
+        }
+    }
+
+    private void buildMediaSource(Uri mUri) {
+        // Measures bandwidth during playback. Can be null if not required.
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        // Produces DataSource instances through which media data is loaded.
+       /* DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
+                Util.getUserAgent(this, getString(R.string.app_name)), bandwidthMeter);
+       */
+        DefaultHttpDataSourceFactory httpDataSourceFactory = new DefaultHttpDataSourceFactory(
+            Util.getUserAgent(this, getString(R.string.app_name)),
+            null,
+            DefaultHttpDataSource.DEFAULT_CONNECT_TIMEOUT_MILLIS,
+            DefaultHttpDataSource.DEFAULT_READ_TIMEOUT_MILLIS,
+            true /* allowCrossProtocolRedirects */
+        );
+
+
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(this,
+            null /* listener */,
+            httpDataSourceFactory
+        );
+        // This is the MediaSource representing the media to be played.
+        MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+            .createMediaSource(mUri);
+        // Prepare the player with the source.
+        player.prepare(videoSource);
+        player.setPlayWhenReady(true);
+        player.addListener(this);
+    }
+
+    private void releasePlayer() {
+        if (player != null) {
+            player.release();
+            player = null;
+        }
+    }
+
+    private void pausePlayer() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+            player.getPlaybackState();
+        }
+    }
+
+    private void resumePlayer() {
+        if (player != null) {
+            player.setPlayWhenReady(true);
+            player.getPlaybackState();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pausePlayer();
+        if (mRunnable != null) {
+            mHandler.removeCallbacks(mRunnable);
+        }
+    }
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        resumePlayer();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+    }
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest, int reason) {
+    }
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+    }
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+    }
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        switch (playbackState) {
+            case Player.STATE_BUFFERING:
+                progressBar.setVisibility(View.VISIBLE);
+                break;
+            case Player.STATE_ENDED:
+                // Activate the force enable
+                break;
+            case Player.STATE_IDLE:
+                break;
+            case Player.STATE_READY:
+                progressBar.setVisibility(View.GONE);
+                break;
+            default:
+                // status = PlaybackStatus.IDLE;
+                break;
+        }
+    }
+    @Override
+    public void onRepeatModeChanged(int repeatMode) {
+    }
+    @Override
+    public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
+    }
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+    }
+    @Override
+    public void onPositionDiscontinuity(int reason) {
+    }
+    @Override
+    public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
+    }
+    @Override
+    public void onSeekProcessed() {
     }
 }

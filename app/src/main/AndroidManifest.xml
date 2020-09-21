@@ -22,17 +22,26 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
+
         android:usesCleartextTraffic="true">
-        <activity android:name=".Activity.NEwsListActivity"></activity>
-        <activity android:name=".Activity.ExamActivity"
-            android:screenOrientation="portrait"></activity>
+
+        <activity android:name=".Activity.NotesActivity" />
+        <activity android:name=".Activity.ResultsFirebase" >
+
+        </activity>
+        <activity android:name=".Activity.LiveClass" />
+        <activity android:name=".Activity.NEwsListActivity" />
+        <activity
+            android:name=".Activity.ExamActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".Activity.FeedbackActivity" />
         <activity android:name=".Activity.DailyTask_Activity" />
         <activity
             android:name=".Activity.FullScreen2"
             android:screenOrientation="landscape" />
-        <activity android:name=".Activity.AllClass"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activity.AllClass"
+            android:screenOrientation="portrait" />
         <activity android:name=".Activity.DocumentActivity" />
         <activity android:name=".Activity.NewsSet" />
         <activity android:name=".Activity.OfflineScreen" />
@@ -52,6 +61,7 @@
         <service
             android:name=".service.VideoLinkService"
             android:exported="false" />
+        <service android:name=".service.KillNotificationService" />
 
         <activity
             android:name=".Activity.VideoListing"
@@ -77,10 +87,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activity.QuestionsActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity android:name=".Activity.ResultActivity"
-            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Activity.QuestionsActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".Activity.ResultActivity"
+            android:screenOrientation="portrait" />
         <activity android:name=".Activity.OfflineScreenUser" />
 
         <uses-library

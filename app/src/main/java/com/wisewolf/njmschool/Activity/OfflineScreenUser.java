@@ -114,7 +114,7 @@ public class OfflineScreenUser extends AppCompatActivity {
             mProgressDialog.cancel();
             Intent intent=new Intent(OfflineScreenUser.this,OfflinePlayFullScreen.class);
             intent.putExtra("root", Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                + File.separator + "Fil");
+                + File.separator + "njms");
             intent.putExtra("name", DcryptName);
             startActivity(intent);
         }
@@ -128,8 +128,15 @@ public class OfflineScreenUser extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
+            File rootFile;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
+            else
+                rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    + File.separator + "njms");
             try {
-                d_encry(DcryptName,DcryptSalt,DcryptInv);
+                walkdir(rootFile);
+                // d_encry(DcryptName,DcryptSalt,DcryptInv);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -144,10 +151,10 @@ public class OfflineScreenUser extends AppCompatActivity {
         String password = pass;
         File rootFile ;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
         else
             rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                + File.separator + "Fil");
+                + File.separator + "njms");
         boolean a=rootFile.mkdirs();
         // reading the salt
         // user should have secure mechanism to transfer the
@@ -199,6 +206,38 @@ public class OfflineScreenUser extends AppCompatActivity {
         fos.close();
 
 
+    }
+
+
+    public void walkdir(File dir) {
+        String[] TARGET_EXTENSIONS = { "des" };
+        File listFile[] = dir.listFiles();
+        if (listFile != null) {
+            for (int i = 0; i < listFile.length; i++) {
+                if (listFile[i].isDirectory()) {
+                    walkdir(listFile[i]);
+                } else {
+                    String fPath = listFile[i].getPath();
+                    for (String ext : TARGET_EXTENSIONS) {
+                        if(fPath.endsWith(ext)) {
+                            putDotBeforeFileName(listFile[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String putDotBeforeFileName(File file) {
+        String fileName = file.getName();
+        String fullPath = file.getAbsolutePath();
+        int indexOfFileNameStart = fullPath.lastIndexOf(fileName);
+        fullPath=fullPath.substring(0, indexOfFileNameStart);
+        StringBuilder sb = new StringBuilder(fullPath);
+        sb.insert(indexOfFileNameStart, fileName+".mp4");
+        String myRequiredFileName = sb.toString();
+        file.renameTo(new File(myRequiredFileName));
+        return myRequiredFileName;
     }
 
 }

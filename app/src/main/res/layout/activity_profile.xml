@@ -388,7 +388,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="U"
+                                        android:text="N"
                                         android:textColor="@color/Basic"
                                         android:textStyle="bold"
                                         android:fontFamily="@font/robotoregular"
@@ -401,7 +401,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Unit Test" />
+                                        android:text="Notes" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 
@@ -429,7 +429,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="E"
+                                        android:text="L"
                                         android:textColor="@color/Basic"
                                         android:textStyle="bold"
                                         android:fontFamily="@font/robotoregular"
@@ -442,7 +442,54 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Exam" />
+                                        android:text="Live" />
+                                </LinearLayout>
+                            </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/unitTests"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                app:cardBackgroundColor="#FFFF"
+                                app:cardCornerRadius="5dp"
+                                app:cardElevation="5dp"
+                                app:cardMaxElevation="5dp"
+                                app:cardUseCompatPadding="true">
+
+                                <LinearLayout
+                                    android:background="@drawable/rectbasic"
+                                    android:padding="10dp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical">
+
+                                    <TextView
+                                        android:layout_margin="8dp"
+                                        android:gravity="center"
+
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="U"
+                                        android:textColor="@color/Basic"
+                                        android:textStyle="bold"
+                                        android:fontFamily="@font/robotoregular"
+                                        android:textSize="22dp" />
+
+                                    <TextView
+                                        android:textColor="@color/black"
+                                        android:textSize="9dp"
+                                        android:gravity="center"
+
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:text="Unit Test" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 

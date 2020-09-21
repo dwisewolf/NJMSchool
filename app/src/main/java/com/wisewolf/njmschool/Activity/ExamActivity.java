@@ -109,26 +109,15 @@ RecyclerView mcq_recycler;
                                 public void onItemClick(QuizHead s) {
                                  if (s.getDate().equals(formattedDate)) {
                                      String topic=s.getSubject().toUpperCase();
-                                     if (topic.equals("HINDI")||topic.equals("PHYSICAL EDUCATION")||topic.equals("COMPUTER SCIENCE")|| topic.equals("PSYCHOLOGY"))
-                                     {
-                                         selectOptional(topic);
-                                         DoTest(s);
-                                      /*   String a =testdone();
-                                         if (a.equals("")){
-                                             DoTest(s);
-                                         }
-                                         else {
-                                             alertBox();
-                                         }*/
-                                     }
-                                     else {
+
                                          Intent intent = new Intent(ExamActivity.this, QuestionsActivity.class);
                                          intent.putExtra("title", s.getTitle());
                                          intent.putExtra("subject", s.getSubject());
                                          intent.putExtra("time", s.getTime());
+                                         intent.putExtra("id", s.getTitle());
                                          startActivity(intent);
                                          finish();
-                                     }
+
                                  }else
                                      Toast.makeText(ExamActivity.this, "Exam Date is on "+s.getDate(), Toast.LENGTH_SHORT).show();
                                 }
@@ -141,7 +130,7 @@ RecyclerView mcq_recycler;
                             finish();Toast.makeText(ExamActivity.this, "No Test Available", Toast.LENGTH_LONG).show(); mcqHead.setText("MCQ not available for today");}
                     } catch (Exception e)
                     {
-                        Toast.makeText(ExamActivity.this, "Very slow internet(EAS84)", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ExamActivity.this, "No Test Available(EAS84)", Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -150,7 +139,7 @@ RecyclerView mcq_recycler;
                 public void onFailure(Call<List<QuizHead>> call, Throwable t) {
                     finish();
 
-                    Toast.makeText(ExamActivity.this, "Internet Speed very less(EA143)", Toast.LENGTH_LONG).show();
+                    Toast.makeText(ExamActivity.this, "No Test Available(EA143)", Toast.LENGTH_LONG).show();
                     String a="";
                 }
             });

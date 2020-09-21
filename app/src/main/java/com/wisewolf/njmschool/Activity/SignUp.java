@@ -1,16 +1,25 @@
 package com.wisewolf.njmschool.Activity;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,6 +32,7 @@ import com.bumptech.glide.Glide;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Response;
 import com.wisewolf.njmschool.Models.SchoolDiff;
+import com.wisewolf.njmschool.NotificationHelper;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.Validation;
@@ -41,6 +51,9 @@ public class SignUp extends AppCompatActivity {
     TextView check, fgpswd;
     EditText phone, password;
     CardView signUp, passCard;
+    private NotificationManager mNotifyManager;
+    private NotificationCompat.Builder mBuilder;
+    int id = 1;
 
 
     @Override
@@ -64,8 +77,12 @@ public class SignUp extends AppCompatActivity {
         passCard = findViewById(R.id.password);
         passCard.setVisibility(View.GONE);
 
-        checkLogin();
 
+        NotificationHelper mNotificationHelper=new NotificationHelper(SignUp.this,"downloadFileName");
+        mNotificationHelper.createNotification();
+
+
+        checkLogin();
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -109,7 +126,7 @@ public class SignUp extends AppCompatActivity {
                                 passCard.setVisibility(View.VISIBLE);
 
                             } else {
-                                Toast.makeText(SignUp.this, "Number not present !! Please contact School office", Toast.LENGTH_LONG).show();
+                                Toast.makeText(SignUp.this, "Number Disabled !! Please contact School office", Toast.LENGTH_LONG).show();
                             }
 
                         } catch (Exception e) {
@@ -166,7 +183,7 @@ public class SignUp extends AppCompatActivity {
             @Override
             public void onFailure(Call<List<Response>> call, Throwable t) {
                 progressDoalog.dismiss();
-                Toast.makeText(SignUp.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SignUp.this, " ", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -188,7 +205,6 @@ public class SignUp extends AppCompatActivity {
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
     }
-
 
     private void checkLogin() {
         final SharedPreferences sp1 = getDefaultSharedPreferences(getApplicationContext());
@@ -301,4 +317,7 @@ public class SignUp extends AppCompatActivity {
     private void generateDataList(List<Response> photoList) {
 
     }
+
+
 }
+

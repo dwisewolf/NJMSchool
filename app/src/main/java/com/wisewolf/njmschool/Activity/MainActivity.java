@@ -28,8 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.wisewolf.njmschool.R;
-
-import org.jsoup.Jsoup;
+import com.wisewolf.njmschool.service.KillNotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         if (isNetworkAvailable()) {
 
 
-            getBillNo();
+            getserverStatus();
           /*  */
 
 
@@ -127,16 +126,44 @@ public class MainActivity extends AppCompatActivity {
 
             String newVersion = null;
             try {
-                newVersion = Jsoup.connect("https://play.google.com/store/apps/details?id=" + MainActivity.this.getPackageName() + "&hl=it")
-                    .timeout(30000)
-                    .userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6")
-                    .referrer("http://www.google.com")
-                    .get()
-                    .select(".hAyfc .htlgb")
-                    .get(7)
-                    .ownText();
-                new_Version=newVersion;
-                return newVersion;
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("update").get()
+                    .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            List<DocumentSnapshot> aaq=   queryDocumentSnapshots.getDocuments();
+                            DocumentSnapshot ne = aaq.get(0);
+                            Object a= ne.get("upd");
+                            a =a.toString();
+                            new_Version=a.toString();
+
+                            if (new_Version != null && !new_Version.isEmpty()) {
+                                if (Float.parseFloat(currentVersion) < Float.parseFloat(new_Version)) {
+                                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+                                    try {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                                    } catch (android.content.ActivityNotFoundException anfe) {
+                                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                                    }
+                                }
+                                else {
+                                    startService(new Intent(MainActivity.this, KillNotificationService.class));
+                                    GotoActivity();
+                                }
+
+                            }
+
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            String a="";
+                        }
+                    });
+
+                return new_Version;
             } catch (Exception e) {
                 return null;
             }
@@ -146,20 +173,7 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String onlineVersion) {
             super.onPostExecute(onlineVersion);
             Log.d("update", "Current version " + currentVersion + "playstore version " + onlineVersion);
-            if (onlineVersion != null && !onlineVersion.isEmpty()) {
-                if (Float.parseFloat(currentVersion) < Float.parseFloat(onlineVersion)) {
-                    final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
-                    try {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
-                    } catch (android.content.ActivityNotFoundException anfe) {
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
-                    }
-                }
-                else {
-                    GotoActivity();
-                }
 
-            }
         }
 
     }
@@ -174,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, TIME_OUT);
     }
-    private void getBillNo() {
+    private void getserverStatus() {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("server").get()

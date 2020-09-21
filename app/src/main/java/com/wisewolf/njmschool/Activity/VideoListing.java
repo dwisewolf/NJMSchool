@@ -2,12 +2,14 @@ package com.wisewolf.njmschool.Activity;
 
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.net.http.SslCertificate;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +40,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.Request;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -46,6 +52,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vimeo.networking.Configuration;
 import com.vimeo.networking.VimeoClient;
 import com.vimeo.networking.callbacks.AuthCallback;
@@ -53,6 +61,7 @@ import com.vimeo.networking.callbacks.ModelCallback;
 import com.vimeo.networking.model.Video;
 import com.vimeo.networking.model.VideoList;
 import com.vimeo.networking.model.error.VimeoError;
+import com.wisewolf.njmschool.Adapter.Class_NotesAdapter;
 import com.wisewolf.njmschool.Adapter.OfflineVideoAdapter;
 import com.wisewolf.njmschool.Adapter.PackageVideoAdapter;
 import com.wisewolf.njmschool.Adapter.RecentPlayedAdapter;
@@ -62,6 +71,8 @@ import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.News;
+import com.wisewolf.njmschool.Models.NoticeMod;
+import com.wisewolf.njmschool.Models.NoticeMod;
 import com.wisewolf.njmschool.Models.OfflineVideos;
 import com.wisewolf.njmschool.Models.VideoUp;
 import com.wisewolf.njmschool.ObjectSerialiser;
@@ -72,7 +83,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.security.spec.KeySpec;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,25 +105,17 @@ import retrofit2.Response;
 
 public class VideoListing extends AppCompatActivity {
 
-
     String StudentClass = "12",pass="WISEWOLF",DcryptName="",DcryptSalt="",DcryptInv="";
     RecyclerView added_list,offlineList,recentVideo,teacherDetails;
     FirebaseStorage storage;
     StorageReference storageRef;
-
-
     private ProgressDialog mProgressDialog;
-
     ImageView topic,logout;
     SubsamplingScaleImageView thumb;
     int exitflag=0;
-
     ArrayList allVideoList = new ArrayList();
-
-    TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers,
-    refresh_media;
-
-    CardView mediaCard,photocard,docucard,feedcard,mcqCard,examCard;
+    TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers, refresh_media;
+    CardView mediaCard,photocard,docucard,feedcard,mcqCard,examCard,unitTests;
     OfflineDatabase dbb;
     VideoView intoVideo;
     VideoList introlist;
@@ -155,8 +161,6 @@ public class VideoListing extends AppCompatActivity {
                 getVideo.enqueue(new Callback<List<VideoUp>>() {
                     @Override
                     public void onResponse(Call<List<VideoUp>> call, Response<List<VideoUp>> response) {
-
-
 
                         added_list.setVisibility(View.GONE);
                         recentVideo.setAdapter(new RecentPlayedAdapter(VideoListing.this, (ArrayList) response.body(), recentVideo, new RecentPlayedAdapter.OnItemClickListener() {
@@ -207,6 +211,8 @@ public class VideoListing extends AppCompatActivity {
             }
         });
 
+
+
         teacherDetails = findViewById(R.id.teacherdetail_list);
 
 
@@ -224,6 +230,7 @@ public class VideoListing extends AppCompatActivity {
         offlinepage = findViewById(R.id.offlinevideos_id);
         closevideo=findViewById(R.id.closevideo);
         teachers=findViewById(R.id.teachersid);
+        unitTests=findViewById(R.id.unitTests);
 
 
         offlineList=findViewById(R.id.offline_list);
@@ -307,14 +314,21 @@ public class VideoListing extends AppCompatActivity {
         mcqCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(VideoListing.this,ExamActivity.class));
+                startActivity(new Intent(VideoListing.this,NotesActivity.class));
             }
         });
 
         examCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(VideoListing.this, "Coming soon...", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(VideoListing.this,LiveClass.class));
+            }
+        });
+
+        unitTests.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(VideoListing.this,ExamActivity.class));
             }
         });
 
@@ -389,34 +403,53 @@ public class VideoListing extends AppCompatActivity {
             .show();
     }
 
-    private void notice() {
-        storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
-        String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.jpg" ;
-        if (GlobalData.clas.equals("12")){
-            school=GlobalData.school_code+"/class"+GlobalData.clas+GlobalData.sect+"/notice.jpg" ;
+    private void notice()  {
+        try {
+            final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
+            Call<List<NoticeMod>> call = service.getNoticeImg(GlobalData.school_code,GlobalData.classes);
+            call.enqueue(new Callback<List<NoticeMod>>() {
+                @Override
+                public void onResponse(Call<List<NoticeMod>> call, Response<List<NoticeMod>> response) {
+                    if (response.body() != null) {
+                        NoticeMod noticeMod=response.body().get(0);
+                        try {
+
+                            thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
+                            Picasso.get().load(noticeMod.getImage()).into(new Target() {
+                                @Override
+                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                    thumb.setImage(ImageSource.bitmap(bitmap));
+                                }
+
+                                @Override
+                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+
+                                }
+
+                                @Override
+                                public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+                                }
+                            });
+                        }
+                        catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+
+                }
+
+                @Override
+                public void onFailure(Call<List<NoticeMod>> call, Throwable t) {
+                    String a="";
+                }
+            });
+
+
+        }catch (Exception ignored){
+            String a="";
         }
-
-        StorageReference islandRef = storageRef.child(school);
-
-        final long ONE_MEGABYTE = 1024 * 1024;
-        islandRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
-            @Override
-            public void onSuccess(byte[] bytes) {
-
-                Bitmap bmp= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
-
-
-                thumb.setImage(ImageSource.bitmap(bmp));
-                // Data for "images/island.jpg" is returns, use this as needed
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                String a="";
-            }
-        });
     }
 
     private void bottomSheet() {
@@ -434,7 +467,12 @@ public class VideoListing extends AppCompatActivity {
         news_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(VideoListing.this,NEwsListActivity.class));
+                if (GlobalData.newsForstudent.size()!=0) {
+                    startActivity(new Intent(VideoListing.this, NEwsListActivity.class));
+                }
+                else {
+                    Toast.makeText(VideoListing.this, "No Notice for current Date", Toast.LENGTH_SHORT).show();
+                }
 
             }
         });
@@ -810,7 +848,7 @@ public class VideoListing extends AppCompatActivity {
             try {
 
                 offlineFlagTextview.setText("Downloaded Videos");
-                offlineFlagTextview.setVisibility(View.VISIBLE);
+                offlineFlagTextview.setVisibility(View.GONE);
                 added_list.setVisibility(View.GONE);
 
                 offlineList.setAdapter(new OfflineVideoAdapter(GlobalData.OfflineVideos, VideoListing.this, offlineList, new OfflineVideoAdapter.OnItemClickListener() {
@@ -831,6 +869,8 @@ public class VideoListing extends AppCompatActivity {
                 LinearLayoutManager added_liste_adapterlayoutManager
                     = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
                 offlineList.setLayoutManager(added_liste_adapterlayoutManager);
+                offlineList.setVisibility(View.GONE);
+
 
 
             }
@@ -859,7 +899,7 @@ public class VideoListing extends AppCompatActivity {
             mProgressDialog.cancel();
             Intent intent=new Intent(VideoListing.this,OfflinePlayFullScreen.class);
             intent.putExtra("root",Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                + File.separator + "Fil");
+                + File.separator + "njms");
             intent.putExtra("name", DcryptName);
             startActivity(intent);
         }
@@ -873,8 +913,15 @@ public class VideoListing extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
+            File rootFile;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
+            else
+                rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    + File.separator + "njms");
             try {
-                d_encry(DcryptName,DcryptSalt,DcryptInv);
+                walkdir(rootFile);
+               // d_encry(DcryptName,DcryptSalt,DcryptInv);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -889,10 +936,10 @@ public class VideoListing extends AppCompatActivity {
         String password = pass;
         File rootFile ;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
         else
             rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                + File.separator + "Fil");
+                + File.separator + "njms");
         boolean a=rootFile.mkdirs();
         // reading the salt
         // user should have secure mechanism to transfer the
@@ -944,6 +991,36 @@ public class VideoListing extends AppCompatActivity {
         fos.close();
 
 
+    }
+
+    public void walkdir(File dir) {
+          String[] TARGET_EXTENSIONS = { "mp4" };
+        File listFile[] = dir.listFiles();
+        if (listFile != null) {
+            for (int i = 0; i < listFile.length; i++) {
+                if (listFile[i].isDirectory()) {
+                    walkdir(listFile[i]);
+                } else {
+                    String fPath = listFile[i].getPath();
+                    for (String ext : TARGET_EXTENSIONS) {
+                        if(fPath.endsWith(ext)) {
+                            putDotBeforeFileName(listFile[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String putDotBeforeFileName(File file) {
+        String fileName = file.getName();
+        String fullPath = file.getAbsolutePath();
+        int indexOfFileNameStart = fullPath.lastIndexOf(fileName);
+        StringBuilder sb = new StringBuilder(fullPath);
+        sb.insert(indexOfFileNameStart, ".");
+        String myRequiredFileName = sb.toString();
+        file.renameTo(new File(myRequiredFileName));
+        return myRequiredFileName;
     }
 
     private void getData(Intent intent) {
@@ -1146,4 +1223,5 @@ public class VideoListing extends AppCompatActivity {
             }
         });
     }
+
 }

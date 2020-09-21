@@ -143,7 +143,7 @@ public class DailyTask_Activity extends AppCompatActivity {
     }
 
     private void videoList() {
-        if (todaysVideo != null&& todaysVideo.size()!=1) {
+        if (todaysVideo != null&& todaysVideo.size()!=0) {
             dailyTaskList.setVisibility(View.VISIBLE);
             noNotes.setVisibility(View.GONE);
             noNotes.setText("");

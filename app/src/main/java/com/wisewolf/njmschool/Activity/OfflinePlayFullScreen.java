@@ -22,6 +22,7 @@ import android.widget.VideoView;
 import com.wisewolf.njmschool.R;
 
 import java.io.File;
+import java.util.regex.Pattern;
 
 public class OfflinePlayFullScreen extends AppCompatActivity {
     String file,name;
@@ -46,12 +47,12 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
         name=intent.getStringExtra("name");
         File rootFile = new File(file);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "Fil");
+            rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
         else
             rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                + File.separator + "Fil");
+                + File.separator + "njms");
 
-        File play=new File(rootFile,name+".mp4");
+        File play=new File(rootFile,name+".des.mp4");
         delete=play;
 
         videoFull.setVideoPath(play.getAbsolutePath());
@@ -79,7 +80,13 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
             // The dialog is automatically dismissed when a dialog button is clicked.
             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-                    delete.delete();
+                    File rootFile;
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+                        rootFile = new File(getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), File.separator + "njms");
+                    else
+                        rootFile =new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                            + File.separator + "njms");
+                    walkdir(rootFile);
                    finish();
                 }
             })
@@ -88,5 +95,37 @@ public class OfflinePlayFullScreen extends AppCompatActivity {
             .setNegativeButton("Cancel", null)
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show();
+    }
+
+    public void walkdir(File dir) {
+        String[] TARGET_EXTENSIONS = { "mp4" };
+        File listFile[] = dir.listFiles();
+        if (listFile != null) {
+            for (int i = 0; i < listFile.length; i++) {
+                if (listFile[i].isDirectory()) {
+                    walkdir(listFile[i]);
+                } else {
+                    String fPath = listFile[i].getPath();
+                    for (String ext : TARGET_EXTENSIONS) {
+                        if(fPath.endsWith(ext)) {
+                            putDotBeforeFileName(listFile[i]);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private String putDotBeforeFileName(File file) {
+        String fileName = file.getName();
+        String fullPath = file.getAbsolutePath();
+        int indexOfFileNameStart = fullPath.lastIndexOf(fileName);
+        String[] words = fileName.split(Pattern.quote("."));
+        fullPath=fullPath.substring(0, indexOfFileNameStart);
+        StringBuilder sb = new StringBuilder(fullPath);
+        sb.insert(indexOfFileNameStart, words[0]+".des");
+        String myRequiredFileName = sb.toString();
+        file.renameTo(new File(myRequiredFileName));
+        return myRequiredFileName;
     }
 }

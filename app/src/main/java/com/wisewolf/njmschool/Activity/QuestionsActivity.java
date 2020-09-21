@@ -62,12 +62,13 @@ public class QuestionsActivity extends AppCompatActivity {
     int flag = 0;
     String formattedDate="";
     ProgressDialog mProgressDialog;
-    String name = "", title, subject, time;
+    String name = "", title, subject, time,id;
     TextView textView;
     public static int marks = 0, correct = 0, wrong = 0;
     CountDownTimer countDownTimer;
     HashMap<String, String> answersFire = new HashMap<String, String>();
     List<HashMap> answFire=new ArrayList<>();
+    QuizQuestion QuizQuestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +95,7 @@ public class QuestionsActivity extends AppCompatActivity {
         title = intent.getStringExtra("title");
         subject = intent.getStringExtra("subject");
         time = intent.getStringExtra("time");
+        id = intent.getStringExtra("id");
         que_image = findViewById(R.id.que_image);
 
         submitbutton = (Button) findViewById(R.id.button3);
@@ -163,12 +165,12 @@ public class QuestionsActivity extends AppCompatActivity {
                                 score.setText("" + correct);
 
                             if (flag < questions.length) {
-                                Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_LONG).show();
+                                Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
 
                                 if (flags[flag].equals("true")) {
                                     que_image.setVisibility(View.VISIBLE);
                                     Glide.with(QuestionsActivity.this)
-                                        .load("http://139.59.79.78/media/" + image[flag])
+                                        .load("http://165.22.215.243/media/" + image[flag])
                                         .into(que_image);
                                 } else {
                                     que_image.setVisibility(View.GONE);
@@ -214,7 +216,7 @@ public class QuestionsActivity extends AppCompatActivity {
         quitbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-              //  postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
+                //  postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
 
             }
         });
@@ -259,11 +261,10 @@ public class QuestionsActivity extends AppCompatActivity {
         try {
             Map<String, Object> updateMap = new HashMap();
             updateMap.put("field1", answFire);
-            db.collection("unitTest")
-                .add(updateMap)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            db.collection("unitTest").document(GlobalData.regno+"_"+GlobalData.classes+"_"+id).set(updateMap)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
+                    public void onSuccess(Void aVoid) {
                         Toast.makeText(QuestionsActivity.this, "sent ...", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
                         startActivity(intent);
@@ -280,6 +281,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
                     }
                 });
+
         } catch (Exception e) {
             String a = "";
             mProgressDialog.cancel();
@@ -311,6 +313,7 @@ public class QuestionsActivity extends AppCompatActivity {
                         mProgressDialog.cancel();
                         if (response.body()!=null) {
                             if (response.body().getAsnwers_list() != null || response.body().getOptions_list() != null || response.body().getQuestions_list() != null) {
+
                                 timer(response.body().getQuestions_list().length);
                                 questions = new String[response.body().getQuestions_list().length];
                                 answers = new String[response.body().getAsnwers_list().length];
@@ -355,7 +358,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                 tv.setText(questions[flag]);
                                 if (flags[flag].equals("true")) {
                                     Glide.with(QuestionsActivity.this)
-                                        .load("http://139.59.79.78/media/" + image[flag])
+                                        .load("http://165.22.215.243/media/" + image[flag])
                                         .into(que_image);
                                 }
                                 rb1.setText(opt[0]);
@@ -545,6 +548,8 @@ public class QuestionsActivity extends AppCompatActivity {
             Map<String, Object> updateMap = new HashMap();
             HashMap<String, String> data = new HashMap<String, String>();
             data.put("reg",GlobalData.regno);
+            data.put("title",title);
+            data.put("subject",subject);
             data.put("q_count",String.valueOf(flag));
             updateMap.put("data", data);
             db.collection("timedOut")
