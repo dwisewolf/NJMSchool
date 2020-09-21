@@ -49,7 +49,7 @@ JitsiMeetUserInfo jitsiMeetUserInfo=new JitsiMeetUserInfo();
                 .setAudioMuted(false)
                 .setVideoMuted(false)
                 .setAudioOnly(false)
-                .setWelcomePageEnabled(false)
+                .setWelcomePageEnabled(true)
                 .build();
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -66,8 +66,9 @@ JitsiMeetUserInfo jitsiMeetUserInfo=new JitsiMeetUserInfo();
         int requestCode,
         int resultCode,
         Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
         JitsiMeetActivityDelegate.onActivityResult(
-            this, requestCode, resultCode, data);
+                this, requestCode, resultCode, data);
     }
 
     @Override
@@ -89,6 +90,7 @@ JitsiMeetUserInfo jitsiMeetUserInfo=new JitsiMeetUserInfo();
 
     @Override
     public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
         JitsiMeetActivityDelegate.onNewIntent(intent);
     }
 
@@ -116,7 +118,7 @@ JitsiMeetUserInfo jitsiMeetUserInfo=new JitsiMeetUserInfo();
 
     @Override
     public void requestPermissions(String[] strings, int i, PermissionListener permissionListener) {
-
+        JitsiMeetActivityDelegate.requestPermissions(this, strings, i, permissionListener);
     }
 
 }
