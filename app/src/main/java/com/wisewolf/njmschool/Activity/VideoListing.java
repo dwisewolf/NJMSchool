@@ -265,7 +265,7 @@ public class VideoListing extends AppCompatActivity {
 
         configVimeo();
        // offlinevideos();
-        notice();
+      //  notice();
 
         allVideoList = GlobalData.allVideoList;
 
@@ -321,7 +321,7 @@ public class VideoListing extends AppCompatActivity {
         examCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(VideoListing.this,LiveClass.class));
+               startActivity(new Intent(VideoListing.this,LiveClass.class));
             }
         });
 
@@ -411,6 +411,7 @@ public class VideoListing extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<List<NoticeMod>> call, Response<List<NoticeMod>> response) {
                     if (response.body() != null) {
+                        Log.e("onResponse: ",(response.body().get(0)).toString() );
                         NoticeMod noticeMod=response.body().get(0);
                         try {
 

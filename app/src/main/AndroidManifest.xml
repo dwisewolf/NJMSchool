@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.wisewolf.njmschool">
-
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -15,16 +15,21 @@
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.CAMERA" />
+
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
-    <uses-feature android:glEsVersion="0x00020000" android:required="true"/>
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <application
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:usesCleartextTraffic="${usesCleartextTraffic}"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
@@ -32,14 +37,17 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-
-        android:usesCleartextTraffic="true">
+        tools:targetApi="28">
 
         <activity android:name=".Activity.NotesActivity" />
-        <activity android:name=".Activity.ResultsFirebase" >
+        <activity android:name=".Activity.ResultsFirebase">
 
         </activity>
-        <activity android:name=".Activity.LiveClass" />
+        <activity
+            android:name=".Activity.LiveClass"
+            android:screenOrientation="portrait"
+            >
+        </activity>
         <activity android:name=".Activity.NEwsListActivity" />
         <activity
             android:name=".Activity.ExamActivity"
@@ -68,17 +76,13 @@
             android:name=".Activity.VideoPlay"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize|uiMode" />
 
-        <service
-            android:name=".service.VideoLinkService"
-            android:exported="false" />
-        <service android:name=".service.KillNotificationService" />
-
         <activity
             android:name=".Activity.VideoListing"
             android:screenOrientation="portrait" />
         <activity
             android:name=".kotlin.ProfileActivity"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".kotlin.Student_Select"
             android:screenOrientation="portrait" />
@@ -104,10 +108,18 @@
             android:name=".Activity.ResultActivity"
             android:screenOrientation="portrait" />
         <activity android:name=".Activity.OfflineScreenUser" />
+        <service
+            android:name=".service.VideoLinkService"
+            android:exported="false" />
+        <service
+            android:name=".service.BackgroundNotificationService"
+            android:exported="false" />
+        <service android:name=".service.KillNotificationService" />
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
     </application>
+
 
 </manifest>
