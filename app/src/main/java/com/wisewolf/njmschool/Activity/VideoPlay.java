@@ -920,7 +920,7 @@ njmsSharedPreferences=NJMSSharedPreferences.getInstance(this);
                 //Log.d("API123", download.getProgress() + " current progress");
 
                 if (downloadComplete) {
-                    Toast.makeText(getApplicationContext(), "Vedio download completed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Video download completed", Toast.LENGTH_SHORT).show();
                 }
             }
         }

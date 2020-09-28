@@ -151,7 +151,7 @@ public class BackgroundNotificationService extends IntentService {
             if (!s.equals("f")){
                 dbb.insertinto(nametostore,salt_name,dir_name,inv_name,location,userid,extra1,extra2);
                 String a="";
-              //  dnFlag="";
+               VideoPlay.dnFlag="";
             }
 
 
