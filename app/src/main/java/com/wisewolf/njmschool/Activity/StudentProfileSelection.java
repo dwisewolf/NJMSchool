@@ -8,16 +8,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.wisewolf.njmschool.Globals.GlobalData;
+import com.wisewolf.njmschool.Globals.LiveMOd;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.DailyTask;
 import com.wisewolf.njmschool.Models.News;
@@ -51,6 +57,8 @@ public class StudentProfileSelection extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_student__select);
         parents = findViewById(R.id.parentsDetails);
+
+
 
         try {
             SchoolDiff a = (SchoolDiff) GlobalData.profiles.get(0);
@@ -146,6 +154,7 @@ public class StudentProfileSelection extends AppCompatActivity {
             intent.putExtra("sec", s.getSection());
             intent.putExtra("phone", String.valueOf(s.getMobileNum()));
             startActivity(intent);
+
         }
         else {
             SharedPreferences.Editor editor = sharedPrefs.edit();
@@ -277,6 +286,7 @@ String a="";
                     intent.putExtra("phone", phone);
                     startActivity(intent);
 
+
                 }
 
                 @Override
@@ -365,5 +375,6 @@ String a="";
         }
         return  clasS;
     }
+
 
 }

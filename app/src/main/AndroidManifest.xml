@@ -29,7 +29,9 @@
         <activity android:name=".Activity.ResultsFirebase" >
 
         </activity>
-        <activity android:name=".Activity.LiveClass" />
+        <activity android:name=".Activity.LiveClass" >
+
+        </activity>
         <activity android:name=".Activity.NEwsListActivity" />
         <activity
             android:name=".Activity.ExamActivity"

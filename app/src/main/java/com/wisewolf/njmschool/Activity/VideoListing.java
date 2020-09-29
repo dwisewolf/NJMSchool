@@ -1,5 +1,6 @@
 package com.wisewolf.njmschool.Activity;
 
+import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
@@ -214,8 +215,6 @@ public class VideoListing extends AppCompatActivity {
 
 
         teacherDetails = findViewById(R.id.teacherdetail_list);
-
-
         thumb = findViewById(R.id.thumb);
         intoVideo = findViewById(R.id.introvideo);
        // intrthumb = findViewById(R.id.introthumb);
@@ -321,7 +320,9 @@ public class VideoListing extends AppCompatActivity {
         examCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(VideoListing.this,LiveClass.class));
+                Intent intent=new Intent(VideoListing.this,LiveClass.class);
+                intent.putExtra("room",GlobalData.school_code+GlobalData.clas);
+                startActivity(intent);
             }
         });
 
@@ -411,6 +412,7 @@ public class VideoListing extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<List<NoticeMod>> call, Response<List<NoticeMod>> response) {
                     if (response.body() != null) {
+                        if (response.body().size()!=0){
                         NoticeMod noticeMod=response.body().get(0);
                         try {
 
@@ -423,12 +425,12 @@ public class VideoListing extends AppCompatActivity {
 
                                 @Override
                                 public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
+                                    thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
                                 }
 
                                 @Override
                                 public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+                                    thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
                                 }
                             });
                         }
@@ -438,7 +440,7 @@ public class VideoListing extends AppCompatActivity {
 
                     }
 
-                }
+                }}
 
                 @Override
                 public void onFailure(Call<List<NoticeMod>> call, Throwable t) {
@@ -629,7 +631,7 @@ public class VideoListing extends AppCompatActivity {
             Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
         }
 
-        introVid();
+         introVid();
     }
 
     private void showNEwsAddAlert() {
@@ -1139,6 +1141,7 @@ public class VideoListing extends AppCompatActivity {
         DB.execute("");
     }
 
+    @SuppressLint("StaticFieldLeak")
     private class IntroVideo extends AsyncTask<String, String, String> {
         @Override
         protected void onPreExecute() {
@@ -1166,8 +1169,6 @@ public class VideoListing extends AppCompatActivity {
                         int x=videoList.data.get(0).pictures.sizes.size();
                       /*  Glide.with(VideoListing.this)
                             .load(videoList.data.get(0).pictures.sizes.get(x-1).linkWithPlayButton) // image url
-
-
 
                             .centerCrop()
                             .into( intrthumb);*/

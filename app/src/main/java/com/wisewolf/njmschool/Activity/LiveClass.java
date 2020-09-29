@@ -39,14 +39,17 @@ JitsiMeetUserInfo jitsiMeetUserInfo=new JitsiMeetUserInfo();
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_live_class);
-        Toast.makeText(this, "this ", Toast.LENGTH_SHORT).show();
+         Intent intent=getIntent();
+         String room=intent.getStringExtra("room");
+
         view = new JitsiMeetView(this);
         JitsiMeetConferenceOptions options = null;
         try {
             options = new JitsiMeetConferenceOptions.Builder()
                 .setServerURL(new URL("https://navjeevanmeet.njmis.school"))
-                .setRoom("njms_liveclass")
+                .setRoom("KASXII")
                 .setAudioMuted(false)
+
                 .setVideoMuted(false)
                 .setAudioOnly(false)
                 .setWelcomePageEnabled(false)

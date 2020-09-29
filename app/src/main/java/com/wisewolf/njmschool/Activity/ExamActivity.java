@@ -47,7 +47,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ExamActivity extends AppCompatActivity {
-RecyclerView mcq_recycler;
+    RecyclerView mcq_recycler;
     String formattedDate="";
     TextView mcqHead;
     ProgressDialog mProgressDialog;

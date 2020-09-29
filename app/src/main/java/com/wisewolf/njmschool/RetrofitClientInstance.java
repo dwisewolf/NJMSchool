@@ -1,5 +1,6 @@
 package com.wisewolf.njmschool;
 
+import com.wisewolf.njmschool.Globals.LiveMOd;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.DailyTask;
 import com.wisewolf.njmschool.Models.FeedbackReplyModel;
@@ -170,7 +171,16 @@ public class RetrofitClientInstance {
         @POST("/noteiceFList/")
         @FormUrlEncoded
         Call<List<NoticeMod>> getNoticeImg  (@Field(value = "school", encoded = true) String school,
-                                       @Field(value = "clas", encoded = true) String user_class);
+                                             @Field(value = "clas", encoded = true) String user_class);
+
+        @POST("/videoFData/")
+        @FormUrlEncoded
+        Call<List<LiveMOd>> getLivestatus  (@Field(value = "school", encoded = true) String school,
+                                           @Field(value = "clas", encoded = true) String user_class);
+
+
+
+
     }
 
 }
