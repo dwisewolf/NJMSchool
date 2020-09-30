@@ -39,12 +39,13 @@
         android:theme="@style/AppTheme"
         tools:targetApi="28">
 
+
         <activity android:name=".Activity.NotesActivity" />
         <activity android:name=".Activity.ResultsFirebase">
 
         </activity>
-        <activity
-            android:name=".Activity.LiveClass"
+        <activity android:name=".Activity.LiveClass" >
+
             android:screenOrientation="portrait"
             >
         </activity>
