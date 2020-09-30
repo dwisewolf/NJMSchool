@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,9 +27,11 @@ import android.annotation.SuppressLint;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
@@ -38,6 +41,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -101,9 +105,11 @@ import com.wisewolf.njmschool.Globals.SubjectList;
 import com.wisewolf.njmschool.Models.ClassVideo;
 import com.wisewolf.njmschool.Models.OfflineVideos;
 import com.wisewolf.njmschool.Models.VideoUp;
+import com.wisewolf.njmschool.NJMSSharedPreferences;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.VimeoCallback;
+import com.wisewolf.njmschool.service.BackgroundNotificationService;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -139,7 +145,7 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
     private String mVedioUrl;
     PlayerView exoplayerView;
     ProgressBar progressBar;
-    String dnFlag="";
+   public static String dnFlag="";
 
 
     String lessn[] = {"Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6", "Lesson 7",
@@ -160,7 +166,8 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
 
     OfflineDatabase dbb;
     String nametostore="",salt_name="",dir_name="",inv_name="",location="",userid="",extra1="",extra2="";
-
+    public static final String PROGRESS_UPDATE = "progress_update";
+    NJMSSharedPreferences njmsSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +182,7 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
         dbb = new OfflineDatabase(getApplicationContext());
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
-
+njmsSharedPreferences=NJMSSharedPreferences.getInstance(this);
 
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
@@ -258,54 +265,7 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                try {
-                    dbb.OfflineVideoss();
-
-                    Date c = Calendar.getInstance().getTime();
-                    int found = 0;
-
-                    SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
-                    String date = sd.format(new Date());
-                    if (GlobalData.OfflineVideos == null) {
-                        found = 0;
-                    } else {
-                        for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
-                            OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
-                            if (selectedVideo.getData().getName().equals(offlineVideos.getName()))
-                                found = 1;
-
-
-                        }
-                    }
-
-                    if (found == 1) {
-                        Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
-                    }  else {
-                        if (dnFlag.equals("")) {
-                            if (c.before(selectedVideo.getData().getDownload().get(0).getExpires())) {
-                                String url = selectedVideo.getData().getDownload().get(0).getLink();
-                                download_name = selectedVideo.getData().getName();
-                                download_url = url;
-                                nametostore = selectedVideo.getData().getName();
-                                extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size() - 1).getLink();
-                                extra2 = selectedVideo.getData().getDescription();
-                                download();
-                            } else {
-
-                                configVimeo(selectedVideo);
-
-                            }
-                        }
-                        else {
-                            Toast.makeText(VideoPlay.this, "one download is in progress", Toast.LENGTH_SHORT).show();
-                            mProgressDialog.show();
-                        }
-                    }
-
-                } catch (Exception ignored) {
-                }
-
-
+              checkOfflineDBBeforeDownloading();
             }
         });
 
@@ -336,6 +296,61 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
 
     }
 
+    private void checkOfflineDBBeforeDownloading() {
+        try {
+            dbb.OfflineVideoss();
+
+            Date c = Calendar.getInstance().getTime();
+            int found = 0;
+
+            SimpleDateFormat sd = new SimpleDateFormat("yymmhh");
+            String date = sd.format(new Date());
+            if (GlobalData.OfflineVideos == null) {
+                found = 0;
+            } else {
+                for (int i = 0; i < GlobalData.OfflineVideos.size(); i++) {
+                    OfflineVideos offlineVideos = (OfflineVideos) GlobalData.OfflineVideos.get(i);
+                    if (selectedVideo.getData().getName().equals(offlineVideos.getName()))
+                        found = 1;
+
+
+                }
+            }
+
+            if (found == 1) {
+                Toast.makeText(VideoPlay.this, "Video is already Downloaded", Toast.LENGTH_SHORT).show();
+            }  else {
+                if (dnFlag.equals("")) {
+                    if (c.before(selectedVideo.getData().getDownload().get(0).getExpires())) {
+                        String url = selectedVideo.getData().getDownload().get(0).getLink();
+                        download_name = selectedVideo.getData().getName();
+                        download_url = url;
+                        nametostore = selectedVideo.getData().getName();
+                        extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size() - 1).getLink();
+                        extra2 = selectedVideo.getData().getDescription();
+                        njmsSharedPreferences.saveData("download_name",download_name);//i added
+                        njmsSharedPreferences.saveData("download_url",download_url);// i aaded
+                        njmsSharedPreferences.saveData("nametostore",nametostore);//i added
+                        njmsSharedPreferences.saveData("extra1",extra1);// i aaded
+                        njmsSharedPreferences.saveData("extra2",extra2);// i aaded
+                        download();
+                    } else {
+
+                        configVimeo(selectedVideo);
+
+                    }
+                }
+                else {
+                    Toast.makeText(VideoPlay.this, "one download is in progress", Toast.LENGTH_SHORT).show();
+                   // mProgressDialog.show(); i commented
+                }
+            }
+
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -357,8 +372,11 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
             if (videoView.isPlaying())
                 videoView.stopPlayback();
           //  new DownloadTask(VideoPlay.this,download_url,download_name,extra1,extra2);
-            Downback DB = new Downback();
-            DB.execute("");
+            startVideoDownload();// for background
+            registerReceiver();
+          //i commented
+           /* Downback DB = new Downback();
+            DB.execute("");*/
         }
         catch (Exception e){
             Toast.makeText(this, String.valueOf(e), Toast.LENGTH_SHORT).show();
@@ -445,6 +463,7 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
                     total += len1;
                     if (fileLength > 0) // only if total length is known
                         publishProgress((int) (total * 100 / fileLength));
+                   // BackgroundNotificationService.
                     f.write(buffer, 0, len1);
                 }
 
@@ -822,7 +841,10 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
                     // The dialog is automatically dismissed when a dialog button is clicked.
                     .setPositiveButton("Download ", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-                            configVimeo(selectedVideo);
+                            checkOfflineDBBeforeDownloading();
+                          /* configVimeo(selectedVideo);
+                           njmsSharedPreferences.saveData("selectedVideo", selectedVideo.getData().getUri());
+*/
                         }
                     })
 
@@ -878,6 +900,40 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
         video_play_list.setLayoutManager(added_liste_adapterlayoutManager);
 
     }
+
+    // for background download
+    private void registerReceiver() {
+
+        LocalBroadcastManager bManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(PROGRESS_UPDATE);
+        bManager.registerReceiver(mBroadcastReceiver, intentFilter);
+
+    }
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            if (intent.getAction().equals(PROGRESS_UPDATE)) {
+
+                boolean downloadComplete = intent.getBooleanExtra("downloadComplete", false);
+                //Log.d("API123", download.getProgress() + " current progress");
+
+                if (downloadComplete) {
+                    Toast.makeText(getApplicationContext(), "Video download completed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
+    private void startVideoDownload() {
+
+
+        Intent intent = new Intent(this, BackgroundNotificationService.class);
+       // intent.putExtra("selectedVideo", (Parcelable) selectedVideo);
+        startService(intent);
+
+    }
+
 
     private ArrayList getLesson(ArrayList selectedVideoList) {
         ArrayList returnVideo = new ArrayList();
@@ -1835,7 +1891,7 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
 
     }
 
-    private void configVimeo(ClassVideo selectedVideo) {
+    public void configVimeo(ClassVideo selectedVideo) {
 
         final Configuration.Builder configBuilder =
             new Configuration.Builder("70b8a941d1f7a9950d7c09d3abf322ba")
@@ -1881,7 +1937,8 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            mProgressDialog.show();
+            Toast.makeText(VideoPlay.this, "Download started..", Toast.LENGTH_SHORT).show();
+          //  mProgressDialog.show();
         }
 
         @Override
@@ -1928,22 +1985,26 @@ public class VideoPlay extends AppCompatActivity implements  Player.EventListene
                     }
 
                     if (found==0){
-
-
                                 download_url = video.download.get(0).link;
-
-
-
                     }
 
 
-
-
                     download_name = selectedVideo.getData().getName();
-
-                    nametostore = selectedVideo.getData().getName();
+                     nametostore = selectedVideo.getData().getName();
                     extra1 = selectedVideo.getData().getPictures().getSizes().get(selectedVideo.getData().getPictures().getSizes().size()-1).getLink();
                     extra2=selectedVideo.getData().getDescription();
+                    njmsSharedPreferences.saveData("download_name",download_name);//i added
+                    njmsSharedPreferences.saveData("download_url",download_url);// i aaded
+                    njmsSharedPreferences.saveData("nametostore",nametostore);//i added
+                    njmsSharedPreferences.saveData("extra1",extra1);// i aaded
+                    njmsSharedPreferences.saveData("extra2",extra2);// i aaded
+
+                    Log.e("description",selectedVideo.getData().getDescription() );
+                    Log.e("download_name",selectedVideo.getData().getName() );
+                    Log.e("nametostore",selectedVideo.getData().getName() );
+                    Log.e("extra1",selectedVideo.getData().getDescription() );
+                    Log.e("extra2",selectedVideo.getData().getDescription() );
+
                     download();
                     // use the video
                 }

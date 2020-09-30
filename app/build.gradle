@@ -8,7 +8,7 @@ android {
     compileSdkVersion 29
 
     buildToolsVersion "29.0.2"
-
+    useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.wisewolf.njmschool"
         minSdkVersion 21
@@ -21,6 +21,7 @@ android {
     }
 
     compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
@@ -35,8 +36,14 @@ android {
 
     buildTypes {
         release {
+           // manifestPlaceholders.cleartextTrafficPermitted ="false"
+             manifestPlaceholders = [usesCleartextTraffic:"false"]
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            manifestPlaceholders = [usesCleartextTraffic:"true"]
+           // manifestPlaceholders.cleartextTrafficPermitted ="true"
         }
     }
 

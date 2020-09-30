@@ -19,6 +19,8 @@ import com.wisewolf.njmschool.Models.VideoUp;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import kotlin.collections.CollectionsKt;
+import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
@@ -38,6 +40,7 @@ public class RetrofitClientInstance {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.connectTimeout(20, TimeUnit.SECONDS);
         client.readTimeout(20, TimeUnit.SECONDS);
+        client  .connectionSpecs(CollectionsKt.listOf(ConnectionSpec.MODERN_TLS, ConnectionSpec.CLEARTEXT));
         client.writeTimeout(20, TimeUnit.SECONDS);
         if (retrofit == null) {
 

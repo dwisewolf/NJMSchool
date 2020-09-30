@@ -248,8 +248,9 @@ public class SignUp extends AppCompatActivity {
             })
             .setNegativeButton("NO", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
-
-
+/*
+                    Intent msgIntent = new Intent(SignUp.this, LiveClass.class);
+                    startActivity(msgIntent);*/
                 }
             })
             .setIcon(android.R.drawable.ic_dialog_alert)
