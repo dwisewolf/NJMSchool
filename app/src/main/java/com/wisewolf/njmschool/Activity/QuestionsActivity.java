@@ -277,6 +277,9 @@ public class QuestionsActivity extends AppCompatActivity {
                                         answersFire.put("ansText", ansText);
                                         answersFire.put("image", image[flag]);
                                         answersFire.put("date", formattedDate);
+                                        answersFire.put("marks", formattedDate);
+                                        answersFire.put("que_Image", formattedDate);
+                                        answersFire.put("ans_Image", formattedDate);
                                         answFire.add(answersFire);
                                         postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
                                         flag++;
@@ -389,6 +392,9 @@ public class QuestionsActivity extends AppCompatActivity {
                                     answersFire.put("ansText", ansText);
                                     answersFire.put("image", image[flag]);
                                     answersFire.put("date", formattedDate);
+                                    answersFire.put("marks", formattedDate);
+                                    answersFire.put("que_Image", formattedDate);
+                                    answersFire.put("ans_Image", formattedDate);
                                     answFire.add(answersFire);
                                     postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
 
@@ -960,6 +966,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                 public void onSuccess(Uri uri) {
                                     String a=uri.toString();
                                     answer_ansText=a;
+
                                     answFire.add(answersFire);
                                     previewImg.setVisibility(View.GONE);
 
