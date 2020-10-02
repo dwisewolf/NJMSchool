@@ -1,8 +1,15 @@
 package com.wisewolf.njmschool.Activity;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -10,12 +17,15 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +35,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.jsibbold.zoomage.ZoomageView;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Feedback;
@@ -33,7 +46,11 @@ import com.wisewolf.njmschool.Models.MCQSubmit;
 import com.wisewolf.njmschool.Models.QuizQuestion;
 import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
+import com.wisewolf.njmschool.service.KillNotificationService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,21 +71,33 @@ public class QuestionsActivity extends AppCompatActivity {
     RadioGroup radio_g;
     ZoomageView que_image;
     RadioButton rb1, rb2, rb3, rb4;
+
+    private static final int CAMERA_REQUEST = 1888;
+    private static final int MY_CAMERA_PERMISSION_CODE = 100;
+
     String questions[];
     String answers[];
     String opt[];
     String flags[];
     String image[];
-    int flag = 0;
+    String answer_flags[];
+    String marksList[];
+    String answer_reg,answer_class,answer_title,answer_subject,answer_questions,answer_ansText,answer_image,answer_date;
+
+    EditText descripptive_answer;
+    Bitmap answerImage;
+    int flag = 0,imgFlag=0;
+    ImageView camera_View,previewImg;
     String formattedDate="";
     ProgressDialog mProgressDialog;
     String name = "", title, subject, time,id;
-    TextView textView;
+    TextView textView,marks_view;
     public static int marks = 0, correct = 0, wrong = 0;
     CountDownTimer countDownTimer;
     HashMap<String, String> answersFire = new HashMap<String, String>();
     List<HashMap> answFire=new ArrayList<>();
     QuizQuestion QuizQuestions;
+    private final int GALLERY_ACTIVITY_CODE=400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +110,7 @@ public class QuestionsActivity extends AppCompatActivity {
         assert actionBar != null;
         actionBar.hide();
         initProgress();
+        startService(new Intent(QuestionsActivity.this, KillNotificationService.class));
 
         Date c = Calendar.getInstance().getTime();
         System.out.println("Current time => " + c);
@@ -97,23 +127,42 @@ public class QuestionsActivity extends AppCompatActivity {
         time = intent.getStringExtra("time");
         id = intent.getStringExtra("id");
         que_image = findViewById(R.id.que_image);
+        camera_View = findViewById(R.id.camera_view);
+        descripptive_answer = findViewById(R.id.descripptive_answer);
+        previewImg = findViewById(R.id.previewImg);
 
         submitbutton = (Button) findViewById(R.id.button3);
         quitbutton = (Button) findViewById(R.id.buttonquit);
         tv = (TextView) findViewById(R.id.tvque);
+        marks_view = (TextView) findViewById(R.id.marks_view);
 
         radio_g = (RadioGroup) findViewById(R.id.answersgrp);
         rb1 = (RadioButton) findViewById(R.id.radioButton);
         rb2 = (RadioButton) findViewById(R.id.radioButton2);
         rb3 = (RadioButton) findViewById(R.id.radioButton3);
         rb4 = (RadioButton) findViewById(R.id.radioButton4);
-
+        radio_g.setVisibility(View.GONE);
+        rb1.setVisibility(View.GONE);
+        rb2.setVisibility(View.GONE);
+        rb3.setVisibility(View.GONE);
+        rb4.setVisibility(View.GONE);
+        previewImg.setVisibility(View.GONE);
+        camera_View.setVisibility(View.GONE);
+        descripptive_answer.setVisibility(View.GONE);
         try {
             alertforQuiz();
 
         } catch (Exception e) {
             Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
         }
+
+        camera_View.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cameraopen();
+
+            }
+        });
 
 
         submitbutton.setOnClickListener(new View.OnClickListener() {
@@ -123,90 +172,288 @@ public class QuestionsActivity extends AppCompatActivity {
                 //mLayout.setBackgroundColor(color);
 
                 if (!submitbutton.getText().equals("Submit")) {
-
-                    if (radio_g.getCheckedRadioButtonId() == -1) {
-                        Toast.makeText(getApplicationContext(), "Please select an option", Toast.LENGTH_SHORT).show();
-                        return;
-                    } else {
+                    if (opt[flag*4].replaceAll("\\s+", "").equals("")) {
 
                         try {
-                            RadioButton uans = (RadioButton) findViewById(radio_g.getCheckedRadioButtonId());
-                            String ansText = uans.getText().toString();
+
+
+                            String ansText = descripptive_answer.getText().toString();
+
 //              Toast.makeText(getApplicationContext(), ansText, Toast.LENGTH_SHORT).show();
                             try {
-                                answersFire = new HashMap<String, String>();
-                                answersFire.put("reg", GlobalData.regno);
-                                answersFire.put("class", GlobalData.clas);
-                                answersFire.put("title", title);
-                                answersFire.put("subject", subject);
-                                answersFire.put("questions", questions[flag]);
-                                answersFire.put("ansText", ansText);
-                                answersFire.put("image", image[flag]);
-                                answersFire.put("date", formattedDate);
-                                answFire.add(answersFire);
-                                postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
+                                if (answer_flags[flag].equals("true")){
+                                    if (imgFlag==1){
 
-                            } catch (Exception e) {
+                                        answer_reg=GlobalData.regno;
+                                        answer_class=GlobalData.clas;
+                                        answer_title=title;
+                                        answer_subject=subject;
+                                        answer_questions=questions[flag];
+                                        answer_image=image[flag];
+                                        answer_date=formattedDate;
+                                        uploadImage();
+                                        flag++;
+                                        if (flag < questions.length) {
+                                            Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
+
+                                            if (flags[flag].equals("true")) {
+                                                que_image.setVisibility(View.VISIBLE);
+                                                Glide.with(QuestionsActivity.this)
+                                                    .load("http://165.22.215.243/media/" + image[flag])
+                                                    .into(que_image);
+                                            } else {
+                                                que_image.setVisibility(View.GONE);
+                                            }
+                                            tv.setText(questions[flag]);
+                                            if (!opt[flag*4].replaceAll("\\s+", "").equals("")) {
+                                                radio_g.setVisibility(View.VISIBLE);
+                                                rb1.setVisibility(View.VISIBLE);
+                                                rb2.setVisibility(View.VISIBLE);
+                                                rb3.setVisibility(View.VISIBLE);
+                                                rb4.setVisibility(View.VISIBLE);
+                                                descripptive_answer.setVisibility(View.GONE);
+
+                                                if (answer_flags[flag].equals("true"))
+                                                    camera_View.setVisibility(View.VISIBLE);
+
+
+                                                rb1.setText(opt[flag * 4]);
+                                                rb2.setText(opt[flag * 4 + 1]);
+                                                rb3.setText(opt[flag * 4 + 2]);
+                                                rb4.setText(opt[flag * 4 + 3]);
+
+                                            }
+                                            else {
+                                                radio_g.setVisibility(View.GONE);
+                                                rb1.setVisibility(View.GONE);
+                                                rb2.setVisibility(View.GONE);
+                                                rb3.setVisibility(View.GONE);
+                                                rb4.setVisibility(View.GONE);
+                                                descripptive_answer.setVisibility(View.VISIBLE);
+                                                if (answer_flags[flag].equals("true"))
+                                                    camera_View.setVisibility(View.VISIBLE);
+                                            }
+
+
+
+
+                                        }
+                                        else {
+                                            marks = correct;
+                                            try {
+                                                tv.setVisibility(View.INVISIBLE);
+                                                que_image.setVisibility(View.INVISIBLE);
+                                                radio_g.setVisibility(View.INVISIBLE);
+                                                submitbutton.setText("Submit");
+
+
+                                                postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
+
+
+                                            }
+                                            catch (Exception e) {
+                                                Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        }
+
+                                        radio_g.clearCheck();
+                                    }
+                                    else {
+                                        Toast.makeText(QuestionsActivity.this, "select a picture from gallery", Toast.LENGTH_SHORT).show();
+                                    }
+
+                                }
+
+                                else {
+                                    if (!ansText.equals("")){
+                                        answersFire = new HashMap<String, String>();
+                                        answersFire.put("reg", GlobalData.regno);
+                                        answersFire.put("class", GlobalData.clas);
+                                        answersFire.put("title", title);
+                                        answersFire.put("subject", subject);
+                                        answersFire.put("questions", questions[flag]);
+                                        answersFire.put("ansText", ansText);
+                                        answersFire.put("image", image[flag]);
+                                        answersFire.put("date", formattedDate);
+                                        answFire.add(answersFire);
+                                        postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
+                                        flag++;
+                                        if (flag < questions.length) {
+                                            Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
+
+                                            if (flags[flag].equals("true")) {
+                                                que_image.setVisibility(View.VISIBLE);
+                                                Glide.with(QuestionsActivity.this)
+                                                    .load("http://165.22.215.243/media/" + image[flag])
+                                                    .into(que_image);
+                                            } else {
+                                                que_image.setVisibility(View.GONE);
+                                            }
+                                            tv.setText(questions[flag]);
+                                            if (!opt[flag*4].replaceAll("\\s+", "").equals("")) {
+                                                radio_g.setVisibility(View.VISIBLE);
+                                                rb1.setVisibility(View.VISIBLE);
+                                                rb2.setVisibility(View.VISIBLE);
+                                                rb3.setVisibility(View.VISIBLE);
+                                                rb4.setVisibility(View.VISIBLE);
+                                                descripptive_answer.setVisibility(View.GONE);
+
+                                                if (answer_flags[flag].equals("true"))
+                                                    camera_View.setVisibility(View.VISIBLE);
+
+
+                                                rb1.setText(opt[flag * 4]);
+                                                rb2.setText(opt[flag * 4 + 1]);
+                                                rb3.setText(opt[flag * 4 + 2]);
+                                                rb4.setText(opt[flag * 4 + 3]);
+
+                                            }
+                                            else {
+                                                radio_g.setVisibility(View.GONE);
+                                                rb1.setVisibility(View.GONE);
+                                                rb2.setVisibility(View.GONE);
+                                                rb3.setVisibility(View.GONE);
+                                                rb4.setVisibility(View.GONE);
+                                                descripptive_answer.setVisibility(View.VISIBLE);
+                                                if (answer_flags[flag].equals("true"))
+                                                    camera_View.setVisibility(View.VISIBLE);
+                                            }
+
+
+
+
+                                        }
+                                        else {
+                                            marks = correct;
+                                            try {
+                                                tv.setVisibility(View.INVISIBLE);
+                                                que_image.setVisibility(View.INVISIBLE);
+                                                radio_g.setVisibility(View.INVISIBLE);
+                                                submitbutton.setText("Submit");
+
+                                                postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
+
+
+                                            }
+                                            catch (Exception e) {
+                                                Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        }
+
+                                        radio_g.clearCheck();
+                                    }
+                                    else {
+                                        Toast.makeText(QuestionsActivity.this, "Type your answers", Toast.LENGTH_SHORT).show();
+                                    }
+
+
+                                }
+
+                            }
+
+                            catch (Exception e) {
                                 Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                             }
 
-                            if (ansText.equals(answers[flag])) {
-                                correct++;
-
-                            } else {
-                                wrong++;
-
-                            }
-
-                            flag++;
 
 
-                            if (score != null)
-                                score.setText("" + correct);
+                        }
 
-                            if (flag < questions.length) {
-                                Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
+                        catch (Exception e) {
+                            Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                        descripptive_answer.setText("");
+                    }
+                    else {
+                        if (radio_g.getCheckedRadioButtonId() == -1) {
+                            Toast.makeText(getApplicationContext(), "Please select an option", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        else {
 
-                                if (flags[flag].equals("true")) {
-                                    que_image.setVisibility(View.VISIBLE);
-                                    Glide.with(QuestionsActivity.this)
-                                        .load("http://165.22.215.243/media/" + image[flag])
-                                        .into(que_image);
-                                } else {
-                                    que_image.setVisibility(View.GONE);
-                                }
-                                tv.setText(questions[flag]);
-                                rb1.setText(opt[flag * 4]);
-                                rb2.setText(opt[flag * 4 + 1]);
-                                rb3.setText(opt[flag * 4 + 2]);
-                                rb4.setText(opt[flag * 4 + 3]);
-                            } else {
-                                marks = correct;
+                            try {
+                                RadioButton uans = (RadioButton) findViewById(radio_g.getCheckedRadioButtonId());
+                                String ansText = uans.getText().toString();
+//              Toast.makeText(getApplicationContext(), ansText, Toast.LENGTH_SHORT).show();
                                 try {
-                                    tv.setVisibility(View.INVISIBLE);
-                                    que_image.setVisibility(View.INVISIBLE);
-                                    radio_g.setVisibility(View.INVISIBLE);
-                                    submitbutton.setText("Submit");
-
-                                    postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
-
+                                    answersFire = new HashMap<String, String>();
+                                    answersFire.put("reg", GlobalData.regno);
+                                    answersFire.put("class", GlobalData.clas);
+                                    answersFire.put("title", title);
+                                    answersFire.put("subject", subject);
+                                    answersFire.put("questions", questions[flag]);
+                                    answersFire.put("ansText", ansText);
+                                    answersFire.put("image", image[flag]);
+                                    answersFire.put("date", formattedDate);
+                                    answFire.add(answersFire);
+                                    postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
 
                                 } catch (Exception e) {
                                     Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                                 }
 
+                                if (ansText.equals(answers[flag])) {
+                                    correct++;
 
+                                } else {
+                                    wrong++;
+
+                                }
+
+                                flag++;
+
+
+                                if (score != null)
+                                    score.setText("" + correct);
+
+                                if (flag < questions.length) {
+                                    Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
+
+                                    if (flags[flag].equals("true")) {
+                                        que_image.setVisibility(View.VISIBLE);
+                                        Glide.with(QuestionsActivity.this)
+                                            .load("http://165.22.215.243/media/" + image[flag])
+                                            .into(que_image);
+                                    } else {
+                                        que_image.setVisibility(View.GONE);
+                                    }
+                                    tv.setText(questions[flag]);
+                                    rb1.setText(opt[flag * 4]);
+                                    rb2.setText(opt[flag * 4 + 1]);
+                                    rb3.setText(opt[flag * 4 + 2]);
+                                    rb4.setText(opt[flag * 4 + 3]);
+                                } else {
+                                    marks = correct;
+                                    try {
+                                        tv.setVisibility(View.INVISIBLE);
+                                        que_image.setVisibility(View.INVISIBLE);
+                                        radio_g.setVisibility(View.INVISIBLE);
+                                        submitbutton.setText("Submit");
+
+                                        postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
+
+
+                                    } catch (Exception e) {
+                                        Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                    }
+
+
+                                }
+                                radio_g.clearCheck();
+                            } catch (Exception e) {
+                                Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                             }
-                            radio_g.clearCheck();
-                        } catch (Exception e) {
-                            Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+
+
                         }
-
-
                     }
+
                 }
                 else {
-
                     postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
                 }
 
@@ -216,7 +463,7 @@ public class QuestionsActivity extends AppCompatActivity {
         quitbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //  postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
+                //postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
 
             }
         });
@@ -261,7 +508,7 @@ public class QuestionsActivity extends AppCompatActivity {
         try {
             Map<String, Object> updateMap = new HashMap();
             updateMap.put("field1", answFire);
-            db.collection("unitTest").document(GlobalData.regno+"_"+GlobalData.classes+"_"+id).set(updateMap)
+            db.collection("midTerm").document(GlobalData.regno+"_"+id).set(updateMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
@@ -319,6 +566,8 @@ public class QuestionsActivity extends AppCompatActivity {
                                 answers = new String[response.body().getAsnwers_list().length];
                                 flags = new String[response.body().getFlag_list().length];
                                 image = new String[response.body().getUrl_list().length];
+                                marksList = new String[response.body().getMarks_list().length];
+                                answer_flags = new String[response.body().getAns_flag_list().length];
 
                                 int size = 0;
 
@@ -345,6 +594,14 @@ public class QuestionsActivity extends AppCompatActivity {
                                     image[i] = response.body().getUrl_list()[i];
                                 }
 
+                                for (int i = 0; i < response.body().getMarks_list().length; i++) {
+                                    marksList[i] = response.body().getMarks_list()[i];
+                                }
+
+                                for (int i = 0; i < response.body().getAns_flag_list().length; i++) {
+                                    answer_flags[i] = response.body().getAns_flag_list()[i];
+                                }
+
 
                                 int pos = 0;
                                 for (int i = 0; i < response.body().getOptions_list().length; i++) {
@@ -356,15 +613,40 @@ public class QuestionsActivity extends AppCompatActivity {
                                 }
 
                                 tv.setText(questions[flag]);
+                                marks_view.setText("marks - "+marksList[flag]);
                                 if (flags[flag].equals("true")) {
                                     Glide.with(QuestionsActivity.this)
                                         .load("http://165.22.215.243/media/" + image[flag])
                                         .into(que_image);
                                 }
-                                rb1.setText(opt[0]);
-                                rb2.setText(opt[1]);
-                                rb3.setText(opt[2]);
-                                rb4.setText(opt[3]);
+                                if (!opt[0].replaceAll("\\s+", "").equals("")) {
+                                    radio_g.setVisibility(View.VISIBLE);
+                                    rb1.setVisibility(View.VISIBLE);
+                                    rb2.setVisibility(View.VISIBLE);
+                                    rb3.setVisibility(View.VISIBLE);
+                                    rb4.setVisibility(View.VISIBLE);
+                                    descripptive_answer.setVisibility(View.GONE);
+
+                                    if (answer_flags[0].equals("true"))
+                                        camera_View.setVisibility(View.VISIBLE);
+
+                                    rb1.setText(opt[0]);
+                                    rb2.setText(opt[1]);
+                                    rb3.setText(opt[2]);
+                                    rb4.setText(opt[3]);
+
+                                }
+                                else {
+                                    radio_g.setVisibility(View.GONE);
+                                    rb1.setVisibility(View.GONE);
+                                    rb2.setVisibility(View.GONE);
+                                    rb3.setVisibility(View.GONE);
+                                    rb4.setVisibility(View.GONE);
+                                    descripptive_answer.setVisibility(View.VISIBLE);
+
+                                    if (answer_flags[0].equals("true"))
+                                        camera_View.setVisibility(View.VISIBLE);
+                                }
 
                                 submitCount();
                             }
@@ -416,7 +698,7 @@ public class QuestionsActivity extends AppCompatActivity {
             data.put("title",title);
             data.put("time",formattedDate);
             updateMap.put("data", data);
-            db.collection("unitCount")
+            db.collection("midtermCount")
                 .add(updateMap)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -446,7 +728,7 @@ public class QuestionsActivity extends AppCompatActivity {
         try {
             mProgressDialog.show();
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer, image);
+            Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer,image ,"0",image);
             call.enqueue(new Callback<MCCQ>() {
                 @Override
                 public void onResponse(Call<MCCQ> call, Response<MCCQ> response) {
@@ -474,7 +756,7 @@ public class QuestionsActivity extends AppCompatActivity {
             mProgressDialog.setMessage("Uploading results...");
             mProgressDialog.show();
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<MCQSubmit> call = service.saveMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject);
+            Call<MCQSubmit> call = service.saveMCQ_Result(GlobalData.regno, GlobalData.classes, title, GlobalData.regno+"_"+id,subject);
             call.enqueue(new Callback<MCQSubmit>() {
                 @Override
                 public void onResponse(Call<MCQSubmit> call, Response<MCQSubmit> response) {
@@ -507,7 +789,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
         Long dur = Long.valueOf(time) * 60000;
 
-        new CountDownTimer(dur, 1000) {
+       countDownTimer= new CountDownTimer(dur, 1000) {
 
             public void onTick(long millisUntilFinished) {
                 String text = String.format(Locale.getDefault(), "Time Remaining %02d min: %02d sec",
@@ -534,7 +816,8 @@ public class QuestionsActivity extends AppCompatActivity {
 
             }
 
-        }.start();
+        };
+       countDownTimer.start();
 
 
     }
@@ -582,7 +865,7 @@ public class QuestionsActivity extends AppCompatActivity {
         try {
             mProgressDialog.show();
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
-            Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer, image);
+            Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer, image,"0",image);
             call.enqueue(new Callback<MCCQ>() {
                 @Override
                 public void onResponse(Call<MCCQ> call, Response<MCCQ> response) {
@@ -611,6 +894,115 @@ public class QuestionsActivity extends AppCompatActivity {
         }
 
 
+    }
+
+    private void cameraopen() {
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+        {
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
+        }
+        else
+        {
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+
+
+        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+        {
+            try {
+                final Uri imageUri = data.getData();
+                final InputStream imageStream = getApplicationContext().getContentResolver().openInputStream(imageUri);
+                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                previewImg.setImageBitmap(selectedImage);
+                answerImage=selectedImage;
+                previewImg.setVisibility(View.VISIBLE);
+                imgFlag=1;
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(QuestionsActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+
+        } else {
+            Toast.makeText(QuestionsActivity.this, "  haven't picked Image", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void uploadImage() {
+        mProgressDialog.setMessage("uploading image...");
+        mProgressDialog.show();
+
+        try {
+            if (answerImage!=null) {
+                Date c = Calendar.getInstance().getTime();
+                System.out.println("Current time => " + c);
+
+                SimpleDateFormat df = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.getDefault());
+                String date = df.format(c);
+                String ref = "answerImage/" + GlobalData.regno + "_"+id + "_"+String.valueOf(flag)+"_"+c+ ".jpg";
+
+                FirebaseStorage firebaseStorage = FirebaseStorage.getInstance();
+                StorageReference storageReferenceProfilePic = firebaseStorage.getReference();
+                StorageReference imageRef = storageReferenceProfilePic.child(ref);
+                imageRef.putBytes(byteconvert(answerImage))
+
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String a=uri.toString();
+                                    answer_ansText=a;
+                                    answFire.add(answersFire);
+                                    previewImg.setVisibility(View.GONE);
+
+                                    postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], answer_ansText, image[flag]);
+                                    mProgressDialog.cancel();
+                                    imgFlag=0;
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    String a="";
+                                    mProgressDialog.cancel();
+                                }
+                            });
+
+
+
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //if the upload is not successful
+                            //hiding the progress dialog
+                            mProgressDialog.cancel();
+                            //and displaying error message
+                        }
+                    });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    private byte[] byteconvert(Bitmap selectedImage) {
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        selectedImage.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        // selectedImage.recycle();
+        return byteArray;
     }
 
 }

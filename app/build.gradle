@@ -11,7 +11,7 @@ android {
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.wisewolf.njmschool"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 29
         versionCode 22
         versionName "22.0"
@@ -96,6 +96,6 @@ dependencies {
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
     implementation "com.google.android.exoplayer:exoplayer:2.11.7"//exo player
 
-    implementation('org.jitsi.react:jitsi-meet-sdk:2.8.2') { transitive = true }
+    implementation('org.jitsi.react:jitsi-meet-sdk:2.10.0') { transitive = true }
     implementation 'com.squareup.picasso:picasso:2.71828'
 }

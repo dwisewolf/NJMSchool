@@ -476,7 +476,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="U"
+                                        android:text="M"
                                         android:textColor="@color/Basic"
                                         android:textStyle="bold"
                                         android:fontFamily="@font/robotoregular"
@@ -489,7 +489,7 @@
 
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
-                                        android:text="Unit Test" />
+                                        android:text="MidTerm Test" />
                                 </LinearLayout>
                             </androidx.cardview.widget.CardView>
 

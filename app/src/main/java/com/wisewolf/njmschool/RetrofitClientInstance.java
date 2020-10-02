@@ -157,6 +157,8 @@ public class RetrofitClientInstance {
                                   @Field("subject") String subject,
                                   @Field("question") String question,
                                   @Field("answer") String answer,
+                                  @Field("ans_Image") String ans_Image,
+                                  @Field("marks") String marks,
                                   @Field("que_Image") String que_Image);
 
         @POST("/MCQcheckansData/")
@@ -164,6 +166,7 @@ public class RetrofitClientInstance {
         Call<MCQSubmit> saveMCQ_Result(@Field("userid") String userid,
                                        @Field("clas") String clas,
                                        @Field("title") String title,
+                                       @Field("f_id") String f_id,
                                        @Field("subject") String subject);
 
         @POST("/notesFList/")

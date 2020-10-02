@@ -28,7 +28,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.wisewolf.njmschool.R;
-import com.wisewolf.njmschool.service.KillNotificationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,7 +146,6 @@ public class MainActivity extends AppCompatActivity {
                                     }
                                 }
                                 else {
-                                    startService(new Intent(MainActivity.this, KillNotificationService.class));
                                     GotoActivity();
                                 }
 

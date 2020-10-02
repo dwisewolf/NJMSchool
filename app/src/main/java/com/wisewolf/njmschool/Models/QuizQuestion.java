@@ -14,6 +14,26 @@ public class QuizQuestion
 
     private String[] url_list;
 
+    private String[] marks_list;
+
+    private String[] ans_flag_list;
+
+    public String[] getAns_flag_list() {
+        return ans_flag_list;
+    }
+
+    public void setAns_flag_list(String[] ans_flag_list) {
+        this.ans_flag_list = ans_flag_list;
+    }
+
+    public String[] getMarks_list() {
+            return marks_list;
+    }
+
+    public void setMarks_list(String[] marks_list) {
+        this.marks_list = marks_list;
+    }
+
     public String[] getFlag_list() {
         return flag_list;
     }
