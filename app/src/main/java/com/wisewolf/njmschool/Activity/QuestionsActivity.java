@@ -12,7 +12,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.StrictMode;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -49,7 +53,9 @@ import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.service.KillNotificationService;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -98,11 +104,15 @@ public class QuestionsActivity extends AppCompatActivity {
     List<HashMap> answFire=new ArrayList<>();
     QuizQuestion QuizQuestions;
     private final int GALLERY_ACTIVITY_CODE=400;
+    private String imgpath="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
+
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
 
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
@@ -902,6 +912,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void cameraopen() {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
@@ -909,8 +920,12 @@ public class QuestionsActivity extends AppCompatActivity {
         }
         else
         {
-            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+            Uri currentImageUri = getImageFileUri();
+            Intent intentPicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            intentPicture.putExtra(MediaStore.EXTRA_OUTPUT, currentImageUri);
+            startActivityForResult(intentPicture, CAMERA_REQUEST);
+          /*  Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);*/
         }
     }
 
@@ -920,23 +935,60 @@ public class QuestionsActivity extends AppCompatActivity {
 
         if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
         {
-            try {
-                final Uri imageUri = data.getData();
-                final InputStream imageStream = getApplicationContext().getContentResolver().openInputStream(imageUri);
-                final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                previewImg.setImageBitmap(selectedImage);
-                answerImage=selectedImage;
-                previewImg.setVisibility(View.VISIBLE);
-                imgFlag=1;
+           // try {
+              //  final Uri imageUri = data.getData();
+                //final InputStream imageStream = getApplicationContext().getContentResolver().openInputStream(imageUri);
+               // final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
+                final  Bitmap selectedImage=BitmapFactory.decodeFile(imgpath);
+                if(selectedImage!=null){
+                    previewImg.setImageBitmap(selectedImage);
+                    answerImage=selectedImage;
+                    previewImg.setVisibility(View.VISIBLE);
+                    imgFlag=1;
 
-            } catch (FileNotFoundException e) {
+                }
+
+           /* } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 Toast.makeText(QuestionsActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
-            }
+            }*/
 
         } else {
             Toast.makeText(QuestionsActivity.this, "  haven't picked Image", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private Uri getImageFileUri(){
+        // Create a storage directory for the images
+        // To be safe(r), you should check that the SD card is mounted
+        // using Environment.getExternalStorageState() before doing this
+
+        File imagePath = new File(Environment.getExternalStorageDirectory()
+                + "/Android/data/"
+                + getApplicationContext().getPackageName()
+                + "/Files");
+        if (!imagePath.exists()) {
+            if (!imagePath.mkdirs()) {
+                return null;
+            } else {
+                // create new folder
+            }
+        }
+
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File image = new File(imagePath, "njms_" + timeStamp + ".jpg");
+
+        imgpath=image.getAbsolutePath();
+        if (!image.exists()) {
+            try {
+                image.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        // Create an File Uri
+        return Uri.fromFile(image);
     }
 
     private void uploadImage() {

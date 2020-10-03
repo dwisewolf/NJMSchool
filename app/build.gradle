@@ -98,4 +98,5 @@ dependencies {
 
     implementation('org.jitsi.react:jitsi-meet-sdk:2.10.0') { transitive = true }
     implementation 'com.squareup.picasso:picasso:2.71828'
+    implementation 'com.google.firebase:firebase-messaging:20.3.0'//push notification
 }

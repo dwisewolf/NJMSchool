@@ -264,7 +264,7 @@ public class VideoListing extends AppCompatActivity {
 
         configVimeo();
        // offlinevideos();
-      //  notice();
+        notice();
 
         allVideoList = GlobalData.allVideoList;
 
@@ -412,18 +412,19 @@ public class VideoListing extends AppCompatActivity {
                     if (response.body() != null) {
                         if (response.body().size()!=0){
                         NoticeMod noticeMod=response.body().get(0);
+                        String url=noticeMod.getImage();
                         try {
 
-                            thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
+                           thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
                             Picasso.get().load(noticeMod.getImage()).into(new Target() {
                                 @Override
                                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                    thumb.setImage(ImageSource.bitmap(bitmap));
+                                    thumb.setImage(ImageSource.uri(url));
                                 }
 
                                 @Override
                                 public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                    thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
+                                  thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
                                 }
 
                                 @Override
