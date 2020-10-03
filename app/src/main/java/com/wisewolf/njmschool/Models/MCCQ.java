@@ -30,4 +30,10 @@ public class MCCQ{
 
     @SerializedName("userid")
     private String userid;
+
+    @SerializedName("marks")
+    private String marks;
+
+    @SerializedName("ans_Image")
+    private String ans_Image;
 }
