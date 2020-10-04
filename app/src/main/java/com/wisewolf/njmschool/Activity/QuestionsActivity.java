@@ -37,12 +37,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jsibbold.zoomage.ZoomageView;
+import com.mindorks.paracamera.Camera;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Feedback;
 import com.wisewolf.njmschool.Models.MCCQ;
@@ -80,7 +82,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
     private static final int CAMERA_REQUEST = 1888;
     private static final int MY_CAMERA_PERMISSION_CODE = 100;
-
+    Camera camera;
     String questions[];
     String answers[];
     String opt[];
@@ -201,74 +203,13 @@ public class QuestionsActivity extends AppCompatActivity {
                                         answer_questions=questions[flag];
                                         answer_image=image[flag];
                                         answer_date=formattedDate;
+
+
                                         uploadImage();
-                                        flag++;
-                                        if (flag < questions.length) {
-                                            Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
-
-                                            if (flags[flag].equals("true")) {
-                                                que_image.setVisibility(View.VISIBLE);
-                                                Glide.with(QuestionsActivity.this)
-                                                    .load("http://165.22.215.243/media/" + image[flag])
-                                                    .into(que_image);
-                                            } else {
-                                                que_image.setVisibility(View.GONE);
-                                            }
-                                            tv.setText(questions[flag]);
-                                            if (!opt[flag*4].replaceAll("\\s+", "").equals("")) {
-                                                radio_g.setVisibility(View.VISIBLE);
-                                                rb1.setVisibility(View.VISIBLE);
-                                                rb2.setVisibility(View.VISIBLE);
-                                                rb3.setVisibility(View.VISIBLE);
-                                                rb4.setVisibility(View.VISIBLE);
-                                                descripptive_answer.setVisibility(View.GONE);
-
-                                                if (answer_flags[flag].equals("true"))
-                                                    camera_View.setVisibility(View.VISIBLE);
-
-
-                                                rb1.setText(opt[flag * 4]);
-                                                rb2.setText(opt[flag * 4 + 1]);
-                                                rb3.setText(opt[flag * 4 + 2]);
-                                                rb4.setText(opt[flag * 4 + 3]);
-
-                                            }
-                                            else {
-                                                radio_g.setVisibility(View.GONE);
-                                                rb1.setVisibility(View.GONE);
-                                                rb2.setVisibility(View.GONE);
-                                                rb3.setVisibility(View.GONE);
-                                                rb4.setVisibility(View.GONE);
-                                                descripptive_answer.setVisibility(View.VISIBLE);
-                                                if (answer_flags[flag].equals("true"))
-                                                    camera_View.setVisibility(View.VISIBLE);
-                                            }
 
 
 
 
-                                        }
-                                        else {
-                                            marks = correct;
-                                            try {
-                                                tv.setVisibility(View.INVISIBLE);
-                                                que_image.setVisibility(View.INVISIBLE);
-                                                radio_g.setVisibility(View.INVISIBLE);
-                                                submitbutton.setText("Submit");
-
-
-                                                postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
-
-
-                                            }
-                                            catch (Exception e) {
-                                                Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
-                                            }
-
-
-                                        }
-
-                                        radio_g.clearCheck();
                                     }
                                     else {
                                         Toast.makeText(QuestionsActivity.this, "select a picture from gallery", Toast.LENGTH_SHORT).show();
@@ -285,11 +226,10 @@ public class QuestionsActivity extends AppCompatActivity {
                                         answersFire.put("subject", subject);
                                         answersFire.put("questions", questions[flag]);
                                         answersFire.put("ansText", ansText);
-                                        answersFire.put("image", image[flag]);
                                         answersFire.put("date", formattedDate);
-                                        answersFire.put("marks", formattedDate);
-                                        answersFire.put("que_Image", formattedDate);
-                                        answersFire.put("ans_Image", formattedDate);
+                                        answersFire.put("marks", marksList[flag]);
+                                        answersFire.put("que_Image", image[flag]);
+                                        answersFire.put("ans_Image", answer_ansText);
                                         answFire.add(answersFire);
                                         postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
                                         flag++;
@@ -400,11 +340,10 @@ public class QuestionsActivity extends AppCompatActivity {
                                     answersFire.put("subject", subject);
                                     answersFire.put("questions", questions[flag]);
                                     answersFire.put("ansText", ansText);
-                                    answersFire.put("image", image[flag]);
                                     answersFire.put("date", formattedDate);
-                                    answersFire.put("marks", formattedDate);
-                                    answersFire.put("que_Image", formattedDate);
-                                    answersFire.put("ans_Image", formattedDate);
+                                    answersFire.put("marks", marksList[flag]);
+                                    answersFire.put("que_Image", image[flag]);
+                                    answersFire.put("ans_Image", answer_ansText);
                                     answFire.add(answersFire);
                                     postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], ansText, image[flag]);
 
@@ -470,7 +409,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
                 }
                 else {
-                    postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
+                //    postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
                 }
 
             }
@@ -529,6 +468,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void aVoid) {
                         Toast.makeText(QuestionsActivity.this, "sent ...", Toast.LENGTH_SHORT).show();
+                        mProgressDialog.cancel();
                         Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
                         startActivity(intent);
                         finish();
@@ -851,7 +791,7 @@ public class QuestionsActivity extends AppCompatActivity {
             data.put("subject",subject);
             data.put("q_count",String.valueOf(flag));
             updateMap.put("data", data);
-            db.collection("timedOut")
+            db.collection("midterm_timedOut")
                 .add(updateMap)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -912,49 +852,62 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void cameraopen() {
+    private void cameraopen1() {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
         {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, MY_CAMERA_PERMISSION_CODE);
         }
         else
         {
-            Uri currentImageUri = getImageFileUri();
-            Intent intentPicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            intentPicture.putExtra(MediaStore.EXTRA_OUTPUT, currentImageUri);
-            startActivityForResult(intentPicture, CAMERA_REQUEST);
-          /*  Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-            startActivityForResult(cameraIntent, CAMERA_REQUEST);*/
+            Intent cameraIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+
+            startActivityForResult(cameraIntent, CAMERA_REQUEST);
+        }
+    }
+    private void cameraopen() {
+        // Create global camera reference in an activity or fragment
+
+
+// Build the camera
+        camera = new Camera.Builder()
+            .resetToCorrectOrientation(true)// it will rotate the camera bitmap to the correct orientation from meta data
+            .setTakePhotoRequestCode(1)
+            .setDirectory("pics")
+            .setName("ali_" + System.currentTimeMillis())
+            .setImageFormat(Camera.IMAGE_JPEG)
+            .setCompression(75)
+            .setImageHeight(1000)// it will try to achieve this height as close as possible maintaining the aspect ratio;
+            .build(this);
+
+        try {
+            camera.takePicture();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
 
-
-        if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
+       /* if (requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK)
         {
-           // try {
-              //  final Uri imageUri = data.getData();
-                //final InputStream imageStream = getApplicationContext().getContentResolver().openInputStream(imageUri);
-               // final Bitmap selectedImage = BitmapFactory.decodeStream(imageStream);
-                final  Bitmap selectedImage=BitmapFactory.decodeFile(imgpath);
-                if(selectedImage!=null){
-                    previewImg.setImageBitmap(selectedImage);
-                    answerImage=selectedImage;
-                    previewImg.setVisibility(View.VISIBLE);
-                    imgFlag=1;
+            Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+            previewImg.setImageBitmap(selectedImage);
+            answerImage=selectedImage;
+            previewImg.setVisibility(View.VISIBLE);
+            imgFlag=1;
+        }*/
+        if(requestCode == Camera.REQUEST_TAKE_PHOTO){
+            Bitmap bitmap = camera.getCameraBitmap();
+            if(bitmap != null) {
 
-                }
-
-           /* } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                Toast.makeText(QuestionsActivity.this, "Something went wrong", Toast.LENGTH_LONG).show();
-            }*/
-
-        } else {
-            Toast.makeText(QuestionsActivity.this, "  haven't picked Image", Toast.LENGTH_LONG).show();
+                previewImg.setImageBitmap(bitmap);
+                answerImage=bitmap;
+                previewImg.setVisibility(View.VISIBLE);
+                imgFlag=1;
+            }else{
+                Toast.makeText(this.getApplicationContext(),"Picture not taken!",Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -972,6 +925,8 @@ public class QuestionsActivity extends AppCompatActivity {
                 return null;
             } else {
                 // create new folder
+
+
             }
         }
 
@@ -1019,10 +974,89 @@ public class QuestionsActivity extends AppCompatActivity {
                                     String a=uri.toString();
                                     answer_ansText=a;
 
+                                    answersFire = new HashMap<String, String>();
+                                    answersFire.put("reg", GlobalData.regno);
+                                    answersFire.put("class", GlobalData.clas);
+                                    answersFire.put("title", title);
+                                    answersFire.put("subject", subject);
+                                    answersFire.put("questions", questions[flag]);
+                                    answersFire.put("ansText", answer_ansText);
+
+                                    answersFire.put("date", formattedDate);
+                                    answersFire.put("marks", marksList[flag]);
+                                    answersFire.put("que_Image", image[flag]);
+                                    answersFire.put("ans_Image", answer_ansText);
                                     answFire.add(answersFire);
+
+
                                     previewImg.setVisibility(View.GONE);
 
                                     postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], answer_ansText, image[flag]);
+                                    flag++;
+                                    if (flag < questions.length) {
+                                        Toast.makeText(QuestionsActivity.this, "Question "+String.valueOf(flag+1)+"/"+String.valueOf(questions.length), Toast.LENGTH_SHORT).show();
+
+                                        if (flags[flag].equals("true")) {
+                                            que_image.setVisibility(View.VISIBLE);
+                                            Glide.with(QuestionsActivity.this)
+                                                .load("http://165.22.215.243/media/" + image[flag])
+                                                .into(que_image);
+                                        } else {
+                                            que_image.setVisibility(View.GONE);
+                                        }
+                                        tv.setText(questions[flag]);
+                                        if (!opt[flag*4].replaceAll("\\s+", "").equals("")) {
+                                            radio_g.setVisibility(View.VISIBLE);
+                                            rb1.setVisibility(View.VISIBLE);
+                                            rb2.setVisibility(View.VISIBLE);
+                                            rb3.setVisibility(View.VISIBLE);
+                                            rb4.setVisibility(View.VISIBLE);
+                                            descripptive_answer.setVisibility(View.GONE);
+
+                                            if (answer_flags[flag].equals("true"))
+                                                camera_View.setVisibility(View.VISIBLE);
+
+
+                                            rb1.setText(opt[flag * 4]);
+                                            rb2.setText(opt[flag * 4 + 1]);
+                                            rb3.setText(opt[flag * 4 + 2]);
+                                            rb4.setText(opt[flag * 4 + 3]);
+
+                                        }
+                                        else {
+                                            radio_g.setVisibility(View.GONE);
+                                            rb1.setVisibility(View.GONE);
+                                            rb2.setVisibility(View.GONE);
+                                            rb3.setVisibility(View.GONE);
+                                            rb4.setVisibility(View.GONE);
+                                            descripptive_answer.setVisibility(View.VISIBLE);
+                                            if (answer_flags[flag].equals("true"))
+                                                camera_View.setVisibility(View.VISIBLE);
+                                        }
+
+
+
+
+                                    }
+                                    else {
+                                        marks = correct;
+                                        try {
+                                            tv.setVisibility(View.INVISIBLE);
+                                            que_image.setVisibility(View.INVISIBLE);
+                                            radio_g.setVisibility(View.INVISIBLE);
+                                            submitbutton.setVisibility(View.GONE);
+
+
+                                            postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);
+
+
+                                        }
+                                        catch (Exception e) {
+                                            Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
+                                        }
+
+
+                                    }
                                     mProgressDialog.cancel();
                                     imgFlag=0;
                                 }

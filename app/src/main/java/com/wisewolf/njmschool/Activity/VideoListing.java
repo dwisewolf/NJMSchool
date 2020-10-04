@@ -402,7 +402,7 @@ public class VideoListing extends AppCompatActivity {
             .show();
     }
 
-    private void notice()  {
+    private void notice1()  {
         try {
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
             Call<List<NoticeMod>> call = service.getNoticeImg(GlobalData.school_code,GlobalData.classes);
@@ -451,6 +451,36 @@ public class VideoListing extends AppCompatActivity {
         }catch (Exception ignored){
             String a="";
         }
+    }
+
+    private void notice() {
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+        String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.JPG" ;
+        if (GlobalData.clas.equals("12")){
+            school=GlobalData.school_code+"/class"+GlobalData.clas+GlobalData.sect+"/notice.JPG" ;
+        }
+
+        StorageReference islandRef = storageRef.child(school);
+
+        final long ONE_MEGABYTE = 1024 * 1024;
+        islandRef.getBytes(ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+            @Override
+            public void onSuccess(byte[] bytes) {
+
+                Bitmap bmp= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
+
+
+                thumb.setImage(ImageSource.bitmap(bmp));
+                // Data for "images/island.jpg" is returns, use this as needed
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                String a="";
+            }
+        });
     }
 
     private void bottomSheet() {
