@@ -186,6 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }, TIME_OUT);
     }
+
     private void getserverStatus() {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

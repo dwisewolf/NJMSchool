@@ -1,11 +1,14 @@
 package com.wisewolf.njmschool.Activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -17,7 +20,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.davemorrissey.labs.subscaleview.ImageSource;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.crashlytics.FirebaseCrashlytics;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
@@ -38,6 +45,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -45,12 +53,14 @@ import kotlin.text.Regex;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import android.provider.Settings.Secure;
 
 public class StudentProfileSelection extends AppCompatActivity {
     RecyclerView studentList;
     ProgressDialog mProgressDialog;
     TextView parents;
     String u_class,school;
+    SchoolDiff a;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +71,7 @@ public class StudentProfileSelection extends AppCompatActivity {
 
 
         try {
-            SchoolDiff a = (SchoolDiff) GlobalData.profiles.get(0);
+              a = (SchoolDiff) GlobalData.profiles.get(0);
             parents.setText(a.getFatherName() + "\nPhone - " + a.getMobileNum());
         }
         catch (Exception e) {
@@ -103,15 +113,8 @@ public class StudentProfileSelection extends AppCompatActivity {
                         startActivity(intent);
                     }
                     if (s.getCategory().equals("STUDENT")) {
-                        GlobalData.regno = s.getUserid();
-                        GlobalData.name = s.getName();
-                         getnews(s.getUserid());
+                         testPhonenumber(s);
 
-                        school=s.getUserid().substring(0,1);
-                        u_class=s.getClas();
-                        mProgressDialog.show();
-
-                        checkDate(school,u_class,s,s.getUserid().substring(0,3));
 
 
                     }
@@ -374,6 +377,104 @@ String a="";
                 break;
         }
         return  clasS;
+    }
+
+    private  void testPhonenumber(SchoolDiff s){
+        String deviceId;
+        deviceId = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("phoneNumberValidation").document(a.getMobileNum()+s.getUserid()).get()
+            .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    String id = (String) documentSnapshot.get("deviceId");
+                    if (id==null){
+                        alertforPhone(s,deviceId);
+                    }
+                    else {
+                        if (id.equals(deviceId)){
+                            GlobalData.regno = s.getUserid();
+                            GlobalData.name = s.getName();
+                            getnews(s.getUserid());
+
+                            school=s.getUserid().substring(0,1);
+                            u_class=s.getClas();
+                            mProgressDialog.show();
+
+                            checkDate(school,u_class,s,s.getUserid().substring(0,3));
+                            Toast.makeText(StudentProfileSelection.this, "Device identified", Toast.LENGTH_SHORT).show();
+
+                        }
+                        else
+                            Toast.makeText(StudentProfileSelection.this, "wrong device,please contact office", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            })
+            .addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+
+                }
+            });
+
+
+
+
+    }
+
+    private void alertforPhone(SchoolDiff s,String deviceId) {
+        new AlertDialog.Builder(StudentProfileSelection.this)
+            .setTitle("Phone Number Validation")
+            .setCancelable(false)
+            .setMessage("Your NJMS app will be registered on this mobile device. If you need access on another phone, please contact the school office. ")
+
+            // Specifying a listener allows you to take an action before dismissing the dialog.
+            // The dialog is automatically dismissed when a dialog button is clicked.
+            .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    try {
+                        HashMap hm = new HashMap();
+                        hm.put("deviceId", deviceId);
+
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("phoneNumberValidation").document(a.getMobileNum()+s.getUserid()).set(hm)
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    GlobalData.regno = s.getUserid();
+                                    GlobalData.name = s.getName();
+                                    getnews(s.getUserid());
+
+                                    school=s.getUserid().substring(0,1);
+                                    u_class=s.getClas();
+                                    mProgressDialog.show();
+
+                                    checkDate(school,u_class,s,s.getUserid().substring(0,3));
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(StudentProfileSelection.this, "Error network", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                    } catch (Exception e) {
+                        Toast.makeText(StudentProfileSelection.this, e.toString(), Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            })
+
+            // A null listener allows the button to dismiss the dialog and take no further action.
+            .setNegativeButton("CLOSE", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    finish();
+                }
+            })
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show();
     }
 
 

@@ -7,9 +7,6 @@
     android:background="@color/Basic"
     tools:context=".Activity.VideoListing">
 
-
-
-
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
@@ -97,7 +94,7 @@
         app:layout_constraintGuide_percent="0.25" />
 
 
-    <com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+    <com.jsibbold.zoomage.ZoomageView
         android:translationZ="10dp"
         android:scaleType="fitXY"
         android:id="@+id/thumb"
@@ -176,7 +173,7 @@
                         android:background="@color/Basic"
                         android:gravity="center"
                         android:padding="15dp"
-                        android:text="INSTRUCTIONS"
+                        android:text="@string/instructions"
                         android:textColor="@color/white"
                         android:textSize="14dp" />
                 </LinearLayout>
@@ -613,15 +610,12 @@
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.75" />
 
-
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline31"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_percent="0.94" />
-
-
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline33"
@@ -647,8 +641,6 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.2652068" />
-
-
 
     <ImageView
         android:id="@+id/logout"

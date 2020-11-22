@@ -103,12 +103,14 @@ public class BackgroundNotificationService extends IntentService {
             mNotifyMgr.notify(1, notificationBuilder.build());
         }*/
     }
+
     private  void updateNotification(int currentProgress) {
  //notificationBuilder.setContentTitle(extra2+"\n");
         notificationBuilder.setProgress(100, currentProgress, false);
         notificationBuilder.setContentText( name[1]+" Downloaded: " + currentProgress + "%");
         notificationManager.notify(0, notificationBuilder.build());
     }
+
     private void sendProgressUpdate(boolean downloadComplete) {
 
         Intent intent = new Intent(VideoPlay.PROGRESS_UPDATE);
@@ -131,6 +133,7 @@ public class BackgroundNotificationService extends IntentService {
     public void onTaskRemoved(Intent rootIntent) {
         notificationManager.cancel(0);
     }
+
     @SuppressLint("StaticFieldLeak")
     private class Downback extends AsyncTask<String, Integer, String> {
         @Override

@@ -96,7 +96,7 @@ public class NotificationHelper {
         builder.setSmallIcon(R.drawable.logo_njms);
         builder.setContentIntent(mContentIntent);
         builder.setOngoing(true);
-builder.setContentText(contentText);
+        builder.setContentText(contentText);
         builder.setSubText(name);
         //API level 16
         builder.setNumber(100);

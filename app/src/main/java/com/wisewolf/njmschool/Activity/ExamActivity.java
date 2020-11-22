@@ -103,13 +103,15 @@ public class ExamActivity extends AppCompatActivity {
                     try {
                         if (response.body() != null) {
                             mProgressDialog.cancel();
-                            mcq_recycler.setAdapter(new QuizHeadAdapter(response.body(), mcq_recycler, new QuizHeadAdapter.OnItemClickListener() {
+                            mcq_recycler.setAdapter(new QuizHeadAdapter(response.body(), mcq_recycler, getApplicationContext(),new QuizHeadAdapter.OnItemClickListener() {
 
                                 @Override
                                 public void onItemClick(QuizHead s) {
                                  if (s.getDate().equals(formattedDate)) {
-                                     String topic=s.getSubject().toUpperCase();
 
+                                     String res=dbb.getExamStatus(GlobalData.regno,s.getTitle());
+                                     if (res.equals("")){
+                                         String topic=s.getSubject().toUpperCase();
                                          Intent intent = new Intent(ExamActivity.this, QuestionsActivity.class);
                                          intent.putExtra("title", s.getTitle());
                                          intent.putExtra("subject", s.getSubject());
@@ -117,6 +119,13 @@ public class ExamActivity extends AppCompatActivity {
                                          intent.putExtra("id", s.getTitle());
                                          startActivity(intent);
                                          finish();
+                                     }
+                                     else {
+                                         Toast.makeText(ExamActivity.this, "You completed this exam", Toast.LENGTH_SHORT).show();
+                                     }
+
+
+
 
                                  }else
                                      Toast.makeText(ExamActivity.this, "Exam Date is on "+s.getDate(), Toast.LENGTH_SHORT).show();

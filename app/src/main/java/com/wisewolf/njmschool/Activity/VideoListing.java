@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -37,6 +38,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -53,6 +55,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.jsibbold.zoomage.ZoomageView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vimeo.networking.Configuration;
@@ -112,7 +115,7 @@ public class VideoListing extends AppCompatActivity {
     StorageReference storageRef;
     private ProgressDialog mProgressDialog;
     ImageView topic,logout;
-    SubsamplingScaleImageView thumb;
+    ZoomageView thumb;
     int exitflag=0;
     ArrayList allVideoList = new ArrayList();
     TextView offlineFlagTextview,news_id,instructions,offlinepage,closevideo,teachers, refresh_media;
@@ -402,7 +405,7 @@ public class VideoListing extends AppCompatActivity {
             .show();
     }
 
-    private void notice1()  {
+    private void notice()  {
         try {
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
             Call<List<NoticeMod>> call = service.getNoticeImg(GlobalData.school_code,GlobalData.classes);
@@ -415,23 +418,10 @@ public class VideoListing extends AppCompatActivity {
                         String url=noticeMod.getImage();
                         try {
 
-                           thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
-                            Picasso.get().load(noticeMod.getImage()).into(new Target() {
-                                @Override
-                                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                    thumb.setImage(ImageSource.uri(url));
-                                }
-
-                                @Override
-                                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                                  thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
-                                }
-
-                                @Override
-                                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                                    thumb.setImage(ImageSource.resource(R.drawable.logo_njms));
-                                }
-                            });
+                            Glide.with(VideoListing.this)
+                                .load(url)
+                                .into(thumb);
+                             
                         }
                         catch (Exception e) {
                             e.printStackTrace();
@@ -453,7 +443,7 @@ public class VideoListing extends AppCompatActivity {
         }
     }
 
-    private void notice() {
+    private void notice1() {
         storage = FirebaseStorage.getInstance();
         storageRef = storage.getReference();
         String school=GlobalData.school_code+"/class"+GlobalData.clas+"/notice.JPG" ;
@@ -471,7 +461,7 @@ public class VideoListing extends AppCompatActivity {
                 Bitmap bmp= BitmapFactory.decodeByteArray(bytes,0,bytes.length);
 
 
-                thumb.setImage(ImageSource.bitmap(bmp));
+             //   thumb.setImage(ImageSource.bitmap(bmp));
                 // Data for "images/island.jpg" is returns, use this as needed
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -1223,6 +1213,8 @@ public class VideoListing extends AppCompatActivity {
     }
 
     private void mediaPlay(VideoList videoList) {
+        Toast.makeText(VideoListing.this, "VideoListing.class", Toast.LENGTH_SHORT).show();
+
         mProgressDialog = new ProgressDialog(VideoListing.this);
         mProgressDialog.setMessage(" Please wait . . .");
         mProgressDialog.setIndeterminate(true);

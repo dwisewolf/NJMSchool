@@ -54,13 +54,20 @@ public class KillNotificationService extends Service {
 
             SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String date = df.format(c);
-
-//TODO duration change
             HashMap hm = new HashMap();
-            hm.put("user", GlobalData.regno);
-            hm.put("time", c);
+            // TODO duration change
+            if (GlobalData.tittle!=null) {
+                hm.put("user", GlobalData.regno);
+                hm.put("time", c);
+                hm.put("title", GlobalData.tittle);
+            }
+            else {
+                hm.put("user", GlobalData.regno);
+                hm.put("time", c);
+            }
 
-            db.collection("closedApp").add(hm)
+
+            db.collection("midterm_closedApp").add(hm)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {

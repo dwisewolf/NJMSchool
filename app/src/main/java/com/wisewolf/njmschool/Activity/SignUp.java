@@ -8,6 +8,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.NotificationCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -29,6 +30,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.nabinbhandari.android.permissions.PermissionHandler;
+import com.nabinbhandari.android.permissions.Permissions;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Response;
 import com.wisewolf.njmschool.Models.SchoolDiff;
@@ -37,6 +40,7 @@ import com.wisewolf.njmschool.R;
 import com.wisewolf.njmschool.RetrofitClientInstance;
 import com.wisewolf.njmschool.Validation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -67,6 +71,7 @@ public class SignUp extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+        checkPerm();
 
         anim = findViewById(R.id.child_gif2);
         fgpswd = findViewById(R.id.fpasswd);
@@ -139,6 +144,7 @@ public class SignUp extends AppCompatActivity {
                     @Override
                     public void onFailure(Call<Validation> call, Throwable t) {
                         Toast.makeText(SignUp.this, "fail", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SignUp.this, String.valueOf(t), Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -304,7 +310,7 @@ public class SignUp extends AppCompatActivity {
                     editor.putString("username", phone);
                     editor.putString("pass", pass);
                     editor.putString("login", "Not-logged");
-                    editor.commit();
+                    editor.apply();
 
                     Intent msgIntent = new Intent(SignUp.this, StudentProfileSelection.class);
                     startActivity(msgIntent);
@@ -317,6 +323,27 @@ public class SignUp extends AppCompatActivity {
 
     private void generateDataList(List<Response> photoList) {
 
+    }
+
+    private void checkPerm() {
+        String[] permissions = {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.CAMERA,Manifest.permission.INTERNET};
+        String rationale = "Please provide  permission so that you can ...";
+        Permissions.Options options = new Permissions.Options()
+            .setRationaleDialogTitle("Info")
+            .setSettingsDialogTitle("Warning");
+
+        Permissions.check(this/*context*/, permissions, rationale, options, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                // do your task.
+            }
+
+            @Override
+            public void onDenied(Context context, ArrayList<String> deniedPermissions) {
+                // permission denied, block the feature.
+            }
+        });
     }
 
 

@@ -19,8 +19,8 @@ public class TeacherDetails{
 	@SerializedName("id")
 	private int id;
 
-	@SerializedName("Notes")
-	private String notes;
+	@SerializedName("info")
+	private String info;
 
 	public String getSchoolCode(){
 		return schoolCode;
@@ -43,6 +43,6 @@ public class TeacherDetails{
 	}
 
 	public String getNotes(){
-		return notes;
+		return info;
 	}
 }

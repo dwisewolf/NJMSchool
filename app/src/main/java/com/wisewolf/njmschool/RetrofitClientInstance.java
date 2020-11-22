@@ -34,7 +34,7 @@ import retrofit2.http.Query;
 public class RetrofitClientInstance {
     private static Retrofit retrofit, retrofitOut;
 
-    private static final String BASE_URL = "http://165.22.215.243/";
+    private static final String BASE_URL = "http://134.209.19.157/";
 
     public static Retrofit getRetrofitInstance() {
         OkHttpClient.Builder client = new OkHttpClient.Builder();

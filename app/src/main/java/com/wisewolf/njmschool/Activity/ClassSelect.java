@@ -27,10 +27,14 @@ import retrofit2.Response;
 
 public class ClassSelect extends AppCompatActivity {
     RecyclerView classList;
-    String[] TeacherClass = {"NURSERY", "LKG", "UKG", "CLASS I", "CLASS II",
-        "CLASS III", "CLASS IV", "CLASS V", "CLASS VI", "CLASS VII", "CLASS VIII",
-        "CLASS VI-NCERT", "CLASS VII-NCERT", "CLASS VIII-NCERT",
-        "CLASS IX", "CLASS X", "CLASS XII_C", "CLASS XII_H", "CLASS XII_S"};
+    String[] TeacherClass = {
+        "NURSERY", "LKG", "UKG", "CLASS I", "CLASS II",
+        "CLASS III", "CLASS IV", "CLASS V", "CLASS VI",
+        "CLASS VII", "CLASS VIII","CLASS VI-NCERT",
+        "CLASS VII-NCERT", "CLASS VIII-NCERT","CLASS IX",
+        "CLASS X", "CLASS XI_C", "CLASS XI_H", "CLASS XI_S",
+        "CLASS XII_C", "CLASS XII_H", "CLASS XII_S"
+    };
     String name, clas, school, phone, sect;
     ProgressDialog mProgressDialog;
 
@@ -99,7 +103,18 @@ public class ClassSelect extends AppCompatActivity {
                     classid = "X";
                 } else if (item.equals("CLASS XI")) {
                     classid = "XI";
-                } else if (item.equals("CLASS XII_C")) {
+
+            } else if (item.equals("CLASS XI_C")) {
+                classid = "XI";
+                GlobalData.sect = "C";
+            } else if (item.equals("CLASS XI_H")) {
+                classid = "XI";
+                GlobalData.sect = "H";
+            } else if (item.equals("CLASS XI_S")) {
+                classid = "XI";
+                GlobalData.sect = "S";
+            }
+            else if (item.equals("CLASS XII_C")) {
                     classid = "XII";
                     GlobalData.sect = "C";
                 } else if (item.equals("CLASS XII_H")) {
@@ -226,4 +241,5 @@ public class ClassSelect extends AppCompatActivity {
         }
         return clasS;
     }
+
 }

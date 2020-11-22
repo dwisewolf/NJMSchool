@@ -172,4 +172,6 @@ public class GlobalData   {
     public static String school_code ;
     public static String classes ;
 
+    public static String tittle ;
+
 }

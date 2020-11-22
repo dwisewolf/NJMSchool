@@ -1,5 +1,7 @@
 package com.wisewolf.njmschool.Adapter;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.wisewolf.njmschool.Database.OfflineDatabase;
+import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.QuizHead;
 import com.wisewolf.njmschool.Models.SchoolDiff;
 import com.wisewolf.njmschool.R;
@@ -18,15 +22,18 @@ public class QuizHeadAdapter extends RecyclerView.Adapter<QuizHeadAdapter.QuizHe
     private List quizHeads;
     private RecyclerView quizHeads_recyclerView;
     private final  OnItemClickListener listener;
+    Context context;
+    OfflineDatabase dbb;
 
     public interface OnItemClickListener {
         void onItemClick(QuizHead s);
     }
 
-    public QuizHeadAdapter(List quizHeads, RecyclerView quizHeads_recyclerView, OnItemClickListener itemClickListener) {
+    public QuizHeadAdapter(List quizHeads, RecyclerView quizHeads_recyclerView, Context context, OnItemClickListener itemClickListener) {
         this.quizHeads = quizHeads;
         this.quizHeads_recyclerView = quizHeads_recyclerView;
         this.listener = itemClickListener;
+        this.context = context;
     }
 
     @NonNull
@@ -70,8 +77,22 @@ public class QuizHeadAdapter extends RecyclerView.Adapter<QuizHeadAdapter.QuizHe
             title.setText("Title - " +o.getTitle());
             desc.setText("Chapter -  :"+o.getDescription());
             time.setText("Time (Min) : "+o.getTime());
-            date.setText("Exam Date : "+o.getDate());
+            getStatus( o);
+            //date.setText("Exam Date : "+o.getDate());
 
+        }
+
+        public void getStatus(QuizHead o){
+            dbb=new OfflineDatabase(context);
+            String res=dbb.getExamStatus(GlobalData.regno,o.getTitle());
+            if (res.equals("")){
+                date.setText("Not Completed");
+                date.setTextColor(Color.parseColor("#8BC34A"));
+            }
+            else {
+                date.setText(" Completed");
+                date.setTextColor(Color.parseColor("#ff4d4d"));
+            }
         }
         public void bind(final Object o, final OnItemClickListener listener, final int position) {
 

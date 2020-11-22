@@ -45,6 +45,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jsibbold.zoomage.ZoomageView;
 import com.mindorks.paracamera.Camera;
+import com.wisewolf.njmschool.Database.OfflineDatabase;
 import com.wisewolf.njmschool.Globals.GlobalData;
 import com.wisewolf.njmschool.Models.Feedback;
 import com.wisewolf.njmschool.Models.MCCQ;
@@ -107,6 +108,7 @@ public class QuestionsActivity extends AppCompatActivity {
     QuizQuestion QuizQuestions;
     private final int GALLERY_ACTIVITY_CODE=400;
     private String imgpath="";
+    OfflineDatabase dbb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +123,7 @@ public class QuestionsActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
+        dbb = new OfflineDatabase(getApplicationContext());
         initProgress();
         startService(new Intent(QuestionsActivity.this, KillNotificationService.class));
 
@@ -195,7 +198,7 @@ public class QuestionsActivity extends AppCompatActivity {
                             try {
                                 if (answer_flags[flag].equals("true")){
                                     if (imgFlag==1){
-
+                                      //  submitbutton.setVisibility(View.GONE);
                                         answer_reg=GlobalData.regno;
                                         answer_class=GlobalData.clas;
                                         answer_title=title;
@@ -212,13 +215,14 @@ public class QuestionsActivity extends AppCompatActivity {
 
                                     }
                                     else {
-                                        Toast.makeText(QuestionsActivity.this, "select a picture from gallery", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(QuestionsActivity.this, "please click a photo", Toast.LENGTH_SHORT).show();
                                     }
 
                                 }
 
                                 else {
                                     if (!ansText.equals("")){
+                                   //     submitbutton.setVisibility(View.GONE);
                                         answersFire = new HashMap<String, String>();
                                         answersFire.put("reg", GlobalData.regno);
                                         answersFire.put("class", GlobalData.clas);
@@ -239,12 +243,13 @@ public class QuestionsActivity extends AppCompatActivity {
                                             if (flags[flag].equals("true")) {
                                                 que_image.setVisibility(View.VISIBLE);
                                                 Glide.with(QuestionsActivity.this)
-                                                    .load("http://165.22.215.243/media/" + image[flag])
+                                                    .load("http://134.209.19.157/media/" + image[flag])
                                                     .into(que_image);
                                             } else {
                                                 que_image.setVisibility(View.GONE);
                                             }
                                             tv.setText(questions[flag]);
+                                            marks_view.setText("marks - "+marksList[flag]);
                                             if (!opt[flag*4].replaceAll("\\s+", "").equals("")) {
                                                 radio_g.setVisibility(View.VISIBLE);
                                                 rb1.setVisibility(View.VISIBLE);
@@ -329,6 +334,7 @@ public class QuestionsActivity extends AppCompatActivity {
                         else {
 
                             try {
+                          //      submitbutton.setVisibility(View.GONE);
                                 RadioButton uans = (RadioButton) findViewById(radio_g.getCheckedRadioButtonId());
                                 String ansText = uans.getText().toString();
 //              Toast.makeText(getApplicationContext(), ansText, Toast.LENGTH_SHORT).show();
@@ -371,12 +377,13 @@ public class QuestionsActivity extends AppCompatActivity {
                                     if (flags[flag].equals("true")) {
                                         que_image.setVisibility(View.VISIBLE);
                                         Glide.with(QuestionsActivity.this)
-                                            .load("http://165.22.215.243/media/" + image[flag])
+                                            .load("http://134.209.19.157/media/" + image[flag])
                                             .into(que_image);
                                     } else {
                                         que_image.setVisibility(View.GONE);
                                     }
                                     tv.setText(questions[flag]);
+                                    marks_view.setText("marks - "+marksList[flag]);
                                     rb1.setText(opt[flag * 4]);
                                     rb2.setText(opt[flag * 4 + 1]);
                                     rb3.setText(opt[flag * 4 + 2]);
@@ -424,6 +431,7 @@ public class QuestionsActivity extends AppCompatActivity {
         });
     }
 
+    //alert showing that quiz is going to start
     private void alertforQuiz() {
         new AlertDialog.Builder(QuestionsActivity.this)
             .setTitle("Unit Test")
@@ -437,6 +445,7 @@ public class QuestionsActivity extends AppCompatActivity {
                     try {
 
                         getQuizHead(title);
+                        GlobalData.tittle=title;
                     } catch (Exception e) {
                         Toast.makeText(QuestionsActivity.this, e.toString(), Toast.LENGTH_SHORT).show();
                     }
@@ -455,6 +464,7 @@ public class QuestionsActivity extends AppCompatActivity {
             .show();
     }
 
+    //submit all answers to firebase , called at end of each exam
     private void submitfirebase(List<HashMap> answFire) {
         mProgressDialog.setMessage("Uploading Results ..please wait");
         mProgressDialog.show();
@@ -503,6 +513,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
+    //get the questions from api
     private void getQuizHead(String title) {
         mProgressDialog.show();
 
@@ -572,7 +583,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                 marks_view.setText("marks - "+marksList[flag]);
                                 if (flags[flag].equals("true")) {
                                     Glide.with(QuestionsActivity.this)
-                                        .load("http://165.22.215.243/media/" + image[flag])
+                                        .load("http://134.209.19.157/media/" + image[flag])
                                         .into(que_image);
                                 }
                                 if (!opt[0].replaceAll("\\s+", "").equals("")) {
@@ -640,13 +651,20 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
+    //count added to local db
     private void submitCount() {
         mProgressDialog.setMessage("Uploading counts ..please wait");
         mProgressDialog.show();
         // Access a Cloud Firestore instance from your Activity
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         try {
-            Map<String, Object> updateMap = new HashMap();
+
+           String y= dbb.insertmidCount(String.valueOf(questions.length),GlobalData.regno,subject,title,formattedDate);
+           if (y.equals("y")){
+               Toast.makeText(QuestionsActivity.this, "Count uploaded to local", Toast.LENGTH_SHORT).show();
+               mProgressDialog.cancel();}
+
+          /* for firebase Map<String, Object> updateMap = new HashMap();
             HashMap<String, String> data = new HashMap<String, String>();
             data.put("count",String.valueOf(questions.length));
             data.put("reg",GlobalData.regno);
@@ -671,7 +689,8 @@ public class QuestionsActivity extends AppCompatActivity {
                         Toast.makeText(QuestionsActivity.this, "Internet needed to submit result(FB224)", Toast.LENGTH_SHORT).show();
 
                     }
-                });
+                });*/
+
         } catch (Exception e) {
             String a = "";
             mProgressDialog.cancel();
@@ -680,16 +699,51 @@ public class QuestionsActivity extends AppCompatActivity {
         }
     }
 
+    //submit each answer to database , added to local db
     private void postMCQ_Answer(final String userid, String clas, String title, String subject, String question, String answer, String image) {
         try {
             mProgressDialog.show();
+            String result=dbb.insert_postMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer,image ,"0",image);
+            if (result.equals("y")){
+                Toast.makeText(QuestionsActivity.this, "answer uploaded to local", Toast.LENGTH_SHORT).show();
+                mProgressDialog.cancel();
+                submitbutton.setVisibility(View.VISIBLE);
+            }
+            else {
+                mProgressDialog.cancel();
+                Toast.makeText(QuestionsActivity.this, "error", Toast.LENGTH_SHORT).show();
+            }
+
+
+        } catch (Exception ignored) {
+            mProgressDialog.cancel();
+            String a = "";
+        }
+
+
+    }
+
+    //duplicated for debug
+   /* private void postMCQ_Answer(final String userid, String clas, String title, String subject, String question, String answer, String image) {
+        try {
+            mProgressDialog.show();
+            String result=dbb.insert_postMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer,image ,"0",image);
+            if (result.equals("y")){
+
+                mProgressDialog.cancel();
+                submitbutton.setVisibility(View.VISIBLE);
+            }
+            else {
+
+            }
+
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
             Call<MCCQ> call = service.saveMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer,image ,"0",image);
             call.enqueue(new Callback<MCCQ>() {
                 @Override
                 public void onResponse(Call<MCCQ> call, Response<MCCQ> response) {
                     mProgressDialog.cancel();
-
+                    submitbutton.setVisibility(View.VISIBLE);
 
                 }
 
@@ -706,11 +760,53 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
     }
+*/
 
+    //submmit final results to db
+    //cal the api at final stage ,
+    // so submit firebase is done first
     private void postMCQ_Result(String userid, String clas, String title, String subject, final List<HashMap> answFire) {
         try {
             mProgressDialog.setMessage("Uploading results...");
             mProgressDialog.show();
+
+            String result=dbb.insert_postMCQ_Result(GlobalData.regno, GlobalData.classes, title,subject, GlobalData.regno+"_"+id);
+            if (result.equals("y"))
+            {
+                Toast.makeText(QuestionsActivity.this, "Result uploaded to local", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else {
+                mProgressDialog.cancel();
+                Toast.makeText(QuestionsActivity.this, "Error in result submission", Toast.LENGTH_SHORT).show();
+            }
+
+
+        } catch (Exception ignored) {
+            mProgressDialog.cancel();
+            String a = "";
+        }
+
+
+    }
+
+   /* private void postMCQ_Result(String userid, String clas, String title, String subject, final List<HashMap> answFire) {
+        try {
+            mProgressDialog.setMessage("Uploading results...");
+            mProgressDialog.show();
+
+            String result=dbb.insert_postMCQ_Result(GlobalData.regno, GlobalData.classes, title,subject, GlobalData.regno+"_"+id);
+            if (result.equals("y"))
+            {
+                Intent intent = new Intent(getApplicationContext(), ResultActivity.class);
+                startActivity(intent);
+                finish();
+            }
+            else {}
+            //do pending here
+
             final RetrofitClientInstance.GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(RetrofitClientInstance.GetDataService.class);
             Call<MCQSubmit> call = service.saveMCQ_Result(GlobalData.regno, GlobalData.classes, title, GlobalData.regno+"_"+id,subject);
             call.enqueue(new Callback<MCQSubmit>() {
@@ -735,6 +831,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
     }
+*/
 
     @Override
     public void onBackPressed() {
@@ -778,6 +875,8 @@ public class QuestionsActivity extends AppCompatActivity {
 
     }
 
+
+    //adding timed out user and exam data to firebase
     private void timedOUtUser(int flag) {
         mProgressDialog.setMessage("Uploading counts ..please wait");
         mProgressDialog.show();
@@ -817,6 +916,37 @@ public class QuestionsActivity extends AppCompatActivity {
         }
     }
 
+    //submit each answer to db for timedout users
+    private void postMCQ_AnswerTieout(final int i, final int count, final String title, final String subject, String question, String answer, String image) {
+        try {
+            mProgressDialog.show();
+            String result=dbb.insert_postMCQ_Answer(GlobalData.regno, GlobalData.classes, title, subject, question, answer, image,"0",image);
+            if (result.equals("y")){
+                Toast.makeText(QuestionsActivity.this, "timeout"+String.valueOf(i)+"  "+String.valueOf(count), Toast.LENGTH_SHORT).show();
+                if (i<count){
+                    postMCQ_AnswerTieout(i+1, count, title, subject, questions[flag], "TIMED OUT", "TIMED OUT");
+                    wrong++;
+
+                }
+                else {
+                    postMCQ_Result(GlobalData.regno, GlobalData.clas, title, subject,answFire);
+                }
+            }
+            else {
+                mProgressDialog.cancel();
+                Toast.makeText(QuestionsActivity.this, "error adding", Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (Exception ignored) {
+            mProgressDialog.cancel();
+            String a = "";
+        }
+
+
+    }
+
+
+  /*  //submit each answer to db for timedout users
     private void postMCQ_AnswerTieout(final int i, final int count, final String title, final String subject, String question, String answer, String image) {
         try {
             mProgressDialog.show();
@@ -851,6 +981,7 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
     }
+*/
 
     private void cameraopen1() {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
@@ -864,6 +995,7 @@ public class QuestionsActivity extends AppCompatActivity {
             startActivityForResult(cameraIntent, CAMERA_REQUEST);
         }
     }
+
     private void cameraopen() {
         // Create global camera reference in an activity or fragment
 
@@ -875,8 +1007,8 @@ public class QuestionsActivity extends AppCompatActivity {
             .setDirectory("pics")
             .setName("ali_" + System.currentTimeMillis())
             .setImageFormat(Camera.IMAGE_JPEG)
-            .setCompression(75)
-            .setImageHeight(1000)// it will try to achieve this height as close as possible maintaining the aspect ratio;
+            .setCompression(50)
+            .setImageHeight(500)// it will try to achieve this height as close as possible maintaining the aspect ratio;
             .build(this);
 
         try {
@@ -899,6 +1031,7 @@ public class QuestionsActivity extends AppCompatActivity {
         }*/
         if(requestCode == Camera.REQUEST_TAKE_PHOTO){
             Bitmap bitmap = camera.getCameraBitmap();
+            bitmap=camera.resizeAndGetCameraBitmap(500);
             if(bitmap != null) {
 
                 previewImg.setImageBitmap(bitmap);
@@ -990,6 +1123,8 @@ public class QuestionsActivity extends AppCompatActivity {
 
 
                                     previewImg.setVisibility(View.GONE);
+                                    answerImage.recycle();
+                                    imgFlag=0;
 
                                     postMCQ_Answer(GlobalData.regno, GlobalData.clas, title, subject, questions[flag], answer_ansText, image[flag]);
                                     flag++;
@@ -999,7 +1134,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                         if (flags[flag].equals("true")) {
                                             que_image.setVisibility(View.VISIBLE);
                                             Glide.with(QuestionsActivity.this)
-                                                .load("http://165.22.215.243/media/" + image[flag])
+                                                .load("http://134.209.19.157/media/" + image[flag])
                                                 .into(que_image);
                                         } else {
                                             que_image.setVisibility(View.GONE);
@@ -1044,7 +1179,7 @@ public class QuestionsActivity extends AppCompatActivity {
                                             tv.setVisibility(View.INVISIBLE);
                                             que_image.setVisibility(View.INVISIBLE);
                                             radio_g.setVisibility(View.INVISIBLE);
-                                            submitbutton.setVisibility(View.GONE);
+                                          //  submitbutton.setVisibility(View.GONE);
 
 
                                             postMCQ_Result(GlobalData.regno, GlobalData.classes, title, subject,answFire);

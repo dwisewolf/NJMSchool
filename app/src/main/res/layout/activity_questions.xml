@@ -104,7 +104,7 @@
                 android:padding="5dp"
                 android:gravity="start"
                 android:ems="10"
-                android:inputType="textPersonName"
+                android:inputType="textMultiLine"
                 android:hint="write your answer here ...." />
 
             <ImageView

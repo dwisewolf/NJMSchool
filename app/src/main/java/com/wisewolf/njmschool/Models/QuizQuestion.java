@@ -10,7 +10,7 @@ public class QuizQuestion
 
     private String[] questions_list;
 
-    private String[] flag_list;
+    private String[] que_flag_list;
 
     private String[] url_list;
 
@@ -35,11 +35,11 @@ public class QuizQuestion
     }
 
     public String[] getFlag_list() {
-        return flag_list;
+        return que_flag_list;
     }
 
     public void setFlag_list(String[] flag_list) {
-        this.flag_list = flag_list;
+        this.que_flag_list = flag_list;
     }
 
     public String[] getUrl_list() {

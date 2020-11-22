@@ -25,4 +25,5 @@
     <string name="no_task_added">No Task Added</string>
     <string name="daily_task">Daily Task</string>
     <string name="date">Date</string>
+    <string name="instructions">INSTRUCTIONS</string>
 </resources>

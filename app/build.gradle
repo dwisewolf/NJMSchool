@@ -5,16 +5,16 @@ apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     buildToolsVersion "29.0.2"
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.wisewolf.njmschool"
         minSdkVersion 23
-        targetSdkVersion 29
-        versionCode 22
-        versionName "22.0"
+        targetSdkVersion 30
+        versionCode 30
+        versionName "30.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -100,4 +100,5 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'com.google.firebase:firebase-messaging:20.3.0'//push notification
     implementation 'com.mindorks:paracamera:0.2.2'
+    implementation 'com.nabinbhandari.android:permissions:3.8'
 }

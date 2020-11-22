@@ -16,9 +16,9 @@ import java.util.List;
 public class OfflineDatabase extends SQLiteOpenHelper {
     SQLiteDatabase dh;
     // Database Version
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
     // Database Name
-    private static final String DATABASE_NAME = "OfflineDB6";
+    private static final String DATABASE_NAME = "OfflineDB8";
 
     public OfflineDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -38,6 +38,15 @@ public class OfflineDatabase extends SQLiteOpenHelper {
 
         String CREATE_TABLE_optionTest = "CREATE TABLE optionTest(id varchar PRIMARY KEY ,userid varchar ,optionId varchar  )";
         sqLiteDatabase.execSQL(CREATE_TABLE_optionTest);
+
+        String CREATE_TABLE_midtermCount = "CREATE TABLE midtermCount(id varchar PRIMARY KEY ,count varchar ,reg varchar,subje varchar,title varchar,time varchar  )";
+        sqLiteDatabase.execSQL(CREATE_TABLE_midtermCount);
+
+        String postMCQ_Answer = "CREATE TABLE postMCQ_Answer(id varchar PRIMARY KEY ,userid varchar , clas varchar, title varchar, subject varchar, question varchar, answer varchar, ans_Image varchar  , marks varchar, que_Image varchar)";
+        sqLiteDatabase.execSQL(postMCQ_Answer);
+
+        String postMCQ_Result = "CREATE TABLE postMCQ_Result(id varchar PRIMARY KEY ,userid varchar , clas varchar, title varchar, id_title varchar, subject varchar)";
+        sqLiteDatabase.execSQL(postMCQ_Result);
 
     }
 
@@ -346,6 +355,109 @@ public class OfflineDatabase extends SQLiteOpenHelper {
         else {
             dh.close();
             return test;
+
+        }
+
+
+
+    }
+
+    public String insertmidCount(String count, String reg, String subje, String title, String time)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("[count]", count);
+            values.put("[reg]", reg);
+            values.put("[subje]", subje);
+            values.put("[title]", title);
+            values.put("[time]", time);
+
+
+            dh.insert("midtermCount", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String insert_postMCQ_Answer( String userid, String clas, String title, String subject, String question, String answer, String ans_Image, String marks, String que_Image)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("[userid]", userid);
+            values.put("[clas]", clas);
+            values.put("[title]", title);
+            values.put("[subject]", subject);
+            values.put("[question]", question);
+            values.put("[answer]", answer);
+            values.put("[ans_Image]", ans_Image);
+            values.put("[marks]", marks);
+            values.put("[que_Image]", que_Image);
+
+            dh.insert("postMCQ_Answer", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String insert_postMCQ_Result( String userid, String clas, String title, String subject, String id_title)
+    {
+        try {
+            dh = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("[userid]", userid);
+            values.put("[clas]", clas);
+            values.put("[title]", title);
+            values.put("[subject]", subject);
+            values.put("[id_title]", id_title);
+
+            dh.insert("postMCQ_Result", null, values);
+            dh.close();
+            return "y";
+
+        } catch (Exception e) {
+            return e.toString();
+        }
+
+
+    }
+
+    public String getExamStatus(String userid,String examid) {
+        dh = this.getReadableDatabase();
+
+        String select = "select * from midtermCount  WHERE reg ='"+userid+"'and title ='"+examid+"'";
+        Cursor cursor = dh.rawQuery(select, null);
+        String  title="";
+
+        if (cursor.moveToFirst()) {
+            int i = 0;
+
+            do {
+
+
+                title=cursor.getString(cursor.getColumnIndex("title"));
+
+
+            }
+            while (cursor.moveToNext());
+            dh.close();
+            return title;
+
+        }
+        else {
+            dh.close();
+            return title;
 
         }
 

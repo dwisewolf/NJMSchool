@@ -2,6 +2,7 @@ package com.wisewolf.njmschool.Activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.collection.ArraySet;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -18,8 +19,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.wisewolf.njmschool.R;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -32,7 +35,7 @@ public class ResultsFirebase extends AppCompatActivity {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         initProgress();
      //   FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("unitCount")
+     /*   db.collection("unitCount")
 
             .get()
             .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
@@ -72,7 +75,7 @@ public class ResultsFirebase extends AppCompatActivity {
                 public void onFailure(@NonNull Exception e) {
 String a="";
                 }
-            });
+            });*/
      //mProgressDialog.show();
 
    /*     db.collection("unitTest")
@@ -98,6 +101,30 @@ String a="";
                 mProgressDialog.cancel();
             }
         });*/
+
+
+      db.collection("midTerm").document("DEO101_XII-PhysicalEducation-MidTerm-MCQ-DEO")
+
+            .get()
+           .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+               @Override
+               public void onSuccess(DocumentSnapshot documentSnapshot) {
+                   Type types = documentSnapshot.toObject(Type.class);
+
+                   // Add all to your list
+                   ArraySet mArrayList = new ArraySet<>();
+                   mArrayList.addAll((Collection) types);
+               }
+           })
+      .addOnFailureListener(new OnFailureListener() {
+          @Override
+          public void onFailure(@NonNull Exception e) {
+              mProgressDialog.setMessage("Loading. . .");
+          }
+      });
+
+
+
     }
 
     private void initProgress() {
